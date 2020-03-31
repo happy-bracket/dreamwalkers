@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.utils.viewport.FitViewport
+import ru.substancial.dreamwalkers.controls.FlightController
 import ru.substancial.dreamwalkers.controls.GroundController
 import ru.substancial.dreamwalkers.dev.SuperFlat
 import ru.substancial.dreamwalkers.ecs.entity.CreateLuna
@@ -34,11 +35,12 @@ class GameScreen : ScreenAdapter() {
             true
     )
 
-    private val controller = GroundController()
+    private val groundController = GroundController()
+    private val flightController = FlightController()
 
     private val cameraSystem = CameraSystem(camera)
     private val renderSystem = DebugRenderSystem(world, camera, debugRenderer)
-    private val controlsSystem = ControlsSystem(controller)
+    private val controlsSystem = ControlsSystem(groundController)
 
     private val engine = Engine()
             .apply {
@@ -50,7 +52,8 @@ class GameScreen : ScreenAdapter() {
             }
 
     init {
-        Controllers.addListener(controller)
+        Controllers.addListener(groundController)
+        Controllers.addListener(flightController)
     }
 
     override fun render(delta: Float) {

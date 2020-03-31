@@ -4,15 +4,14 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
-import com.badlogic.gdx.Gdx
-import ru.substancial.dreamwalkers.controls.LeftStickController
+import ru.substancial.dreamwalkers.controls.GroundController
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.component.LunaComponent
 import ru.substancial.dreamwalkers.ecs.get
 import ru.substancial.dreamwalkers.ecs.ComponentExtractor as CE
 
 class ControlsSystem(
-        private val movementController: LeftStickController
+        private val movementController: GroundController
 ) : EntitySystem() {
 
     private var luna: Entity? = null

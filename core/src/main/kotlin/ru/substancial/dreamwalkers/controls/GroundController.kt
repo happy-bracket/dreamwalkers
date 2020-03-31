@@ -4,7 +4,7 @@ import com.badlogic.gdx.controllers.Controller
 import com.badlogic.gdx.controllers.ControllerAdapter
 import kotlin.math.round
 
-class LeftStickController : ControllerAdapter() {
+class GroundController : ControllerAdapter() {
 
     private var accumulator: Float = 0f
 

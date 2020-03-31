@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.utils.viewport.FitViewport
-import ru.substancial.dreamwalkers.controls.LeftStickController
+import ru.substancial.dreamwalkers.controls.GroundController
 import ru.substancial.dreamwalkers.dev.SuperFlat
 import ru.substancial.dreamwalkers.ecs.entity.CreateLuna
 import ru.substancial.dreamwalkers.ecs.system.CameraSystem
@@ -34,7 +34,7 @@ class GameScreen : ScreenAdapter() {
             true
     )
 
-    private val controller = LeftStickController()
+    private val controller = GroundController()
 
     private val cameraSystem = CameraSystem(camera)
     private val renderSystem = DebugRenderSystem(world, camera, debugRenderer)

@@ -6,6 +6,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
 import ru.substancial.dreamwalkers.bodies.GroundTag
+import ru.substancial.dreamwalkers.physics.BodyInfo
 
 fun World.SuperFlat(): Body {
     return body {
@@ -24,6 +25,9 @@ fun World.SuperFlat(): Body {
                 position = Vector2(5f, 0f)
         ) {
         }
-        userData = GroundTag
+        userData = BodyInfo(
+                GroundTag,
+                "ground"
+        )
     }
 }

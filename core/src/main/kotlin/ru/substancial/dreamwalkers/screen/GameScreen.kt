@@ -8,10 +8,11 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.utils.viewport.FitViewport
-import ru.substancial.dreamwalkers.controls.FlightController
+import ru.substancial.dreamwalkers.controls.AerialController
 import ru.substancial.dreamwalkers.controls.GroundController
 import ru.substancial.dreamwalkers.dev.SuperFlat
 import ru.substancial.dreamwalkers.ecs.entity.CreateLuna
+import ru.substancial.dreamwalkers.ecs.system.AerialSystem
 import ru.substancial.dreamwalkers.ecs.system.CameraSystem
 import ru.substancial.dreamwalkers.ecs.system.ControlsSystem
 import ru.substancial.dreamwalkers.ecs.system.DebugRenderSystem
@@ -36,11 +37,12 @@ class GameScreen : ScreenAdapter() {
     )
 
     private val groundController = GroundController()
-    private val flightController = FlightController()
+    private val aerialController = AerialController()
 
     private val cameraSystem = CameraSystem(camera)
     private val renderSystem = DebugRenderSystem(world, camera, debugRenderer)
-    private val controlsSystem = ControlsSystem(groundController)
+    private val controlsSystem = ControlsSystem(groundController, aerialController)
+    private val aerialSystem = AerialSystem(world)
 
     private val engine = Engine()
             .apply {
@@ -49,11 +51,12 @@ class GameScreen : ScreenAdapter() {
                 addSystem(cameraSystem)
                 addSystem(renderSystem)
                 addSystem(controlsSystem)
+                addSystem(aerialSystem)
             }
 
     init {
         Controllers.addListener(groundController)
-        Controllers.addListener(flightController)
+        Controllers.addListener(aerialController)
     }
 
     override fun render(delta: Float) {

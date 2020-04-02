@@ -4,7 +4,7 @@ import com.badlogic.gdx.controllers.Controller
 import com.badlogic.gdx.controllers.ControllerAdapter
 import com.badlogic.gdx.math.Vector2
 
-class FlightController : ControllerAdapter() {
+class AerialController : ControllerAdapter() {
 
     private var leftTiltDown: Boolean = false
     private var rightTiltDown: Boolean = false

@@ -4,6 +4,13 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
+import ru.substancial.dreamwalkers.physics.BodyInfo
+import ru.substancial.dreamwalkers.physics.info
+
+object LunaTag
+
+fun Body.isLuna() =
+        info.tag is LunaTag
 
 fun World.LunaBody(): Body =
         body {
@@ -12,4 +19,8 @@ fun World.LunaBody(): Body =
             box(2f, 1f) {
                 friction = 0.5f
             }
+            userData = BodyInfo(
+                    LunaTag,
+                    "luna"
+            )
         }

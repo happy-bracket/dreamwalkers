@@ -3,6 +3,7 @@ package ru.substancial.dreamwalkers.ecs.system
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.Contact
 import com.badlogic.gdx.physics.box2d.World
@@ -27,11 +28,13 @@ class AerialSystem(
                 object : ContactAdapter() {
 
                     override fun beginContact(contact: Contact) {
+                        Gdx.app.log("beginContact", "")
                         val body = extractBodyIfGroundContact(contact) ?: return
                         groundedBodies.add(body.info.id)
                     }
 
                     override fun endContact(contact: Contact) {
+                        Gdx.app.log("endContact", "")
                         val body = extractBodyIfGroundContact(contact) ?: return
                         groundedBodies.remove(body.info.id)
                     }
@@ -53,6 +56,7 @@ class AerialSystem(
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val (body) = entity[CE.Body]
         val aerial = entity[CE.Aerial]
+//        Gdx.app.log("groundedBodies", groundedBodies.toString())
         aerial.isAirborne = body.info.id !in groundedBodies
     }
 

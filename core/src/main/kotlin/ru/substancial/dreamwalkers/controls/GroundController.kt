@@ -1,6 +1,5 @@
 package ru.substancial.dreamwalkers.controls
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.controllers.Controller
 import com.badlogic.gdx.controllers.ControllerAdapter
 import kotlin.math.round

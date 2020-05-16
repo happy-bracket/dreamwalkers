@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.physics.box2d.Body
 import ru.substancial.dreamwalkers.controls.AerialController
 import ru.substancial.dreamwalkers.controls.GroundController

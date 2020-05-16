@@ -11,10 +11,9 @@ import ru.substancial.dreamwalkers.bodies.isGround
 import ru.substancial.dreamwalkers.ecs.component.AerialComponent
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.get
+import ru.substancial.dreamwalkers.physics.GroundSensor
 import ru.substancial.dreamwalkers.physics.info
 import ru.substancial.dreamwalkers.utilities.ContactAdapter
-import ru.substancial.dreamwalkers.utilities.component1
-import ru.substancial.dreamwalkers.utilities.component2
 import ru.substancial.dreamwalkers.ecs.ComponentExtractor as CE
 
 class AerialSystem(
@@ -28,25 +27,32 @@ class AerialSystem(
                 object : ContactAdapter() {
 
                     override fun beginContact(contact: Contact) {
-                        Gdx.app.log("beginContact", "")
-                        val body = extractBodyIfGroundContact(contact) ?: return
-                        groundedBodies.add(body.info.id)
+                        extractBodyIfGroundContact(contact) {
+                            groundedBodies.add(it.info.id)
+                        }
                     }
 
                     override fun endContact(contact: Contact) {
-                        Gdx.app.log("endContact", "")
-                        val body = extractBodyIfGroundContact(contact) ?: return
-                        groundedBodies.remove(body.info.id)
+                        extractBodyIfGroundContact(contact) {
+                            groundedBodies.remove(it.info.id)
+                        }
                     }
 
-                    private fun extractBodyIfGroundContact(contact: Contact): Body? {
-                        val (a, b) = contact
-                        return when {
-                            a.isGround() && b.isGround() -> null
-                            a.isGround() -> b
-                            b.isGround() -> a
-                            else -> null
-                        }
+                    private fun extractBodyIfGroundContact(contact: Contact, ifExtracted: (Body) -> Unit) {
+                        val fa = contact.fixtureA
+                        val fb = contact.fixtureB
+                        val ba = fa.body
+                        val bb = fb.body
+
+                        val ga = ba.isGround()
+                        val gb = bb.isGround()
+
+                        if (!(ga && gb).xor(ga || gb)) return
+
+                        val touch = if (ga) fb else fa
+
+                        if (touch.info?.tag is GroundSensor)
+                            ifExtracted(touch.body)
                     }
 
                 }
@@ -56,7 +62,6 @@ class AerialSystem(
     override fun processEntity(entity: Entity, deltaTime: Float) {
         val (body) = entity[CE.Body]
         val aerial = entity[CE.Aerial]
-//        Gdx.app.log("groundedBodies", groundedBodies.toString())
         aerial.isAirborne = body.info.id !in groundedBodies
     }
 

@@ -17,6 +17,7 @@ class AerialController : ControllerAdapter() {
     }
 
     override fun buttonDown(controller: Controller?, buttonIndex: Int): Boolean {
+        Gdx.app.log("jeppa", buttonIndex.toString())
         when (buttonIndex) {
 
         }
@@ -34,8 +35,9 @@ class AerialController : ControllerAdapter() {
     }
 
     override fun axisMoved(controller: Controller?, axisIndex: Int, value: Float): Boolean {
-        // 3 for left-x
-        // 2 for left-y
+        Gdx.app.log("jeppa", axisIndex.toString())
+        // 1 for left-x
+        // 0 for left-y
         when (axisIndex) {
             3 -> flightDirection.x = value
             2 -> flightDirection.y = value

@@ -34,4 +34,8 @@ object ButtonLayout {
             BRect to 0
     )
 
+    operator fun get(index: String): Int {
+        return buttonToIndex[index]!!
+    }
+
 }

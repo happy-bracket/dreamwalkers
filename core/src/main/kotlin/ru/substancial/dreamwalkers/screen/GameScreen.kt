@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import ru.substancial.dreamwalkers.controls.AerialController
 import ru.substancial.dreamwalkers.controls.GroundController
 import ru.substancial.dreamwalkers.dev.SuperFlat
+import ru.substancial.dreamwalkers.ecs.component.ButtonLayout
 import ru.substancial.dreamwalkers.ecs.entity.CreateLuna
 import ru.substancial.dreamwalkers.ecs.system.AerialSystem
 import ru.substancial.dreamwalkers.ecs.system.CameraSystem
@@ -19,6 +20,8 @@ import ru.substancial.dreamwalkers.ecs.system.DebugRenderSystem
 import ru.substancial.dreamwalkers.utilities.ClearScreen
 
 class GameScreen : ScreenAdapter() {
+
+    private val deadzone: Float = 0.3f
 
     private val camera = OrthographicCamera()
     private val viewport = FitViewport(16f, 9f, camera)
@@ -36,8 +39,8 @@ class GameScreen : ScreenAdapter() {
             true
     )
 
-    private val groundController = GroundController()
-    private val aerialController = AerialController()
+    private val groundController = GroundController(deadzone, ButtonLayout)
+    private val aerialController = AerialController(deadzone, ButtonLayout)
 
     private val cameraSystem = CameraSystem(camera)
     private val renderSystem = DebugRenderSystem(world, camera, debugRenderer)

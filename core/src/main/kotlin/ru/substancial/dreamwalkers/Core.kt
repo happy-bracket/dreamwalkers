@@ -7,7 +7,9 @@ import ru.substancial.dreamwalkers.screen.GameScreen
 class Core : Game() {
 
     override fun create() {
-        setScreen(ControllerSetupScreen())
+        setScreen(ControllerSetupScreen {
+            setScreen(GameScreen())
+        })
     }
 
 }

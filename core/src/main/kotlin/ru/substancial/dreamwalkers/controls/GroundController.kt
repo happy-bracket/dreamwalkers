@@ -1,10 +1,12 @@
 package ru.substancial.dreamwalkers.controls
 
 import com.badlogic.gdx.controllers.Controller
-import com.badlogic.gdx.controllers.ControllerAdapter
+import ru.substancial.dreamwalkers.ecs.component.ButtonLayout
+import ru.substancial.dreamwalkers.ecs.component.ButtonLayout.L2
+import ru.substancial.dreamwalkers.ecs.component.ButtonLayout.LX
 import kotlin.math.round
 
-class GroundController : ControllerAdapter() {
+class GroundController(deadzone: Float, private val buttonLayout: ButtonLayout) : DeadzoneControllerAdapter(deadzone) {
 
     private var accumulator: Float = 0f
     var jumpClicked: () -> Unit = {}
@@ -15,17 +17,16 @@ class GroundController : ControllerAdapter() {
 
     override fun buttonUp(controller: Controller?, buttonIndex: Int): Boolean {
         when (buttonIndex) {
-            0 -> jumpClicked()
+            buttonLayout[L2] -> jumpClicked()
         }
         return true
     }
 
-    override fun axisMoved(controller: Controller?, axisIndex: Int, value: Float): Boolean {
-        // 3 coz left stick x-axis
-        when(axisIndex) {
-            3 -> accumulator = round(value)
+    override fun reactToAxis(controller: Controller?, axisIndex: Int, value: Float) {
+        when (axisIndex) {
+            buttonLayout[LX] -> accumulator = round(value)
+            buttonLayout[L2] -> jumpClicked()
         }
-        return true
     }
 
 }

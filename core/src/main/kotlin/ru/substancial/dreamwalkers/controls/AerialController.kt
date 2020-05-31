@@ -1,11 +1,17 @@
 package ru.substancial.dreamwalkers.controls
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.controllers.Controller
 import com.badlogic.gdx.controllers.ControllerAdapter
 import com.badlogic.gdx.math.Vector2
+import ru.substancial.dreamwalkers.ecs.component.ButtonLayout
+import ru.substancial.dreamwalkers.ecs.component.ButtonLayout.L2
+import ru.substancial.dreamwalkers.ecs.component.ButtonLayout.LX
+import ru.substancial.dreamwalkers.ecs.component.ButtonLayout.LY
 
-class AerialController : ControllerAdapter() {
+class AerialController(
+        deadzone: Float,
+        private val buttonLayout: ButtonLayout
+) : DeadzoneControllerAdapter(deadzone) {
 
     private val flightDirection: Vector2 = Vector2()
     var wingsSpread: Boolean = false
@@ -17,7 +23,6 @@ class AerialController : ControllerAdapter() {
     }
 
     override fun buttonDown(controller: Controller?, buttonIndex: Int): Boolean {
-        Gdx.app.log("jeppa", buttonIndex.toString())
         when (buttonIndex) {
 
         }
@@ -25,24 +30,18 @@ class AerialController : ControllerAdapter() {
     }
 
     override fun buttonUp(controller: Controller?, buttonIndex: Int): Boolean {
-        // 4 for L1
-        // 6 for L2
-        // 5 for R1
         when (buttonIndex) {
-            6 -> strokeListener()
+            buttonLayout[L2] -> strokeListener()
         }
         return true
     }
 
-    override fun axisMoved(controller: Controller?, axisIndex: Int, value: Float): Boolean {
-        Gdx.app.log("jeppa", axisIndex.toString())
-        // 1 for left-x
-        // 0 for left-y
+    override fun reactToAxis(controller: Controller?, axisIndex: Int, value: Float) {
         when (axisIndex) {
-            3 -> flightDirection.x = value
-            2 -> flightDirection.y = value
+            buttonLayout[LX] -> flightDirection.x = value
+            buttonLayout[LY] -> flightDirection.y = value
+            buttonLayout[L2] -> strokeListener()
         }
-        return true
     }
 
 }

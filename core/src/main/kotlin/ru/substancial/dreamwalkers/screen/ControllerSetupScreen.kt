@@ -26,23 +26,16 @@ class ControllerSetupScreen(
 
     init {
         Controllers.addListener(object : ControllerAdapter() {
-            private var button: Int? = null
-            private var axis: Int? = null
-            private var pov: Int? = null
 
             override fun buttonUp(controller: Controller?, buttonIndex: Int): Boolean {
                 Gdx.app.log("button", buttonIndex.toString())
-                if (buttonIndex != button) {
-                    button = buttonIndex
-                    assign(buttonIndex)
-                }
+                assign(buttonIndex)
                 return true
             }
 
             override fun axisMoved(controller: Controller?, axisIndex: Int, value: Float): Boolean {
                 Gdx.app.log("axis", "$axisIndex: $value")
                 if (abs(value) >= 0.3f) {
-                    axis = axisIndex
                     assign(axisIndex)
                 }
                 return true
@@ -50,10 +43,7 @@ class ControllerSetupScreen(
 
             override fun povMoved(controller: Controller?, povIndex: Int, value: PovDirection?): Boolean {
                 Gdx.app.log("pov", povIndex.toString())
-                if (pov != povIndex) {
-                    pov = povIndex
-                    assign(povIndex)
-                }
+                assign(povIndex)
                 return true
             }
 

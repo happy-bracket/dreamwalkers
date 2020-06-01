@@ -11,6 +11,8 @@ class GroundController(deadzone: Float, private val buttonLayout: ButtonLayout) 
     private var accumulator: Float = 0f
     var jumpClicked: () -> Unit = {}
 
+    private val leftTrigger = TriggerAsButton(0.4f)
+
     fun pollDirection(): Float {
         return accumulator
     }
@@ -25,7 +27,7 @@ class GroundController(deadzone: Float, private val buttonLayout: ButtonLayout) 
     override fun reactToAxis(controller: Controller?, axisIndex: Int, value: Float) {
         when (axisIndex) {
             buttonLayout[LX] -> accumulator = round(value)
-            buttonLayout[L2] -> jumpClicked()
+            buttonLayout[L2] -> leftTrigger.process(value, jumpClicked)
         }
     }
 

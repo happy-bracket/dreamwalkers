@@ -9,97 +9,69 @@ import com.badlogic.gdx.math.Vector2
 interface ControllerReporter {
 
     /**
-     * Position of the left analog stick, usually within {-1.0..1.0, -1.0..1.0}
+     * Position of specified analog stick, usually within {-1.0..1.0, -1.0..1.0}
      */
-    fun leftStick(): Vector2
-
-    /**
-     * @see leftStick
-     */
-    fun rightStick(): Vector2
+    fun stick(side: Side): Vector2
 
     /**
      * Reports if a stick is pressed down like a button.
      */
-    fun leftStickPressed(): Boolean
+    fun stickPressed(side: Side): Boolean
 
     /**
-     * @see leftStickPressed
-     */
-    fun rightStickPressed(): Boolean
-
-    /**
-     * Extent at which left trigger is pressed down.
+     * Extent at which specified trigger is pressed down.
      * Some controllers report this as an analog input, providing value within {0.0..1.0}, for example Xbox Controller.
      * Controllers that do not have this feature (e.g. some report it as a button) should report either 0.0 or 1.0.
      */
-    fun leftTrigger(): Float
+    fun trigger(side: Side): Float
 
     /**
-     * @see leftTrigger
+     * Whether specified bumper is pressed down or not.
      */
-    fun rightTrigger(): Float
+    fun bumper(side: Side): Boolean
 
     /**
-     * Whether bottom dpad arrow is pressed down.
+     * Whether specified dpad arrow is pressed down.
      */
-    fun dpadDown(): Boolean
+    fun dpad(direction: Direction): Boolean
 
     /**
-     * @see dpadDown
-     */
-    fun dpadUp(): Boolean
-
-    /**
-     * @see dpadDown
-     */
-    fun dpadLeft(): Boolean
-
-    /**
-     * @see dpadDown
-     */
-    fun dpadRight(): Boolean
-
-    /**
-     * These are the substantial difference between different controllers.
-     * Generally, following methods with `action*` naming pattern represent 4 buttons on the right side of a controller.
+     * This is substantial difference between different controllers.
+     * Generally, this method represents 4 buttons on the right side of a controller.
      *
-     * "A" on Xbox, Cross on DualShock
-     */
-    fun actionDown(): Boolean
-
-    /**
-     * "X" on Xbox, Rectangle on DualShock
-     */
-    fun actionLeft(): Boolean
-
-    /**
-     * "Y" on Xbox, Triangle on DualShock
-     */
-    fun actionUp(): Boolean
-
-    /**
-     * "B" on Xbox, Circle on DualShock
+     * [Direction.Down] - "A" on Xbox, Cross on DualShock
+     *
+     * [Direction.Left] - "X" on Xbox, Rectangle on DualShock
+     *
+     * [Direction.Up] - "Y" on Xbox, Triangle on DualShock
+     *
+     * [Direction.Right] "B" on Xbox, Circle on DualShock
      *
      * You get the idea.
      */
-    fun actionRight(): Boolean
+    fun action(direction: Direction): Boolean
+
+    sealed class Side {
+        object Left : Side()
+        object Right : Side()
+    }
+
+    sealed class Direction {
+        object Up : Direction()
+        object Left : Direction()
+        object Right : Direction()
+        object Down : Direction()
+    }
 
 }
 
-private fun triggerDown(extent: Float, deadzone: Deadzone): Boolean =
-        deadzone.tryReport(extent) { true } ?: false
-
-fun ControllerReporter.leftTriggerDown(deadzone: Deadzone): Boolean =
-        triggerDown(leftTrigger(), deadzone)
-
-fun ControllerReporter.rightTriggerDown(deadzone: Deadzone): Boolean =
-        triggerDown(rightTrigger(), deadzone)
+private fun  ControllerReporter.triggerDown(side: ControllerReporter.Side, deadzone: Deadzone): Boolean =
+        deadzone.tryReport(trigger(side)) { true } ?: false
 
 /**
  * Returns `x` on trigger axis, since some controllers report them as one axis.
  * Probably won't work if a controller does not.
  */
 fun ControllerReporter.triggerAxis(): Float {
-    return leftTrigger() - rightTrigger()
+    return trigger(ControllerReporter.Side.Left) - trigger(ControllerReporter.Side.Right)
 }

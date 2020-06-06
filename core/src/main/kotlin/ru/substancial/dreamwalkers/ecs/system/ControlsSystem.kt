@@ -4,36 +4,37 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import ru.substancial.dreamwalkers.controls.AerialController
 import ru.substancial.dreamwalkers.controls.GroundController
+import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.component.AerialComponent
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.component.LunaComponent
 import ru.substancial.dreamwalkers.ecs.get
+import ru.substancial.dreamwalkers.utilities.applyImpulseToCenter
+import ru.substancial.dreamwalkers.utilities.checkDeadzone
 import ru.substancial.dreamwalkers.ecs.ComponentExtractor as CE
 
 class ControlsSystem(
-        private val movementController: GroundController,
-        private val aerialController: AerialController
+        private val controller: TheController
 ) : EntitySystem() {
 
     init {
-        movementController.jumpClicked = {
-            if (!isAirborne()) {
-                val body = extractBody()
-                body.applyLinearImpulse(0f, 10f, body.worldCenter.x, body.worldCenter.y, true)
+        controller.airTriggerDownListener = {
+            if (isAirborne()) {
+                val rawDir = controller.pollLeftStick()
+                if (rawDir.checkDeadzone(0.3f)) {
+                    val direction = rawDir.nor().scl(8f, 8f)
+                    luna[CE.Body].body.applyImpulseToCenter(direction, true)
+                }
             }
         }
 
-        aerialController.strokeListener = {
-            if (isAirborne()) {
-                val body = extractBody()
-                val strDir = aerialController.getStrokeDirection()
-                val stroke = strDir
-                        .nor()
-                        .scl(10f, -10f)
-                body.applyLinearImpulse(stroke, body.worldCenter, true)
+        controller.airTriggerUpListener = {
+            if (!isAirborne()) {
+                luna[CE.Body].body.applyImpulseToCenter(Vector2(0f, 10f), true)
             }
         }
     }
@@ -48,8 +49,8 @@ class ControlsSystem(
 
     override fun removedFromEngine(engine: Engine?) {
         _luna = null
-        movementController.jumpClicked = {}
-        aerialController.strokeListener = {}
+        controller.airTriggerDownListener = {}
+        controller.airTriggerUpListener = {}
     }
 
     override fun update(deltaTime: Float) {
@@ -57,8 +58,12 @@ class ControlsSystem(
         val (airborne) = luna[CE.Aerial]
 
         if (!airborne) {
-            val direction = movementController.pollDirection()
-            body.applyForceToCenter(direction * 5f, 0f, true)
+            val direction = controller.pollLeftStick()
+                    .nor()
+                    .scl(5f, 0f)
+            body.applyForceToCenter(direction, true)
+        } else {
+            body.applyForceToCenter(Vector2(0f, 8f), true)
         }
     }
 

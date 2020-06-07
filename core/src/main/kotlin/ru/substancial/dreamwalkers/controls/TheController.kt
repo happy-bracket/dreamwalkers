@@ -7,20 +7,23 @@ import ru.substancial.dreamwalkers.ecs.component.ButtonLayout
 import ru.substancial.dreamwalkers.ecs.component.ButtonLayout.L2
 import ru.substancial.dreamwalkers.ecs.component.ButtonLayout.LX
 import ru.substancial.dreamwalkers.ecs.component.ButtonLayout.LY
+import ru.substancial.dreamwalkers.utilities.checkDeadzone
 
 class TheController : ControllerAdapter() {
 
     private val leftStick = Vector2()
     private var _airTriggerDown = false
 
-    private val airTriggerDown: Boolean
+    val airTriggerDown: Boolean
         get() = _airTriggerDown
 
     var airTriggerDownListener = {}
     var airTriggerUpListener = {}
 
     fun pollLeftStick(): Vector2 {
-        return leftStick.cpy()
+        return if (leftStick.checkDeadzone(0.3f)) {
+            leftStick.cpy()
+        } else Vector2()
     }
 
     override fun axisMoved(controller: Controller?, axisIndex: Int, value: Float): Boolean {

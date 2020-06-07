@@ -8,11 +8,8 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.utils.viewport.FitViewport
-import ru.substancial.dreamwalkers.controls.AerialController
-import ru.substancial.dreamwalkers.controls.GroundController
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.dev.SuperFlat
-import ru.substancial.dreamwalkers.ecs.component.ButtonLayout
 import ru.substancial.dreamwalkers.ecs.entity.CreateLuna
 import ru.substancial.dreamwalkers.ecs.system.AerialSystem
 import ru.substancial.dreamwalkers.ecs.system.CameraSystem

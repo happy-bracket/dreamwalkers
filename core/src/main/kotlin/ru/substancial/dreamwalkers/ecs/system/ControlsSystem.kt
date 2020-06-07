@@ -6,8 +6,6 @@ import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
-import ru.substancial.dreamwalkers.controls.AerialController
-import ru.substancial.dreamwalkers.controls.GroundController
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.component.AerialComponent
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
@@ -63,7 +61,8 @@ class ControlsSystem(
                     .scl(5f, 0f)
             body.applyForceToCenter(direction, true)
         } else {
-            body.applyForceToCenter(Vector2(0f, 8f), true)
+            if (controller.airTriggerDown)
+                body.applyForceToCenter(Vector2(0f, 8f), true)
         }
     }
 

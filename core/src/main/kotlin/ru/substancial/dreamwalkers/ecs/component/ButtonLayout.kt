@@ -12,10 +12,10 @@ object ButtonLayout {
     const val LY = "LY"
     const val RX = "RX"
     const val RY = "RY"
-    const val BCross = "BX"
-    const val BTriangle = "BT"
-    const val BCircle = "BC"
-    const val BRect = "BR"
+    const val ActionDown = "ActionDown"
+    const val ActionUp = "ActionUp"
+    const val ActionRight = "ActionRight"
+    const val ActionLeft = "ActionLeft"
 
     val buttonToIndex = mutableMapOf(
             L to 0,
@@ -28,10 +28,10 @@ object ButtonLayout {
             LY to 0,
             RX to 0,
             RY to 0,
-            BCross to 0,
-            BTriangle to 0,
-            BCircle to 0,
-            BRect to 0
+            ActionDown to 0,
+            ActionUp to 0,
+            ActionRight to 0,
+            ActionLeft to 0
     )
 
     operator fun get(index: String): Int {

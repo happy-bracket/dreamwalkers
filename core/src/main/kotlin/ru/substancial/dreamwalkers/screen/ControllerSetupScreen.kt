@@ -53,6 +53,7 @@ class ControllerSetupScreen(
                 val current = assignQueue.pop()
                 ButtonLayout.buttonToIndex[current] = index
                 if (assignQueue.isEmpty()) {
+                    dispose()
                     finishCallback()
                 }
             }
@@ -70,6 +71,10 @@ class ControllerSetupScreen(
 
     override fun resize(width: Int, height: Int) {
         viewport.update(width, height)
+    }
+
+    override fun dispose() {
+        Controllers.clearListeners()
     }
 
 }

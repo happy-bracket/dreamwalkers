@@ -41,7 +41,7 @@ class GameScreen : ScreenAdapter() {
 
     private val cameraSystem = CameraSystem(camera)
     private val renderSystem = DebugRenderSystem(world, camera, debugRenderer)
-    private val controlsSystem = ControlsSystem(controller)
+    private val controlsSystem = ControlsSystem(camera, controller)
     private val aerialSystem = AerialSystem(world)
 
     private val engine = Engine()

@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.dev.SuperFlat
 import ru.substancial.dreamwalkers.ecs.entity.CreateLuna
+import ru.substancial.dreamwalkers.ecs.entity.createWeapon
 import ru.substancial.dreamwalkers.ecs.system.AerialSystem
 import ru.substancial.dreamwalkers.ecs.system.CameraSystem
 import ru.substancial.dreamwalkers.ecs.system.ControlsSystem
@@ -47,6 +48,7 @@ class GameScreen : ScreenAdapter() {
     private val engine = Engine()
             .apply {
                 addEntity(world.CreateLuna())
+                addEntity(createWeapon(world))
 
                 addSystem(cameraSystem)
                 addSystem(renderSystem)

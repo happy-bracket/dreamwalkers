@@ -17,36 +17,14 @@ import ru.substancial.dreamwalkers.ecs.component.LunaComponent
 import ru.substancial.dreamwalkers.physics.BodyInfo
 import ru.substancial.dreamwalkers.physics.FixtureInfo
 
-private val WeaponDistance = 5f
-
 fun World.CreateLuna(): Entity {
     val entity = Entity()
 
     val body = LunaBody()
-    val weapon = Weapon()
 
     entity.add(BodyComponent(body))
-    entity.add(LunaComponent(weapon, WeaponDistance))
+    entity.add(LunaComponent)
     entity.add(AerialComponent(false))
 
     return entity
-}
-
-private fun World.Weapon(): Body {
-    val weapon = body {
-        type = BodyDef.BodyType.DynamicBody
-        this.gravityScale = 0f
-        linearDamping = 0.8f
-        this.fixedRotation = true
-
-        box(width = 0.1f, height = 1.5f) {
-            isSensor = true
-            density = 1f
-            userData = FixtureInfo(Unit, "luna_weapon")
-        }
-        userData = BodyInfo(Unit, "luna_weapon")
-
-    }
-
-    return weapon
 }

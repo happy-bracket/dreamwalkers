@@ -4,21 +4,23 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.Body
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.component.AerialComponent
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.component.LunaComponent
 import ru.substancial.dreamwalkers.ecs.component.WeaponComponent
+import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.get
 import ru.substancial.dreamwalkers.utilities.applyImpulseToCenter
 import ru.substancial.dreamwalkers.utilities.checkDeadzone
+import ru.substancial.dreamwalkers.utilities.setVelocityViaImpulse
 import kotlin.math.abs
-import kotlin.math.acos
 import ru.substancial.dreamwalkers.ecs.ComponentExtractor as CE
 
 class ControlsSystem(
@@ -31,15 +33,15 @@ class ControlsSystem(
             if (isAirborne()) {
                 val rawDir = controller.pollLeftStick()
                 if (rawDir.checkDeadzone(0.3f)) {
-                    val direction = rawDir.nor().scl(8f, 8f)
-                    luna[CE.Body].body.applyImpulseToCenter(direction, true)
+                    val direction = rawDir.nor().scl(8f)
+                    luna.extract<BodyComponent>().body.setVelocityViaImpulse(direction)
                 }
             }
         }
 
         controller.airTriggerUpListener = {
             if (!isAirborne()) {
-                luna[CE.Body].body.applyImpulseToCenter(Vector2(0f, 10f), true)
+                luna.extract<BodyComponent>().body.setVelocityViaImpulse(Vector2(0f, 10f))
             }
         }
     }
@@ -68,77 +70,94 @@ class ControlsSystem(
     }
 
     override fun update(deltaTime: Float) {
-        val lunaBody = luna[CE.Body].body
-        val (airborne) = luna[CE.Aerial]
-        val luna = luna[CE.Luna]
-        val weaponProps = weapon[CE.Weapon]
-        val weaponBody = weapon[CE.Body].body
-
-        if (!airborne) {
-            val direction = controller.pollLeftStick()
-                    .nor()
-                    .scl(5f, 0f)
-            lunaBody.applyForceToCenter(direction, true)
-        } else {
-            if (controller.airTriggerDown)
-                lunaBody.applyForceToCenter(Vector2(0f, 8f), true)
-        }
+        val weaponProps = weapon.extract<WeaponComponent>()
+        val lunaBody = luna.extract<BodyComponent>().body
+        val weaponBody = weapon.extract<BodyComponent>().body
 
         val rs = controller.pollRightStick()
         val destinationRelativeToLuna = when {
             rs.isZero -> Vector2(weaponProps.weaponDistance, 0f).rotate(225f)
             else -> rs.nor().setLength(weaponProps.weaponDistance)
         }
-
-        val equilibrium = weaponProps.weaponDistance - 1.5f
+        val destination = lunaBody.getWorldPoint(destinationRelativeToLuna)
+        val force = destination.sub(weaponBody.worldCenter).nor().setLength(7f)
+        weaponBody.applyForceToCenter(force, true)
 
         val weaponToLuna = lunaBody.worldCenter.cpy().sub(weaponBody.worldCenter)
-        val distance = weaponToLuna.len()
-        val counterForce = if (distance >= equilibrium) {
-            weaponToLuna.nor().setLength(7f)
-        } else {
-            Vector2.Zero
-        }
-
         weaponBody.setTransform(weaponBody.worldCenter, weaponToLuna.cpy().rotate90(1).angleRad())
+    }
 
-        val destination = lunaBody.getWorldPoint(destinationRelativeToLuna).cpy()
-
-        val applicationPoint = weaponBody.getWorldPoint(Vector2(0f, 0.75f)).cpy()
-        val counterForceApplicationPoint = weaponBody.getWorldPoint(Vector2(0f, -0.75f)).cpy()
-
-        outside = if (weaponBody.worldCenter.dst(lunaBody.worldCenter) >= weaponProps.weaponDistance) {
-            if (!outside) {
-                val velocityDirection = weaponBody.linearVelocity
-                val radiusVector = weaponToLuna.cpy().rotate90(1)
-                val dot = velocityDirection.dot(radiusVector)
-                val mag = velocityDirection.len() * radiusVector.len()
-                val angle = MathUtils.radiansToDegrees * acos(abs(dot / mag))
-
-                if (angle >= 60f) {
-                    val counterImpulse = weaponBody.linearVelocity.cpy().rotate(180f).scl(weaponBody.mass)
-                    weaponBody.applyLinearImpulse(counterImpulse, weaponBody.worldCenter, true)
-                }
-            }
-            true
-        } else {
-            false
-        }
-
-        val force = destination.sub(weaponBody.worldCenter).nor().setLength(7f)
-
-        drawer.projectionMatrix = camera.combined
-        drawer.begin(ShapeRenderer.ShapeType.Filled)
-        drawer.color = Color.BLUE
-        drawer.line(applicationPoint, applicationPoint.cpy().add(force))
-        drawer.circle(applicationPoint.x, applicationPoint.y, 0.15f)
-        drawer.color = Color.GREEN
-        drawer.line(counterForceApplicationPoint, counterForceApplicationPoint.cpy().add(counterForce))
-        drawer.circle(counterForceApplicationPoint.x, counterForceApplicationPoint.y, 0.15f)
-        drawer.end()
-
-        weaponBody.applyForce(force, applicationPoint, true)
-        weaponBody.applyForce(counterForce, counterForceApplicationPoint, true)
+    // if I ever need it again
+    private fun psychokineticSwordControl() {
+        //        val lunaBody = luna.extract<BodyComponent>().body
+//        val (airborne) = luna.extract<AerialComponent>()
+//        val luna = luna.extract<LunaComponent>()
+//        val weaponProps = weapon.extract<WeaponComponent>()
+//        val weaponBody = weapon.extract<BodyComponent>().body
+//
+//        if (!airborne) {
+//            val direction = controller.pollLeftStick()
+//                    .nor()
+//                    .scl(5f, 0f)
+//            lunaBody.applyForceToCenter(direction, true)
+//        } else {
+//            if (controller.airTriggerDown)
+//                lunaBody.applyForceToCenter(Vector2(0f, 8f), true)
+//        }
+//
+//        val rs = controller.pollRightStick()
+//        val destinationRelativeToLuna = when {
+//            rs.isZero -> Vector2(weaponProps.weaponDistance, 0f).rotate(225f)
+//            else -> rs.nor().setLength(weaponProps.weaponDistance)
+//        }
+//
+//        val equilibrium = weaponProps.weaponDistance - 1.5f
+//
+//        val weaponToLuna = lunaBody.worldCenter.cpy().sub(weaponBody.worldCenter)
+//        val distance = weaponToLuna.len()
+//        val counterForce = if (distance >= equilibrium) {
+//            weaponToLuna.nor().setLength(7f)
+//        } else {
+//            Vector2.Zero
+//        }
+//
+//        weaponBody.setTransform(weaponBody.worldCenter, weaponToLuna.cpy().rotate90(1).angleRad())
+//
+//        val destination = lunaBody.getWorldPoint(destinationRelativeToLuna).cpy()
+//
+//        val applicationPoint = weaponBody.getWorldPoint(Vector2(0f, 0.75f)).cpy()
+//        val counterForceApplicationPoint = weaponBody.getWorldPoint(Vector2(0f, -0.75f)).cpy()
+//
+//        val destinationAngle = weaponToLuna.cpy().scl(-1f).angle(destinationRelativeToLuna).let(::abs)
+//
+//        outside = weaponBody.worldCenter.dst(lunaBody.worldCenter) >= weaponProps.weaponDistance
+//        Gdx.app.log("egor2", "dest: $destinationAngle")
+//        if (destination.dst(weaponBody.position) <= 0.3f) {
+//            val velocityDirection = weaponBody.linearVelocity
+//            val tangent = weaponToLuna.cpy().rotate90(-velocityDirection.angle(weaponToLuna).toInt())
+//            val stabilityImpulse = tangent.cpy().sub(velocityDirection).scl(weaponBody.mass)
+//            weaponBody.applyImpulseToCenter(stabilityImpulse, true)
+//        }
+//
+//        if (outside && destinationAngle <= 10f) {
+//            val killVelocity = weaponBody.linearVelocity.cpy().scl(-weaponBody.mass)
+//            weaponBody.applyImpulseToCenter(killVelocity, true)
+//        }
+//
+//        val force = destination.sub(weaponBody.worldCenter).nor().setLength(7f)
+//
+//        /*drawer.projectionMatrix = camera.combined
+//        drawer.begin(ShapeRenderer.ShapeType.Filled)
+//        drawer.color = Color.BLUE
+//        drawer.line(applicationPoint, applicationPoint.cpy().add(force))
+//        drawer.circle(applicationPoint.x, applicationPoint.y, 0.15f)
+//        drawer.color = Color.GREEN
+//        drawer.line(counterForceApplicationPoint, counterForceApplicationPoint.cpy().add(counterForce))
+//        drawer.circle(counterForceApplicationPoint.x, counterForceApplicationPoint.y, 0.15f)
+//        drawer.end()*/
+//
+//        weaponBody.applyForce(force, applicationPoint, true)
+//        weaponBody.applyForce(counterForce, counterForceApplicationPoint, true)
     }
 
     private fun isAirborne(): Boolean = luna[CE.Aerial].isAirborne

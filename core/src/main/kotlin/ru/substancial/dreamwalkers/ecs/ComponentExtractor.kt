@@ -7,6 +7,7 @@ import ru.substancial.dreamwalkers.ecs.component.AerialComponent
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.component.LunaComponent
 import ru.substancial.dreamwalkers.ecs.component.WeaponComponent
+import kotlin.reflect.KClass
 
 object ComponentExtractor {
 
@@ -19,3 +20,10 @@ object ComponentExtractor {
 
 operator fun <T : Component> Entity.get(mapper: ComponentMapper<T>): T =
         mapper.get(this)
+
+val mappersCache = HashMap<Class<*>, ComponentMapper<*>>()
+inline fun <reified T : Component> Entity.extract(): T {
+    val type = T::class.java
+    val mapper = mappersCache.getOrPut(type) { ComponentMapper.getFor(type) }
+    return mapper[this] as T
+}

@@ -18,13 +18,17 @@ fun Body.isLuna() =
         info.tag is LunaRootTag
 
 fun World.LunaBody(): Body {
-    val bodyWidth = 2f
-    val bodyHeight = 1f
+    val bodyWidth = 1.8f
+    val bodyHeight = 1.7f
+
+    val area = bodyWidth * bodyHeight
+
     return body {
         type = BodyDef.BodyType.DynamicBody
         linearDamping = 0.8f
         box(bodyWidth, bodyHeight) {
             friction = 0.5f
+            density = 500f / area
             injectInfo(LunaBodyTag, "luna_body")
         }
         box(
@@ -33,6 +37,7 @@ fun World.LunaBody(): Body {
                 position = Vector2(0f, -bodyHeight / 2)
         ) {
             isSensor = true
+            density = 0f
             injectInfo(LunaHoovesTag, "luna_hooves")
         }
         userData = BodyInfo(

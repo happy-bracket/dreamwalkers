@@ -10,8 +10,10 @@ import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.dev.SuperFlat
+import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.entity.CreateLuna
 import ru.substancial.dreamwalkers.ecs.entity.createWeapon
+import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.system.AerialSystem
 import ru.substancial.dreamwalkers.ecs.system.CameraSystem
 import ru.substancial.dreamwalkers.ecs.system.ControlsSystem
@@ -47,8 +49,9 @@ class GameScreen : ScreenAdapter() {
 
     private val engine = Engine()
             .apply {
-                addEntity(world.CreateLuna())
-                addEntity(createWeapon(world))
+                val luna = world.CreateLuna()
+                addEntity(luna)
+                addEntity(createWeapon(world, luna.extract<BodyComponent>().body))
 
                 addSystem(cameraSystem)
                 addSystem(renderSystem)

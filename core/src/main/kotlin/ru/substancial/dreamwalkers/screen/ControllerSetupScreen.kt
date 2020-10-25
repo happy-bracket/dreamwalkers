@@ -8,14 +8,13 @@ import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.controllers.PovDirection
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.ecs.component.ButtonLayout
 import ru.substancial.dreamwalkers.utilities.ClearScreen
 import java.util.*
 import kotlin.math.abs
 
-class ControllerSetupScreen(
-        private val finishCallback: () -> Unit
-) : ScreenAdapter(), HasDisplay by HasDisplayMixin() {
+class ControllerSetupScreen(val core: Core) : ScreenAdapter(), HasDisplay by HasDisplayMixin() {
 
     private val assignQueue = LinkedList(ButtonLayout.buttonToIndex.keys)
 
@@ -53,8 +52,8 @@ class ControllerSetupScreen(
                 val current = assignQueue.pop()
                 ButtonLayout.buttonToIndex[current] = index
                 if (assignQueue.isEmpty()) {
+                    core.screen = GameScreen()
                     dispose()
-                    finishCallback()
                 }
             }
 
@@ -75,6 +74,8 @@ class ControllerSetupScreen(
 
     override fun dispose() {
         Controllers.clearListeners()
+        textRenderer.dispose()
+        text.dispose()
     }
 
 }

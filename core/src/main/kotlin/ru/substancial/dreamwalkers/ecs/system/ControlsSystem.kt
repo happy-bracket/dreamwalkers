@@ -1,41 +1,34 @@
 package ru.substancial.dreamwalkers.ecs.system
 
-import com.badlogic.ashley.core.Engine
-import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
 import ru.substancial.dreamwalkers.controls.TheController
-import ru.substancial.dreamwalkers.ecs.component.*
+import ru.substancial.dreamwalkers.ecs.component.InputComponent
 import ru.substancial.dreamwalkers.ecs.extract
+import ru.substancial.dreamwalkers.utilities.RegisteringSystem
 
 class ControlsSystem(
         private val controller: TheController
-) : EntitySystem() {
+) : RegisteringSystem() {
 
-    init {
-        controller.airTriggerDownListener = {
-            targetInput.leftTriggerListener(true)
-        }
-
-        controller.airTriggerUpListener = {
-            targetInput.leftTriggerListener(false)
-        }
-    }
-
-    private var _targetInput: InputComponent? = null
-    private val targetInput: InputComponent
-        get() = _targetInput!!
-
-    override fun addedToEngine(engine: Engine) {
-        _targetInput = engine.getEntitiesFor(inputFamily).first().extract()
-    }
-
-    override fun removedFromEngine(engine: Engine?) {
-        controller.airTriggerDownListener = {}
-        controller.airTriggerUpListener = {}
-        _targetInput = null
-    }
+    private val input by singular(
+            inputFamily,
+            onAdded = {
+                val targetInput = it.extract<InputComponent>()
+                controller.airTriggerDownListener = {
+                    targetInput.leftTriggerListener(true)
+                }
+                controller.airTriggerUpListener = {
+                    targetInput.leftTriggerListener(false)
+                }
+            },
+            onRemoved = {
+                controller.airTriggerDownListener = {}
+                controller.airTriggerUpListener = {}
+            }
+    )
 
     override fun update(deltaTime: Float) {
+        val targetInput = input.extract<InputComponent>()
         targetInput.leftStick.set(controller.pollLeftStick())
         targetInput.rightStick.set(controller.pollRightStick())
         targetInput.leftTriggerDown = controller.airTriggerDown
@@ -115,17 +108,6 @@ class ControlsSystem(
     }
 
     companion object {
-
-        private val lunaFamily = Family.all(
-                LunaComponent::class.java,
-                AerialComponent::class.java,
-                BodyComponent::class.java
-        ).get()
-
-        private val weaponFamily = Family.all(
-                WeaponComponent::class.java,
-                BodyComponent::class.java
-        ).get()
 
         private val inputFamily = Family.all(InputComponent::class.java).get()
 

@@ -1,0 +1,51 @@
+package ru.substancial.dreamwalkers.ecs.system
+
+import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.math.Vector2
+import ru.substancial.dreamwalkers.ecs.component.*
+import ru.substancial.dreamwalkers.ecs.extract
+import ru.substancial.dreamwalkers.utilities.RegisteringSystem
+
+class WeaponSystem : RegisteringSystem() {
+
+    private val weapon by singular(weaponFamily)
+    private val input by singular(inputFamily)
+    private val luna by singular(lunaFamily)
+
+    override fun update(deltaTime: Float) {
+        val weaponProps = weapon.extract<WeaponComponent>()
+        val lunaBody = luna.extract<BodyComponent>().body
+        val weaponBody = weapon.extract<BodyComponent>().body
+        val input = input.extract<InputComponent>()
+
+        val rs = input.rightStick.cpy()
+        val destinationRelativeToLuna = when {
+            rs.isZero -> Vector2(weaponProps.weaponDistance, 0f).rotate(225f)
+            else -> rs.nor().setLength(weaponProps.weaponDistance)
+        }
+        val destination = lunaBody.getWorldPoint(destinationRelativeToLuna)
+        val force = destination.sub(weaponBody.worldCenter).nor().setLength(7f)
+        weaponBody.applyForceToCenter(force, true)
+
+        val weaponToLuna = lunaBody.worldCenter.cpy().sub(weaponBody.worldCenter)
+        weaponBody.setTransform(weaponBody.worldCenter, weaponToLuna.cpy().rotate90(1).angleRad())
+    }
+
+    companion object {
+
+        private val weaponFamily = Family.all(
+                WeaponComponent::class.java,
+                BodyComponent::class.java
+        ).get()
+
+        private val lunaFamily = Family.all(
+                LunaComponent::class.java,
+                AerialComponent::class.java,
+                BodyComponent::class.java
+        ).get()
+
+        private val inputFamily = Family.all(InputComponent::class.java).get()
+
+    }
+
+}

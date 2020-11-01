@@ -44,6 +44,7 @@ class GameScreen : ScreenAdapter() {
     private val aerialSystem = AerialSystem(world)
     private val lunaBodySystem = LunaBodySystem()
     private val positionSystem = PositionSystem()
+    private val weaponSystem = WeaponSystem()
 
     private val engine = Engine()
             .apply {
@@ -58,6 +59,7 @@ class GameScreen : ScreenAdapter() {
                 addSystem(aerialSystem)
                 addSystem(lunaBodySystem)
                 addSystem(positionSystem)
+                addSystem(weaponSystem)
             }
 
     init {

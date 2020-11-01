@@ -17,13 +17,17 @@ class WeaponSystem : RegisteringSystem() {
         val lunaBody = luna.extract<BodyComponent>().body
         val weaponBody = weapon.extract<BodyComponent>().body
         val input = input.extract<InputComponent>()
+        val isLookingRight = luna.extract<LookComponent>().isLookingRight()
 
         val rs = input.rightStick.cpy()
         val destinationRelativeToLuna = when {
-            rs.isZero -> Vector2(weaponProps.weaponDistance, 0f).rotate(225f)
+            rs.isZero ->
+                Vector2(weaponProps.weaponDistance, 0f).rotate(
+                        if (isLookingRight) 225f else -45f
+                )
             else -> rs.nor().setLength(weaponProps.weaponDistance)
         }
-        val destination = lunaBody.getWorldPoint(destinationRelativeToLuna)
+        val destination = lunaBody.getWorldPoint(destinationRelativeToLuna).cpy()
         val force = destination.sub(weaponBody.worldCenter).nor().setLength(7f)
         weaponBody.applyForceToCenter(force, true)
 
@@ -41,7 +45,8 @@ class WeaponSystem : RegisteringSystem() {
         private val lunaFamily = Family.all(
                 LunaComponent::class.java,
                 AerialComponent::class.java,
-                BodyComponent::class.java
+                BodyComponent::class.java,
+                LookComponent::class.java
         ).get()
 
         private val inputFamily = Family.all(InputComponent::class.java).get()

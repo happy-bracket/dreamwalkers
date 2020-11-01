@@ -1,4 +1,4 @@
-package ru.substancial.dreamwalkers.ecs.component
+package ru.substancial.dreamwalkers.controls
 
 object ButtonLayout {
 

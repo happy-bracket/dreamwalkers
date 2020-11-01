@@ -9,7 +9,7 @@ import com.badlogic.gdx.controllers.PovDirection
 import com.badlogic.gdx.graphics.g2d.BitmapFont
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import ru.substancial.dreamwalkers.Core
-import ru.substancial.dreamwalkers.ecs.component.ButtonLayout
+import ru.substancial.dreamwalkers.controls.ButtonLayout
 import ru.substancial.dreamwalkers.utilities.ClearScreen
 import java.util.*
 import kotlin.math.abs

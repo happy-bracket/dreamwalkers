@@ -3,12 +3,11 @@ package ru.substancial.dreamwalkers.controls
 import com.badlogic.gdx.controllers.Controller
 import com.badlogic.gdx.controllers.ControllerAdapter
 import com.badlogic.gdx.math.Vector2
-import ru.substancial.dreamwalkers.ecs.component.ButtonLayout
-import ru.substancial.dreamwalkers.ecs.component.ButtonLayout.L2
-import ru.substancial.dreamwalkers.ecs.component.ButtonLayout.LX
-import ru.substancial.dreamwalkers.ecs.component.ButtonLayout.LY
-import ru.substancial.dreamwalkers.ecs.component.ButtonLayout.RX
-import ru.substancial.dreamwalkers.ecs.component.ButtonLayout.RY
+import ru.substancial.dreamwalkers.controls.ButtonLayout.L2
+import ru.substancial.dreamwalkers.controls.ButtonLayout.LX
+import ru.substancial.dreamwalkers.controls.ButtonLayout.LY
+import ru.substancial.dreamwalkers.controls.ButtonLayout.RX
+import ru.substancial.dreamwalkers.controls.ButtonLayout.RY
 import ru.substancial.dreamwalkers.utilities.checkDeadzone
 
 class TheController : ControllerAdapter() {

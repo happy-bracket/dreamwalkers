@@ -14,6 +14,7 @@ import ru.substancial.dreamwalkers.bodies.LunaBody
 import ru.substancial.dreamwalkers.ecs.component.AerialComponent
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.component.LunaComponent
+import ru.substancial.dreamwalkers.ecs.component.PositionComponent
 import ru.substancial.dreamwalkers.physics.BodyInfo
 import ru.substancial.dreamwalkers.physics.FixtureInfo
 
@@ -25,6 +26,7 @@ fun World.CreateLuna(): Entity {
     entity.add(BodyComponent(body))
     entity.add(LunaComponent)
     entity.add(AerialComponent(false))
+    entity.add(PositionComponent())
 
     return entity
 }

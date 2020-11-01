@@ -24,8 +24,8 @@ abstract class RegisteringSystem : EntitySystem() {
 
     fun multiple(
             family: Family,
-            onAdded: (Entity) -> Unit,
-            onRemoved: (Entity) -> Unit
+            onAdded: (Entity) -> Unit = {},
+            onRemoved: (Entity) -> Unit = {}
     ): Storage.Multiple {
         val storage = Storage.Multiple()
         markers.add(RetrieveMarker(family, storage, onAdded, onRemoved))

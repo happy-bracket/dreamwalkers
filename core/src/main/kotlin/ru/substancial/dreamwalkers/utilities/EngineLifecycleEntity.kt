@@ -73,6 +73,7 @@ abstract class RegisteringSystem : EntitySystem() {
             val entities = engine.getEntitiesFor(family)
             when (target) {
                 is Storage.Singular -> {
+                    if (entities.size() == 0) throw IllegalStateException("engine did not contain any entity satisfying family $family")
                     val result = entities.first()
                     onAdded(result)
                     target._stored = result

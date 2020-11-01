@@ -11,10 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import ru.substancial.dreamwalkers.controls.TheController
-import ru.substancial.dreamwalkers.ecs.component.AerialComponent
-import ru.substancial.dreamwalkers.ecs.component.BodyComponent
-import ru.substancial.dreamwalkers.ecs.component.LunaComponent
-import ru.substancial.dreamwalkers.ecs.component.WeaponComponent
+import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.get
 import ru.substancial.dreamwalkers.utilities.applyImpulseToCenter
@@ -24,31 +21,18 @@ import kotlin.math.abs
 import ru.substancial.dreamwalkers.ecs.ComponentExtractor as CE
 
 class ControlsSystem(
-        private val camera: OrthographicCamera,
         private val controller: TheController
 ) : EntitySystem() {
 
     init {
         controller.airTriggerDownListener = {
-            if (isAirborne()) {
-                val rawDir = controller.pollLeftStick()
-                if (rawDir.checkDeadzone(0.3f)) {
-                    val direction = rawDir.nor().scl(8f)
-                    luna.extract<BodyComponent>().body.setVelocityViaImpulse(direction)
-                }
-            }
+            targetInput.leftTriggerListener(true)
         }
 
         controller.airTriggerUpListener = {
-            if (!isAirborne()) {
-                luna.extract<BodyComponent>().body.setVelocityViaImpulse(Vector2(0f, 10f))
-            }
+            targetInput.leftTriggerListener(false)
         }
     }
-
-    private val drawer = ShapeRenderer()
-
-    private var outside: Boolean = false
 
     private var _luna: Entity? = null
     private val luna: Entity
@@ -58,18 +42,29 @@ class ControlsSystem(
     private val weapon: Entity
         get() = _weapon!!
 
+    private var _targetInput: InputComponent? = null
+    private val targetInput: InputComponent
+        get() = _targetInput!!
+
     override fun addedToEngine(engine: Engine) {
         _luna = engine.getEntitiesFor(lunaFamily).first()
         _weapon = engine.getEntitiesFor(weaponFamily).first()
+        _targetInput = engine.getEntitiesFor(inputFamily).first().extract()
     }
 
     override fun removedFromEngine(engine: Engine?) {
         _luna = null
         controller.airTriggerDownListener = {}
         controller.airTriggerUpListener = {}
+        _targetInput = null
     }
 
     override fun update(deltaTime: Float) {
+        targetInput.leftStick.set(controller.pollLeftStick())
+        targetInput.rightStick.set(controller.pollRightStick())
+        targetInput.leftTriggerDown = controller.airTriggerDown
+
+        // TODO: move
         val weaponProps = weapon.extract<WeaponComponent>()
         val lunaBody = luna.extract<BodyComponent>().body
         val weaponBody = weapon.extract<BodyComponent>().body
@@ -174,6 +169,8 @@ class ControlsSystem(
                 WeaponComponent::class.java,
                 BodyComponent::class.java
         ).get()
+
+        private val inputFamily = Family.all(InputComponent::class.java).get()
 
     }
 

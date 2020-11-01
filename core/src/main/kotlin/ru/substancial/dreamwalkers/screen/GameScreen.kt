@@ -12,17 +12,13 @@ import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.dev.SuperFlat
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.entity.CreateLuna
+import ru.substancial.dreamwalkers.ecs.entity.InputEntity
 import ru.substancial.dreamwalkers.ecs.entity.createWeapon
 import ru.substancial.dreamwalkers.ecs.extract
-import ru.substancial.dreamwalkers.ecs.system.AerialSystem
-import ru.substancial.dreamwalkers.ecs.system.CameraSystem
-import ru.substancial.dreamwalkers.ecs.system.ControlsSystem
-import ru.substancial.dreamwalkers.ecs.system.DebugRenderSystem
+import ru.substancial.dreamwalkers.ecs.system.*
 import ru.substancial.dreamwalkers.utilities.ClearScreen
 
 class GameScreen : ScreenAdapter() {
-
-    private val deadzone: Float = 0.3f
 
     private val camera = OrthographicCamera()
     private val viewport = FitViewport(16f, 9f, camera)
@@ -44,19 +40,22 @@ class GameScreen : ScreenAdapter() {
 
     private val cameraSystem = CameraSystem(camera)
     private val renderSystem = DebugRenderSystem(world, camera, debugRenderer)
-    private val controlsSystem = ControlsSystem(camera, controller)
+    private val controlsSystem = ControlsSystem(controller)
     private val aerialSystem = AerialSystem(world)
+    private val lunaBodySystem = LunaBodySystem()
 
     private val engine = Engine()
             .apply {
                 val luna = world.CreateLuna()
                 addEntity(luna)
                 addEntity(createWeapon(world, luna.extract<BodyComponent>().body))
+                addEntity(InputEntity())
 
                 addSystem(cameraSystem)
                 addSystem(renderSystem)
                 addSystem(controlsSystem)
                 addSystem(aerialSystem)
+                addSystem(lunaBodySystem)
             }
 
     init {
@@ -65,7 +64,7 @@ class GameScreen : ScreenAdapter() {
 
     override fun render(delta: Float) {
         ClearScreen()
-        world.step(1/60f, 6, 2)
+        world.step(1 / 60f, 6, 2)
         engine.update(delta)
     }
 

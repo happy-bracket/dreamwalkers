@@ -14,9 +14,10 @@ class WeaponSystem : RegisteringSystem() {
 
     override fun update(deltaTime: Float) {
         val weaponProps = weapon.extract<WeaponComponent>()
-        val lunaBody = luna.extract<BodyComponent>().body
         val weaponBody = weapon.extract<BodyComponent>().body
+        val lunaBody = luna.extract<BodyComponent>().body
         val input = input.extract<InputComponent>()
+
         val isLookingRight = luna.extract<LookComponent>().isLookingRight()
 
         val rs = input.rightStick.cpy()
@@ -32,7 +33,7 @@ class WeaponSystem : RegisteringSystem() {
         weaponBody.applyForceToCenter(force, true)
 
         val weaponToLuna = lunaBody.worldCenter.cpy().sub(weaponBody.worldCenter)
-        weaponBody.setTransform(weaponBody.worldCenter, weaponToLuna.cpy().rotate90(1).angleRad())
+        weaponBody.setTransform(weaponBody.worldCenter, weaponToLuna.rotate90(1).angleRad())
     }
 
     companion object {

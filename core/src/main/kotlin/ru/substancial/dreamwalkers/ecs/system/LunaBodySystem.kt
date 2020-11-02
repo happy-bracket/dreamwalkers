@@ -10,6 +10,7 @@ import ru.substancial.dreamwalkers.ecs.component.InputComponent
 import ru.substancial.dreamwalkers.ecs.component.LunaComponent
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
+import ru.substancial.dreamwalkers.utilities.applyImpulseToCenter
 import ru.substancial.dreamwalkers.utilities.checkDeadzone
 import ru.substancial.dreamwalkers.utilities.setVelocityViaImpulse
 
@@ -21,7 +22,7 @@ class LunaBodySystem : RegisteringSystem() {
             onAdded = {
                 val input = it.extract<InputComponent>()
                 input.leftTriggerListener = { isDown ->
-                    if (isDown) leftTriggerDown() else rightTriggerUp()
+                    if (isDown) leftTriggerDown() else leftTriggerUp()
                 }
             },
             onRemoved = {
@@ -38,7 +39,8 @@ class LunaBodySystem : RegisteringSystem() {
         if (!aerial.isAirborne) {
             val direction = actualInput.leftStick.cpy()
                     .nor()
-                    .scl(5f, 0f)
+                    .scl(5000f, 0f) // TODO: make naturalistic running speed
+            Gdx.app.log("egor2", "$direction")
             lunaBody.applyForceToCenter(direction, true)
         } else {
             if (actualInput.leftTriggerDown)
@@ -58,7 +60,7 @@ class LunaBodySystem : RegisteringSystem() {
         }
     }
 
-    private fun rightTriggerUp() {
+    private fun leftTriggerUp() {
         val aerial = luna.extract<AerialComponent>()
         if (!aerial.isAirborne) {
             luna.extract<BodyComponent>().body.setVelocityViaImpulse(Vector2(0f, 10f))

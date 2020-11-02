@@ -2,6 +2,7 @@ package ru.substancial.dreamwalkers.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import ru.substancial.dreamwalkers.ecs.component.AerialComponent
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
@@ -35,7 +36,7 @@ class LunaBodySystem : RegisteringSystem() {
         val aerial = luna.extract<AerialComponent>()
 
         if (!aerial.isAirborne) {
-            val direction = actualInput.rightStick.cpy()
+            val direction = actualInput.leftStick.cpy()
                     .nor()
                     .scl(5f, 0f)
             lunaBody.applyForceToCenter(direction, true)

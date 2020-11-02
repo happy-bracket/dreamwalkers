@@ -1,6 +1,7 @@
 package ru.substancial.dreamwalkers.ecs.system
 
 import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.Gdx
 import ru.substancial.dreamwalkers.ecs.component.InputComponent
 import ru.substancial.dreamwalkers.ecs.component.LookComponent
 import ru.substancial.dreamwalkers.ecs.component.LunaComponent
@@ -18,11 +19,16 @@ class LunaLookSystem : RegisteringSystem() {
         val look = luna.extract<LookComponent>()
         val actualInput = input.extract<InputComponent>()
 
-        val desiredMovement = actualInput.rightStick.cpy()
+        val desiredMovement = actualInput.leftStick
+
+        if (desiredMovement.isZero) {
+            turnAroundDelayProgress = 0f
+            return
+        }
 
         val moveAngle = desiredMovement.angle()
-        val isDesiredMovementRight = moveAngle >= 315f || moveAngle <= 45f
-        val isDesiredMovementLeft = moveAngle >= 135f || moveAngle <= 225f
+        val isDesiredMovementRight = moveAngle in 315f..0f || moveAngle in 0f..45f
+        val isDesiredMovementLeft = moveAngle in 135f..225f
 
         if (!isDesiredMovementLeft && !isDesiredMovementRight) {
             turnAroundDelayProgress = 0f
@@ -39,6 +45,7 @@ class LunaLookSystem : RegisteringSystem() {
         turnAroundDelayProgress += deltaTime
         if (turnAroundDelayProgress >= turnAroundDelay) {
             look.lookDirection.scl(-1f)
+            turnAroundDelayProgress = 0f
         }
     }
 

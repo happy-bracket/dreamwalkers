@@ -52,8 +52,8 @@ class ControllerSetupScreen(val core: Core) : ScreenAdapter(), HasDisplay by Has
                 val current = assignQueue.pop()
                 ButtonLayout.buttonToIndex[current] = index
                 if (assignQueue.isEmpty()) {
-                    core.screen = GameScreen()
                     dispose()
+                    core.screen = GameScreen()
                 }
             }
 

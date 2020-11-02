@@ -8,7 +8,7 @@ class LookComponent(
 ) : Component {
 
     fun isLookingRight(): Boolean = lookDirection.angle().let { lookAngle ->
-        lookAngle >= 270f || lookAngle <= 90f
+        lookAngle in 270f..0f || lookAngle in 0f..90f
     }
 
 }

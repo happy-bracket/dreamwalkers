@@ -2,7 +2,6 @@ package ru.substancial.dreamwalkers.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import ru.substancial.dreamwalkers.ecs.component.AerialComponent
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
@@ -10,7 +9,6 @@ import ru.substancial.dreamwalkers.ecs.component.InputComponent
 import ru.substancial.dreamwalkers.ecs.component.LunaComponent
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
-import ru.substancial.dreamwalkers.utilities.applyImpulseToCenter
 import ru.substancial.dreamwalkers.utilities.checkDeadzone
 import ru.substancial.dreamwalkers.utilities.setVelocityViaImpulse
 
@@ -37,11 +35,17 @@ class LunaBodySystem : RegisteringSystem() {
         val aerial = luna.extract<AerialComponent>()
 
         if (!aerial.isAirborne) {
-            val direction = actualInput.leftStick.cpy()
-                    .nor()
-                    .scl(5000f, 0f) // TODO: make naturalistic running speed
-            Gdx.app.log("egor2", "$direction")
-            lunaBody.applyForceToCenter(direction, true)
+            val ls = actualInput.leftStick.cpy()
+            val pullForce = ls.scl(1f, 0f).nor().scl(7500f)
+            if (!actualInput.leftStick.isZero) {
+                lunaBody.applyForceToCenter(pullForce, true)
+                if (lunaBody.linearVelocity.len2() >= 56.25) {
+                    lunaBody.applyForceToCenter(pullForce.scl(-1f), true)
+                }
+            } else {
+                val stoppingForce = lunaBody.linearVelocity.cpy().scl(-1f, 0f).nor().scl(7500f)
+                lunaBody.applyForceToCenter(stoppingForce, true)
+            }
         } else {
             if (actualInput.leftTriggerDown)
                 lunaBody.applyForceToCenter(Vector2(0f, 8f), true)

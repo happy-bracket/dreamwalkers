@@ -25,10 +25,10 @@ fun World.LunaBody(): Body {
 
     return body {
         type = BodyDef.BodyType.DynamicBody
-        linearDamping = 0.8f
+        linearDamping = 0f
         fixedRotation = true
         box(bodyWidth, bodyHeight) {
-            friction = 0.5f
+            friction = 0f
             density = 500f / area
             injectInfo(LunaBodyTag, "luna_body")
         }

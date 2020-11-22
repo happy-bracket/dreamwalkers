@@ -2,11 +2,9 @@ package ru.substancial.dreamwalkers.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
-import ru.substancial.dreamwalkers.ecs.component.AerialComponent
-import ru.substancial.dreamwalkers.ecs.component.BodyComponent
-import ru.substancial.dreamwalkers.ecs.component.InputComponent
-import ru.substancial.dreamwalkers.ecs.component.LunaComponent
+import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
 import ru.substancial.dreamwalkers.utilities.checkDeadzone
@@ -35,20 +33,22 @@ class LunaBodySystem : RegisteringSystem() {
         val aerial = luna.extract<AerialComponent>()
 
         if (!aerial.isAirborne) {
+            lunaBody.gravityScale = 1f
             val ls = actualInput.leftStick.cpy()
-            val pullForce = ls.scl(1f, 0f).nor().scl(7500f)
+            val movement = luna.extract<MovementComponent>()
+            val pullForce = ls.scl(1f, 0f).nor().scl(movement.pullForceMagnitude)
             if (!actualInput.leftStick.isZero) {
+                movement.desiresToMove = true
                 lunaBody.applyForceToCenter(pullForce, true)
-                if (lunaBody.linearVelocity.len2() >= 56.25) {
-                    lunaBody.applyForceToCenter(pullForce.scl(-1f), true)
-                }
             } else {
-                val stoppingForce = lunaBody.linearVelocity.cpy().scl(-1f, 0f).nor().scl(7500f)
-                lunaBody.applyForceToCenter(stoppingForce, true)
+                movement.desiresToMove = false
             }
         } else {
-            if (actualInput.leftTriggerDown)
-                lunaBody.applyForceToCenter(Vector2(0f, 8f), true)
+            if (actualInput.leftTriggerDown) {
+                lunaBody.gravityScale = 0.1f
+            } else {
+                lunaBody.gravityScale = 1f
+            }
         }
     }
 

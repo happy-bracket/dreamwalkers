@@ -25,6 +25,7 @@ fun World.CreateLuna(): Entity {
     entity.add(AerialComponent())
     entity.add(PositionComponent())
     entity.add(LookComponent())
+    entity.add(MovementComponent(7.5f, body.mass, false))
 
     return entity
 }

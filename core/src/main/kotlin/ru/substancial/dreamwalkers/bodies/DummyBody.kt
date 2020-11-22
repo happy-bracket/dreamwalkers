@@ -7,16 +7,13 @@ import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
 import ru.substancial.dreamwalkers.physics.BodyInfo
 import ru.substancial.dreamwalkers.physics.GroundSensor
-import ru.substancial.dreamwalkers.physics.info
 import ru.substancial.dreamwalkers.physics.injectInfo
 
-interface LunaBody
+object DummyRootTag
+object DummyBodyTag
+object DummyLegsTag : GroundSensor
 
-object LunaRootTag : LunaBody
-object LunaBodyTag : LunaBody
-object LunaHoovesTag : GroundSensor, LunaBody
-
-fun World.LunaBody(): Body {
+fun World.DummyBody(): Body {
     val bodyWidth = 1.8f
     val bodyHeight = 1.7f
 
@@ -26,11 +23,13 @@ fun World.LunaBody(): Body {
         type = BodyDef.BodyType.DynamicBody
         linearDamping = 0f
         fixedRotation = true
-        box(bodyWidth, bodyHeight) {
+
+        box(width = bodyWidth, height = bodyHeight) {
             friction = 0f
             density = 500f / area
-            injectInfo(LunaBodyTag, "luna_body")
+            injectInfo(DummyBodyTag, "dummy_body")
         }
+
         box(
                 width = bodyWidth * 0.95f,
                 height = 0.2f,
@@ -38,12 +37,12 @@ fun World.LunaBody(): Body {
         ) {
             isSensor = true
             density = 0f
-            injectInfo(LunaHoovesTag, "luna_hooves")
+            injectInfo(DummyLegsTag, "dummy_legs")
         }
-        userData = BodyInfo(
-                LunaRootTag,
-                "luna"
-        )
 
+        userData = BodyInfo(
+                DummyRootTag,
+                "dummy"
+        )
     }
 }

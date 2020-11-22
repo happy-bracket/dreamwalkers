@@ -3,18 +3,16 @@ package ru.substancial.dreamwalkers.ecs.system
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.Contact
 import com.badlogic.gdx.physics.box2d.World
 import ru.substancial.dreamwalkers.bodies.isGround
 import ru.substancial.dreamwalkers.ecs.component.AerialComponent
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
-import ru.substancial.dreamwalkers.ecs.get
+import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.physics.GroundSensor
 import ru.substancial.dreamwalkers.physics.info
 import ru.substancial.dreamwalkers.utilities.ContactAdapter
-import ru.substancial.dreamwalkers.ecs.ComponentExtractor as CE
 
 class AerialSystem(
         world: World
@@ -60,8 +58,8 @@ class AerialSystem(
     }
 
     override fun processEntity(entity: Entity, deltaTime: Float) {
-        val (body) = entity[CE.Body]
-        val aerial = entity[CE.Aerial]
+        val (body) = entity.extract<BodyComponent>()
+        val aerial = entity.extract<AerialComponent>()
         aerial.isAirborne = body.info.id !in groundedBodies
     }
 

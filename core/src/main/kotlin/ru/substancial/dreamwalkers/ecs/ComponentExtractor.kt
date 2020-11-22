@@ -9,21 +9,22 @@ import ru.substancial.dreamwalkers.ecs.component.LunaComponent
 import ru.substancial.dreamwalkers.ecs.component.WeaponComponent
 import kotlin.reflect.KClass
 
-object ComponentExtractor {
-
-    val Body = ComponentMapper.getFor(BodyComponent::class.java)
-    val Aerial = ComponentMapper.getFor(AerialComponent::class.java)
-    val Luna = ComponentMapper.getFor(LunaComponent::class.java)
-    val Weapon = ComponentMapper.getFor(WeaponComponent::class.java)
-
-}
-
-operator fun <T : Component> Entity.get(mapper: ComponentMapper<T>): T =
-        mapper.get(this)
+inline operator fun <T : Component> Entity.contains(mapper: ComponentMapper<T>): Boolean =
+        mapper.has(this)
 
 val mappersCache = HashMap<Class<*>, ComponentMapper<*>>()
-inline fun <reified T : Component> Entity.extract(): T {
+inline fun <reified T : Component> gm(): ComponentMapper<*> {
     val type = T::class.java
-    val mapper = mappersCache.getOrPut(type) { ComponentMapper.getFor(type) }
-    return mapper[this] as T
+    return mappersCache.getOrPut(type) { ComponentMapper.getFor(type) }
+}
+
+inline fun <reified T : Component> Entity.extract(): T {
+    return gm<T>()[this] as T
+}
+
+inline fun <reified T : Component> Entity.maybeExtract(): T? {
+    val mapper = gm<T>()
+    return if (mapper in this) {
+        mapper[this] as T
+    } else null
 }

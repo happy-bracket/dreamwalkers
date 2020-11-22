@@ -8,9 +8,11 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.utils.viewport.FitViewport
+import ru.substancial.dreamwalkers.bodies.DummyBody
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.dev.SuperFlat
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
+import ru.substancial.dreamwalkers.ecs.entity.CreateDummy
 import ru.substancial.dreamwalkers.ecs.entity.CreateLuna
 import ru.substancial.dreamwalkers.ecs.entity.InputEntity
 import ru.substancial.dreamwalkers.ecs.entity.createWeapon
@@ -38,6 +40,8 @@ class GameScreen : ScreenAdapter() {
 
     private val controller = TheController()
 
+    private val luna = world.CreateLuna()
+
     private val cameraSystem = CameraSystem(camera)
     private val renderSystem = DebugRenderSystem(world, camera, debugRenderer)
     private val controlsSystem = ControlsSystem(controller)
@@ -46,11 +50,14 @@ class GameScreen : ScreenAdapter() {
     private val positionSystem = PositionSystem()
     private val weaponSystem = WeaponSystem()
     private val lunaLookSystem = LunaLookSystem()
+    private val decelerationSystem = DecelerationSystem()
+    private val aiSystem = AiSystem(world, luna)
 
     private val engine = Engine()
             .apply {
-                val luna = world.CreateLuna()
+                val dummy = world.CreateDummy()
                 addEntity(luna)
+                addEntity(dummy) // TODO: order matters! If an entity is added to engine after system, it won't have its `onAdded` callback called
                 addEntity(createWeapon(world, luna.extract<BodyComponent>().body))
                 addEntity(InputEntity())
 
@@ -62,6 +69,8 @@ class GameScreen : ScreenAdapter() {
                 addSystem(positionSystem)
                 addSystem(weaponSystem)
                 addSystem(lunaLookSystem)
+                addSystem(decelerationSystem)
+                addSystem(aiSystem)
             }
 
     init {

@@ -40,8 +40,6 @@ class GameScreen : ScreenAdapter() {
 
     private val controller = TheController()
 
-    private val luna = world.CreateLuna()
-
     private val cameraSystem = CameraSystem(camera)
     private val renderSystem = DebugRenderSystem(world, camera, debugRenderer)
     private val controlsSystem = ControlsSystem(controller)
@@ -51,13 +49,14 @@ class GameScreen : ScreenAdapter() {
     private val weaponSystem = WeaponSystem()
     private val lunaLookSystem = LunaLookSystem()
     private val decelerationSystem = DecelerationSystem()
-    private val aiSystem = AiSystem(world, luna)
+    private val aiSystem = AiSystem(world)
 
     private val engine = Engine()
             .apply {
+                val luna = world.CreateLuna()
                 val dummy = world.CreateDummy()
                 addEntity(luna)
-                addEntity(dummy) // TODO: order matters! If an entity is added to engine after system, it won't have its `onAdded` callback called
+                addEntity(dummy)
                 addEntity(createWeapon(world, luna.extract<BodyComponent>().body))
                 addEntity(InputEntity())
 

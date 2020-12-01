@@ -1,8 +1,11 @@
 package ru.substancial.dreamwalkers.controls
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.controllers.Controller
 import com.badlogic.gdx.controllers.ControllerAdapter
+import com.badlogic.gdx.controllers.ControllerMapping
 import com.badlogic.gdx.math.Vector2
+import com.studiohartman.jamepad.ControllerAxis
 import ru.substancial.dreamwalkers.controls.ButtonLayout.L2
 import ru.substancial.dreamwalkers.controls.ButtonLayout.LX
 import ru.substancial.dreamwalkers.controls.ButtonLayout.LY
@@ -11,6 +14,8 @@ import ru.substancial.dreamwalkers.controls.ButtonLayout.RY
 import ru.substancial.dreamwalkers.utilities.checkDeadzone
 
 class TheController : ControllerAdapter() {
+
+    private var latestUsedController: Controller? = null
 
     private val leftStick = Vector2()
 
@@ -36,14 +41,18 @@ class TheController : ControllerAdapter() {
     }
 
     override fun axisMoved(controller: Controller?, axisIndex: Int, value: Float): Boolean {
+        if (latestUsedController?.uniqueId != controller?.uniqueId) {
+            latestUsedController = controller
+        }
+        val m = latestUsedController?.mapping ?: return false
         when (axisIndex) {
-            ButtonLayout[LX] -> {
+            m.axisLeftX -> {
                 leftStick.x = value
             }
-            ButtonLayout[LY] -> {
-                leftStick.y = -value
+            m.axisLeftY -> {
+                leftStick.y = value
             }
-            ButtonLayout[L2] -> {
+            ControllerAxis.TRIGGERLEFT.ordinal -> {
                 if (value >= 0.4f) {
                     if (!_airTriggerDown) {
                         _airTriggerDown = true
@@ -56,11 +65,11 @@ class TheController : ControllerAdapter() {
                     }
                 }
             }
-            ButtonLayout[RX] -> {
+            m.axisRightX -> {
                 rightStick.x = value
             }
-            ButtonLayout[RY] -> {
-                rightStick.y = -value
+            m.axisRightY -> {
+                rightStick.y = value
             }
         }
         return false

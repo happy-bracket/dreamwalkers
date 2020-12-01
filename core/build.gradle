@@ -17,4 +17,6 @@ dependencies {
     compile "io.github.libktx:ktx-style:$ktxStyleVersion"
     compile "io.github.libktx:ktx-scene2d:$ktxScene2DVersion"
     implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
+    compile 'com.github.WilliamAHartman:Jamepad:1.4.0'
+    compile 'uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.4'
 }

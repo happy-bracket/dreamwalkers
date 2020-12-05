@@ -13,6 +13,8 @@ import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.utilities.ClearScreen
+import ru.substancial.dreamwalkers.utilities.addProcessor
+import ru.substancial.dreamwalkers.utilities.removeProcessor
 
 class MainScreen(private val core: Core) : ScreenAdapter(), HasDisplay by HasDisplayMixin() {
 
@@ -40,7 +42,7 @@ class MainScreen(private val core: Core) : ScreenAdapter(), HasDisplay by HasDis
         stage.addActor(root)
 
         stage.isDebugAll = true
-        Gdx.input.inputProcessor = stage
+        Gdx.input.addProcessor(stage)
     }
 
     override fun render(delta: Float) {
@@ -56,7 +58,7 @@ class MainScreen(private val core: Core) : ScreenAdapter(), HasDisplay by HasDis
     override fun dispose() {
         stage.dispose()
         skin.dispose()
-        Gdx.input.inputProcessor = null
+        Gdx.input.removeProcessor(stage)
     }
 
 }

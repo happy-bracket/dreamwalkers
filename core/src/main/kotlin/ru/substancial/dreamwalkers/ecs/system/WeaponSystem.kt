@@ -2,25 +2,26 @@ package ru.substancial.dreamwalkers.ecs.system
 
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.math.Vector2
+import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
 
-class WeaponSystem : RegisteringSystem() {
+class WeaponSystem(
+        private val controller: TheController
+) : RegisteringSystem() {
 
     private val weapon by singular(weaponFamily)
-    private val input by singular(inputFamily)
     private val luna by singular(lunaFamily)
 
     override fun update(deltaTime: Float) {
         val weaponProps = weapon.extract<WeaponComponent>()
         val weaponBody = weapon.extract<BodyComponent>().body
         val lunaBody = luna.extract<BodyComponent>().body
-        val input = input.extract<InputComponent>()
 
         val isLookingRight = luna.extract<LookComponent>().isLookingRight()
 
-        val rs = input.rightStick.cpy()
+        val rs = controller.rightStick
         val destinationRelativeToLuna = when {
             rs.isZero ->
                 Vector2(weaponProps.weaponDistance, 0f).rotate(
@@ -49,8 +50,6 @@ class WeaponSystem : RegisteringSystem() {
                 BodyComponent::class.java,
                 LookComponent::class.java
         ).get()
-
-        private val inputFamily = Family.all(InputComponent::class.java).get()
 
     }
 

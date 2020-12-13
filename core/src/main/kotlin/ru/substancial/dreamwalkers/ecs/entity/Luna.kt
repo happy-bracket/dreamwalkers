@@ -15,10 +15,10 @@ import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.physics.BodyInfo
 import ru.substancial.dreamwalkers.physics.FixtureInfo
 
-fun World.CreateLuna(): Entity {
+fun World.CreateLuna(spawnPoint: Vector2): Entity {
     val entity = Entity()
 
-    val body = LunaBody()
+    val body = LunaBody(spawnPoint)
 
     entity.add(BodyComponent(body))
     entity.add(LunaComponent)

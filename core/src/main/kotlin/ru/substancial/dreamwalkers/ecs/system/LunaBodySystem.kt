@@ -59,7 +59,6 @@ class LunaBodySystem : RegisteringSystem() {
             val rawDir = input.leftStick
             if (rawDir.checkDeadzone(0.3f)) {
                 val direction = rawDir.nor().scl(8f)
-                Gdx.app.log("egor2", direction.toString())
                 luna.extract<BodyComponent>().body.setVelocityViaImpulse(direction)
             }
         }

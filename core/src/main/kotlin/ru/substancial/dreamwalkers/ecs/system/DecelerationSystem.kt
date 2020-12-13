@@ -9,6 +9,7 @@ import ru.substancial.dreamwalkers.ecs.component.MovementComponent
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.maybeExtract
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
+import ru.substancial.dreamwalkers.utilities.setVelocityViaImpulse
 
 class DecelerationSystem : RegisteringSystem() {
 
@@ -21,13 +22,23 @@ class DecelerationSystem : RegisteringSystem() {
             val body = entity.extract<BodyComponent>().body
             val aerial = entity.maybeExtract<AerialComponent>()
             val velocity2 = body.linearVelocity.len2()
-            if ((velocity2 >= movement.maxSpeed2 || !movement.desiresToMove)) {
+            if (velocity2 >= movement.maxSpeed2 || !movement.desiresToMove) {
                 if (aerial == null || !aerial.isAirborne) {
-                    val stoppingForce = tmp.set(body.linearVelocity).nor().scl(-movement.pullForceMagnitude)
-                    body.applyForceToCenter(stoppingForce, true)
+                    if (velocity2 in 0.01f..MIN_VELOCITY_THRESHOLD) {
+                        body.setVelocityViaImpulse(body.linearVelocity.cpy().scl(-1f))
+                    } else if (velocity2 >= MIN_VELOCITY_THRESHOLD) {
+                        val stoppingForce = tmp.set(body.linearVelocity).nor().scl(-movement.pullForceMagnitude)
+                        body.applyForceToCenter(stoppingForce, false)
+                    }
                 }
             }
         }
+    }
+
+    companion object {
+
+        private const val MIN_VELOCITY_THRESHOLD = 1f
+
     }
 
 }

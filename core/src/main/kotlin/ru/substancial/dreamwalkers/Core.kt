@@ -15,11 +15,13 @@ import ru.substancial.dreamwalkers.utilities.removeProcessor
 class Core : Game() {
 
     private lateinit var console: GUIConsole
+    lateinit var commandExecutor: DwCommandExecutor
 
     override fun create() {
         Gdx.input.inputProcessor = InputMultiplexer()
         console = GUIConsole(Skin(Gdx.files.internal("assets/testskin/uiskin.json")), false)
-        console.setCommandExecutor(DwCommandExecutor(this))
+        commandExecutor = DwCommandExecutor(this)
+        console.setCommandExecutor(commandExecutor)
         Gdx.input.addProcessor(console.inputProcessor)
         setupLogger(console)
         setScreen(MainScreen(this))

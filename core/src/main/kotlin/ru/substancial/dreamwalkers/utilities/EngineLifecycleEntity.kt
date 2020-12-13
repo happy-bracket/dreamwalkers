@@ -46,18 +46,20 @@ abstract class RegisteringSystem : EntitySystem() {
 
     sealed class Storage<T : Any> {
 
-        internal abstract var _stored: T?
-        internal val stored: T
+        internal abstract var _stored: ImmutableArray<Entity>?
+        internal val stored: ImmutableArray<Entity>
             get() = _stored ?: throw IllegalStateException("System was not bound to engine on access attempt")
 
-        operator fun getValue(thisRef: RegisteringSystem, prop: KProperty<*>): T = stored
+        abstract operator fun getValue(thisRef: RegisteringSystem, prop: KProperty<*>): T
 
         class Singular : Storage<Entity>() {
-            override var _stored: Entity? = null
+            override var _stored: ImmutableArray<Entity>? = null
+            override fun getValue(thisRef: RegisteringSystem, prop: KProperty<*>): Entity = stored.first()
         }
 
         class Multiple : Storage<ImmutableArray<Entity>>() {
             override var _stored: ImmutableArray<Entity>? = null
+            override fun getValue(thisRef: RegisteringSystem, prop: KProperty<*>): ImmutableArray<Entity> = stored
         }
 
     }
@@ -73,10 +75,8 @@ abstract class RegisteringSystem : EntitySystem() {
             val entities = engine.getEntitiesFor(family)
             when (target) {
                 is Storage.Singular -> {
-                    if (entities.size() == 0) throw IllegalStateException("engine did not contain any entity satisfying family $family")
-                    val result = entities.first()
-                    onAdded(result)
-                    target._stored = result
+                    entities.forEach(onAdded)
+                    target._stored = entities
                 }
                 is Storage.Multiple -> {
                     entities.forEach(onAdded)
@@ -88,7 +88,7 @@ abstract class RegisteringSystem : EntitySystem() {
         fun removedFromEngine() {
             when (target) {
                 is Storage.Singular -> {
-                    onRemoved(target.stored)
+                    target.stored.onEach(onRemoved)
                 }
                 is Storage.Multiple -> {
                     target.stored.forEach(onRemoved)

@@ -16,7 +16,7 @@ object LunaRootTag : LunaBody
 object LunaBodyTag : LunaBody
 object LunaHoovesTag : GroundSensor, LunaBody
 
-fun World.LunaBody(): Body {
+fun World.LunaBody(spawnPoint: Vector2): Body {
     val bodyWidth = 1.8f
     val bodyHeight = 1.7f
 
@@ -26,7 +26,8 @@ fun World.LunaBody(): Body {
         type = BodyDef.BodyType.DynamicBody
         linearDamping = 0f
         fixedRotation = true
-        box(bodyWidth, bodyHeight) {
+        position.set(spawnPoint)
+        circle(bodyHeight / 2f) {
             friction = 0f
             density = 500f / area
             injectInfo(LunaBodyTag, "luna_body")

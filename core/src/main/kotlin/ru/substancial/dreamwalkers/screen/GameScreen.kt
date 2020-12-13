@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.maps.objects.EllipseMapObject
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
@@ -15,8 +14,8 @@ import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.entity.Entities
 import ru.substancial.dreamwalkers.ecs.entity.Luna
 import ru.substancial.dreamwalkers.ecs.system.*
+import ru.substancial.dreamwalkers.level.Level
 import ru.substancial.dreamwalkers.utilities.ClearScreen
-import ru.substancial.dreamwalkers.utilities.TerrainBody
 
 class GameScreen(private val core: Core) : ScreenAdapter() {
 
@@ -62,16 +61,15 @@ class GameScreen(private val core: Core) : ScreenAdapter() {
         Controllers.addListener(controller)
 
         val map = TmxMapLoader().load("assets/levels/fixedtest.tmx")
-        TerrainBody(map, world)
+        val level = Level(map, 16)
 
-        val spawnPoint = map.layers["spawn_point"]
-                .objects.first()
-                .let { it as EllipseMapObject }
-                .ellipse.let {
-                    Vector2(it.x / 16, it.y / 16)
-                }
+        level.constructGround(world)
 
-        Entities.Luna(spawnPoint, engine, world)
+        Entities.Luna(
+                level.playerSpawnPoint,
+                engine,
+                world
+        )
         core.commandExecutor.currentEngine = engine
     }
 

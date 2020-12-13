@@ -11,7 +11,7 @@ import ru.substancial.dreamwalkers.ecs.component.WeaponComponent
 import ru.substancial.dreamwalkers.physics.BodyInfo
 import ru.substancial.dreamwalkers.physics.FixtureInfo
 
-fun createWeapon(world: World, luna: Body): Entity {
+fun Entities.Weapon(world: World, luna: Body): Entity {
     val body = world.body {
         type = BodyDef.BodyType.DynamicBody
         this.gravityScale = 0f

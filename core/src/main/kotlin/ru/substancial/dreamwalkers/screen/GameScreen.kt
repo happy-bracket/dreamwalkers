@@ -1,8 +1,6 @@
 package ru.substancial.dreamwalkers.screen
 
 import com.badlogic.ashley.core.Engine
-import com.badlogic.ashley.core.Family
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.OrthographicCamera
@@ -14,11 +12,8 @@ import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.utils.viewport.FitViewport
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
-import ru.substancial.dreamwalkers.ecs.component.BodyComponent
-import ru.substancial.dreamwalkers.ecs.component.LunaComponent
-import ru.substancial.dreamwalkers.ecs.entity.CreateLuna
-import ru.substancial.dreamwalkers.ecs.entity.createWeapon
-import ru.substancial.dreamwalkers.ecs.extract
+import ru.substancial.dreamwalkers.ecs.entity.Entities
+import ru.substancial.dreamwalkers.ecs.entity.Luna
 import ru.substancial.dreamwalkers.ecs.system.*
 import ru.substancial.dreamwalkers.utilities.ClearScreen
 import ru.substancial.dreamwalkers.utilities.TerrainBody
@@ -67,7 +62,7 @@ class GameScreen(private val core: Core) : ScreenAdapter() {
         Controllers.addListener(controller)
 
         val map = TmxMapLoader().load("assets/levels/fixedtest.tmx")
-        val terrain = TerrainBody(map, world)
+        TerrainBody(map, world)
 
         val spawnPoint = map.layers["spawn_point"]
                 .objects.first()
@@ -76,16 +71,8 @@ class GameScreen(private val core: Core) : ScreenAdapter() {
                     Vector2(it.x / 16, it.y / 16)
                 }
 
-        val luna = world.CreateLuna(spawnPoint)
-        engine.addEntity(luna)
-        engine.addEntity(createWeapon(world, luna.extract<BodyComponent>().body))
-        val lunaBody = engine.getEntitiesFor(Family.all(LunaComponent::class.java).get()).first()
-                .extract<BodyComponent>()
-                .body
+        Entities.Luna(spawnPoint, engine, world)
         core.commandExecutor.currentEngine = engine
-
-        Gdx.app.log("terrain", terrain.position.toString())
-        Gdx.app.log("luna", lunaBody.position.toString())
     }
 
     override fun render(delta: Float) {

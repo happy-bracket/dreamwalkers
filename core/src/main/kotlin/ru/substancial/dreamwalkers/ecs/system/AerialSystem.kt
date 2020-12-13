@@ -3,8 +3,6 @@ package ru.substancial.dreamwalkers.ecs.system
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.utils.ImmutableArray
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.Contact
 import com.badlogic.gdx.physics.box2d.World
@@ -16,7 +14,6 @@ import ru.substancial.dreamwalkers.physics.GroundSensor
 import ru.substancial.dreamwalkers.physics.info
 import ru.substancial.dreamwalkers.utilities.ContactAdapter
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
-import ru.substancial.dreamwalkers.utilities.setVelocityViaImpulse
 
 class AerialSystem(
         world: World

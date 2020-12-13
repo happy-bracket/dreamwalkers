@@ -8,7 +8,7 @@ import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
 import ru.substancial.dreamwalkers.utilities.checkDeadzone
-import ru.substancial.dreamwalkers.utilities.setVelocityViaImpulse
+import ru.substancial.dreamwalkers.utilities.addVelocityViaImpulse
 
 class LunaBodySystem(
         private val controller: TheController
@@ -52,7 +52,7 @@ class LunaBodySystem(
             val rawDir = controller.leftStick
             if (rawDir.checkDeadzone(0.3f)) {
                 val direction = rawDir.nor().scl(8f)
-                luna.extract<BodyComponent>().body.setVelocityViaImpulse(direction)
+                luna.extract<BodyComponent>().body.addVelocityViaImpulse(direction)
             }
         }
     }
@@ -60,7 +60,7 @@ class LunaBodySystem(
     private fun leftTriggerUp() {
         val aerial = luna.extract<AerialComponent>()
         if (!aerial.isAirborne) {
-            luna.extract<BodyComponent>().body.setVelocityViaImpulse(Vector2(0f, 10f))
+            luna.extract<BodyComponent>().body.addVelocityViaImpulse(Vector2(0f, 10f))
         }
     }
 

@@ -39,7 +39,10 @@ class Level(private val map: TiledMap, private val scale: Int) {
         box(
                 width = rect.width / scale,
                 height = rect.height / scale,
-                position = Vector2(rect.x / scale, rect.y / scale)
+                position = Vector2(
+                        rect.x / scale + rect.width / (scale * 2),
+                        rect.y / scale + rect.height / (scale * 2)
+                )
         ) {}
     }
 

@@ -63,7 +63,7 @@ class GameScreen(private val core: Core) : ScreenAdapter() {
     init {
         Controllers.addListener(controller)
 
-        val map = TmxMapLoader().load("assets/levels/fixedtest.tmx")
+        val map = TmxMapLoader().load("assets/levels/observatory.tmx")
         val level = Level(map, 16)
 
         level.constructGround(world)

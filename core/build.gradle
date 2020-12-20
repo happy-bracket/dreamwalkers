@@ -19,4 +19,6 @@ dependencies {
     implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
     compile 'com.github.WilliamAHartman:Jamepad:1.4.0'
     compile 'uk.co.electronstudio.sdl2gdx:sdl2gdx:1.0.4'
+    implementation name: 'luaj-jse-3.0.1'
+    implementation name: 'luaj-sources-3.0.1'
 }

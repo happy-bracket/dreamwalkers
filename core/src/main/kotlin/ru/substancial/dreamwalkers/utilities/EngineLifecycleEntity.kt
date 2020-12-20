@@ -46,14 +46,12 @@ abstract class RegisteringSystem : EntitySystem() {
         internal val stored: ImmutableArray<Entity>
             get() = _stored ?: throw IllegalStateException("System was not bound to engine on access attempt")
 
-        abstract operator fun getValue(thisRef: RegisteringSystem, prop: KProperty<*>): T
-
         class Singular : Storage<Entity>() {
-            override fun getValue(thisRef: RegisteringSystem, prop: KProperty<*>): Entity = stored.first()
+            operator fun getValue(thisRef: RegisteringSystem, prop: KProperty<*>): Entity = stored.first()
         }
 
         class Multiple : Storage<ImmutableArray<Entity>>() {
-            override fun getValue(thisRef: RegisteringSystem, prop: KProperty<*>): ImmutableArray<Entity> = stored
+            operator fun getValue(thisRef: RegisteringSystem, prop: KProperty<*>): ImmutableArray<Entity> = stored
         }
 
     }
@@ -65,14 +63,7 @@ abstract class RegisteringSystem : EntitySystem() {
 
         fun addedToEngine(engine: Engine) {
             val entities = engine.getEntitiesFor(family)
-            when (target) {
-                is Storage.Singular -> {
-                    target._stored = entities
-                }
-                is Storage.Multiple -> {
-                    target._stored = entities
-                }
-            }
+            target._stored = entities
         }
 
         fun removedFromEngine() {

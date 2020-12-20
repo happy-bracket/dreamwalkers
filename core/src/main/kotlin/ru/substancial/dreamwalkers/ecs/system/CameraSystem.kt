@@ -23,6 +23,11 @@ class CameraSystem(
         camera.update()
     }
 
+    fun setZoom(zoom: Float) {
+        camera.zoom = zoom
+        camera.update()
+    }
+
     companion object {
 
         private val family = Family.all(

@@ -8,7 +8,9 @@ import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.ecs.component.AerialComponent
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.component.LunaComponent
+import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.maybeExtract
+import ru.substancial.dreamwalkers.ecs.system.CameraSystem
 import ru.substancial.dreamwalkers.screen.MainScreen
 
 class DwCommandExecutor(private val core: Core) : CommandExecutor() {
@@ -20,18 +22,28 @@ class DwCommandExecutor(private val core: Core) : CommandExecutor() {
     }
 
     fun isLunaAirborne() {
-        currentEngine?.getEntitiesFor(Family.all(LunaComponent::class.java).get())
+        val engine = currentEngine ?: run {
+            console.log("Engine is not attached", LogLevel.ERROR)
+            return
+        }
+        val luna = engine.getEntitiesFor(Family.all(LunaComponent::class.java).get())
                 ?.firstOrNull()
-                ?.maybeExtract<AerialComponent>()
-                ?.let { console.log(it.toString(), LogLevel.SUCCESS) }
-                ?: console.log("Engine was not attached", LogLevel.ERROR)
+                ?: run {
+                    console.log("No Luna in the engine", LogLevel.ERROR)
+                    return
+                }
+
+        console.log(luna.extract<AerialComponent>().isAirborne.toString(), LogLevel.SUCCESS)
     }
 
-    fun lunaVelocity() {
-        currentEngine?.getEntitiesFor(Family.all(LunaComponent::class.java).get())
-                ?.firstOrNull()
-                ?.maybeExtract<BodyComponent>()
-                ?.let { console.log(it.body.linearVelocity.toString(), LogLevel.SUCCESS) }
+    fun setCameraZoom(zoom: Float) {
+        val engine = currentEngine ?: run {
+            console.log("Engine is not attached", LogLevel.ERROR)
+            return
+        }
+        val camSystem = engine.getSystem(CameraSystem::class.java)
+        camSystem.setZoom(zoom)
+        console.log("Zoom set to $zoom", LogLevel.SUCCESS)
     }
 
 }

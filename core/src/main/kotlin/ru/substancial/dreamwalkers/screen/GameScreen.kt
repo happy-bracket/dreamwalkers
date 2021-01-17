@@ -10,20 +10,29 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
+import org.luaj.vm2.lib.jse.JsePlatform
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
-import ru.substancial.dreamwalkers.ecs.entity.Entities
-import ru.substancial.dreamwalkers.ecs.entity.Luna
 import ru.substancial.dreamwalkers.ecs.system.*
 import ru.substancial.dreamwalkers.level.Level
+import ru.substancial.dreamwalkers.level.LuaNames
+import ru.substancial.dreamwalkers.level.SaveFile
+import ru.substancial.dreamwalkers.level.ScenarioInteraction
 import ru.substancial.dreamwalkers.utilities.ClearScreen
+import ru.substancial.dreamwalkers.utilities.lua
 
-class GameScreen(private val core: Core) : ScreenAdapter() {
+class GameScreen(
+        private val core: Core,
+        private val scenarioPath: String,
+        scenarioName: String,
+        saveFile: SaveFile?
+) : ScreenAdapter() {
 
     private val camera = OrthographicCamera()
     private val viewport = FitViewport(16f, 9f, camera)
 
     private val world = World(Vector2(0f, -10f), false)
+    private var level: Level? = null
     private val debugRenderer = Box2DDebugRenderer(
             true,
             true,
@@ -62,24 +71,20 @@ class GameScreen(private val core: Core) : ScreenAdapter() {
 
     init {
         Controllers.addListener(controller)
-
-        val map = TmxMapLoader().load("assets/levels/observatory.tmx")
-        val level = Level(map, 16)
-
-        level.constructGround(world)
-
-        Entities.Luna(
-                level.playerSpawnPoint,
-                engine,
-                world
-        )
         core.commandExecutor.currentEngine = engine
+
+        val globals = JsePlatform.standardGlobals()
+        val scenario = globals.loadfile(scenarioName)
+        scenario.call()
+        scenario[LuaNames.Scenario.init](ScenarioInteractor().lua, saveFile.lua)
     }
 
     override fun render(delta: Float) {
         ClearScreen()
         world.step(1 / 60f, 6, 2)
         engine.update(delta)
+        stage.act(delta)
+        stage.draw()
     }
 
     override fun resize(width: Int, height: Int) {
@@ -91,6 +96,17 @@ class GameScreen(private val core: Core) : ScreenAdapter() {
         debugRenderer.dispose()
         Controllers.clearListeners()
         core.commandExecutor.currentEngine = null
+    }
+
+    inner class ScenarioInteractor : ScenarioInteraction {
+
+        override fun loadLevel(name: String): Level {
+            val map = TmxMapLoader().load(scenarioPath + name)
+            val loadedLevel = Level(map, 16)
+            level = loadedLevel
+            loadedLevel.inflate(world, engine)
+            return loadedLevel
+        }
     }
 
 }

@@ -1,6 +1,8 @@
 package ru.substancial.dreamwalkers.ecs.system
 
+import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
+import com.badlogic.ashley.core.EntityListener
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.physics.box2d.Body
@@ -19,6 +21,7 @@ class AerialSystem(
         world: World
 ) : RegisteringSystem() {
 
+    private var listener: EntityListener? = null
     private val bodies: ImmutableArray<Entity> by multiple(family)
 
     init {

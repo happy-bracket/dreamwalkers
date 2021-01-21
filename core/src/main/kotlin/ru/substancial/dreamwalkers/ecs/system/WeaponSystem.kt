@@ -11,10 +11,12 @@ class WeaponSystem(
         private val controller: TheController
 ) : RegisteringSystem() {
 
-    private val weapon by singular(weaponFamily)
-    private val luna by singular(lunaFamily)
+    private val weapon by optional(weaponFamily)
+    private val luna by optional(lunaFamily)
 
     override fun update(deltaTime: Float) {
+        val luna = this.luna ?: return
+        val weapon = this.weapon ?: return
         val weaponProps = weapon.extract<WeaponComponent>()
         val weaponBody = weapon.extract<BodyComponent>().body
         val lunaBody = luna.extract<BodyComponent>().body

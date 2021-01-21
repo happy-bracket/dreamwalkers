@@ -11,11 +11,12 @@ class LunaLookSystem(
         private val controller: TheController
 ) : RegisteringSystem() {
 
-    private val luna by singular(lunaFamily)
+    private val luna by optional(lunaFamily)
 
     private var turnAroundDelayProgress = 0f
 
     override fun update(deltaTime: Float) {
+        val luna = this.luna ?: return
         val look = luna.extract<LookComponent>()
 
         val desiredMovement = controller.leftStick

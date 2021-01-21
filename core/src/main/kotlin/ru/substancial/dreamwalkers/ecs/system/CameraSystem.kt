@@ -11,16 +11,17 @@ class CameraSystem(
         private val camera: OrthographicCamera
 ) : RegisteringSystem() {
 
-    private val luna by multiple(family)
+    private val luna by optional(family)
 
     init {
         camera.zoom = 20f
     }
 
     override fun update(deltaTime: Float) {
-        val (body) = luna.first().extract<BodyComponent>()
-        camera.position.set(body.worldCenter, 0f)
-        camera.update()
+        luna?.extract<BodyComponent>()?.let { (body) ->
+            camera.position.set(body.worldCenter, 0f)
+            camera.update()
+        }
     }
 
     fun setZoom(zoom: Float) {

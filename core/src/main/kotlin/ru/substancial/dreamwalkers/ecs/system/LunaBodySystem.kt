@@ -14,7 +14,7 @@ class LunaBodySystem(
         private val controller: TheController
 ) : RegisteringSystem() {
 
-    private val luna by singular(lunaFamily)
+    private val luna by optional(lunaFamily)
 
     override fun addedToEngine(engine: Engine) {
         super.addedToEngine(engine)
@@ -23,6 +23,7 @@ class LunaBodySystem(
     }
 
     override fun update(deltaTime: Float) {
+        val luna = this.luna ?: return
         val lunaBody = luna.extract<BodyComponent>().body
         val aerial = luna.extract<AerialComponent>()
 
@@ -47,6 +48,7 @@ class LunaBodySystem(
     }
 
     private fun leftTriggerDown() {
+        val luna = this.luna ?: return
         val aerial = luna.extract<AerialComponent>()
         if (aerial.isAirborne) {
             val rawDir = controller.leftStick
@@ -58,6 +60,7 @@ class LunaBodySystem(
     }
 
     private fun leftTriggerUp() {
+        val luna = this.luna ?: return
         val aerial = luna.extract<AerialComponent>()
         if (!aerial.isAirborne) {
             luna.extract<BodyComponent>().body.addVelocityViaImpulse(Vector2(0f, 10f))

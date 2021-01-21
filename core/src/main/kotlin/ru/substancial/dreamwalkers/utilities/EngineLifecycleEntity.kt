@@ -20,6 +20,14 @@ abstract class RegisteringSystem : EntitySystem() {
         return storage
     }
 
+    fun optional(
+            family: Family
+    ) : Storage.Optional {
+        val storage = Storage.Optional()
+        markers.add(RetrieveMarker(family, storage))
+        return storage
+    }
+
     fun multiple(
             family: Family
     ): Storage.Multiple {
@@ -40,7 +48,7 @@ abstract class RegisteringSystem : EntitySystem() {
         }
     }
 
-    sealed class Storage<T : Any> {
+    sealed class Storage<T> {
 
         internal var _stored: ImmutableArray<Entity>? = null
         internal val stored: ImmutableArray<Entity>
@@ -48,6 +56,10 @@ abstract class RegisteringSystem : EntitySystem() {
 
         class Singular : Storage<Entity>() {
             operator fun getValue(thisRef: RegisteringSystem, prop: KProperty<*>): Entity = stored.first()
+        }
+
+        class Optional : Storage<Entity?>() {
+            operator fun getValue(thisRef: RegisteringSystem, prop: KProperty<*>): Entity? = stored.firstOrNull()
         }
 
         class Multiple : Storage<ImmutableArray<Entity>>() {

@@ -1,21 +1,20 @@
 package ru.substancial.dreamwalkers.ai.behaviors
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ai.btree.LeafTask
 import com.badlogic.gdx.ai.btree.Task
 import com.badlogic.gdx.ai.btree.Task.Status.RUNNING
 import com.badlogic.gdx.math.Vector2
-import ru.substancial.dreamwalkers.ai.AiPair
+import ru.substancial.dreamwalkers.ai.AiEnvironment
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.component.MovementComponent
 import ru.substancial.dreamwalkers.ecs.component.PositionComponent
 import ru.substancial.dreamwalkers.ecs.extract
 
-class ChaseLuna : LeafTask<AiPair>() {
+class ChaseLuna : LeafTask<AiEnvironment>() {
 
     override fun execute(): Status {
         val entities = `object`
-        val luna = entities.luna
+        val luna = entities.luna ?: return RUNNING
         val thisEntity = entities.thisEntity
         val lunaPosition = luna.extract<PositionComponent>().xy
         val thisPosition = thisEntity.extract<PositionComponent>().xy
@@ -27,7 +26,7 @@ class ChaseLuna : LeafTask<AiPair>() {
         return RUNNING
     }
 
-    override fun copyTo(task: Task<AiPair>?): Task<AiPair>? {
+    override fun copyTo(task: Task<AiEnvironment>?): Task<AiEnvironment>? {
         return task
     }
 

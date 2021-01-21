@@ -11,18 +11,13 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
-import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.jse.JsePlatform
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.system.*
-import ru.substancial.dreamwalkers.level.Level
-import ru.substancial.dreamwalkers.level.LuaNames
-import ru.substancial.dreamwalkers.level.SaveFile
-import ru.substancial.dreamwalkers.level.ScenarioInteraction
+import ru.substancial.dreamwalkers.level.*
 import ru.substancial.dreamwalkers.utilities.ClearScreen
 import ru.substancial.dreamwalkers.utilities.lua
-import java.util.concurrent.atomic.AtomicBoolean
 
 class GameScreen(
         private val core: Core,
@@ -35,7 +30,6 @@ class GameScreen(
     private val viewport = FitViewport(16f, 9f, camera)
 
     private val world = World(Vector2(0f, -10f), false)
-    private var level: Level? = null
 
     private val debugRenderer = Box2DDebugRenderer(
             true,
@@ -49,6 +43,8 @@ class GameScreen(
     private val controller = TheController()
 
     private val stage = Stage(viewport)
+
+    private val scenarioHolder: ScenarioHolder
 
     private val cameraSystem = CameraSystem(camera)
     private val renderSystem = DebugRenderSystem(world, camera, debugRenderer)
@@ -77,10 +73,9 @@ class GameScreen(
         Controllers.addListener(controller)
         core.commandExecutor.currentEngine = engine
 
-        val globals = JsePlatform.standardGlobals()
-        val scenario = globals.loadfile(scenarioName)
-        scenario.call()
-        scenario[LuaNames.Scenario.init](ScenarioInteractor().lua, saveFile.lua)
+        val interactor = GameScenarioCallbacks()
+        scenarioHolder = ScenarioHolder(scenarioName, interactor, engine, world)
+        scenarioHolder.initialize(saveFile)
     }
 
     override fun render(delta: Float) {
@@ -102,7 +97,7 @@ class GameScreen(
         core.commandExecutor.currentEngine = null
     }
 
-    inner class ScenarioInteractor : ScenarioInteraction {
+    inner class GameScenarioCallbacks : ScenarioCallbacks {
 
         override fun loadLevel(name: String): Level {
             val levelFolder = Gdx.files.internal(scenarioPath + name)
@@ -112,8 +107,9 @@ class GameScreen(
 
             val map = TmxMapLoader().load(levelPath.path())
             val loadedLevel = Level(map, 16)
-            level = loadedLevel
             loadedLevel.inflate(world, engine)
+
+            scenarioHolder.setLevel(loadedLevel)
 
             return loadedLevel
         }

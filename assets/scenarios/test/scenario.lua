@@ -1,4 +1,4 @@
 
 function init(interactor, savefile)
-    interactor:loadLevel("observatory/observatory.tmx")
+    interactor:loadLevel("observatory")
 end

@@ -19,7 +19,7 @@ import kotlin.math.sqrt
 
 class EntitySpawner(private val world: World, private val engine: Engine) {
 
-    fun spawnWithHitbox(
+    fun spawnWithPushbox(
             width: Float,
             height: Float,
             spawnPosition: Vector2,
@@ -35,15 +35,11 @@ class EntitySpawner(private val world: World, private val engine: Engine) {
             val area = MathUtils.PI * (width / 2) * (height / 2)
 
             val vertices = discreteEllipse(width, height)
-            val triangulator = EarClippingTriangulator()
-            val triangles = triangulator.computeTriangles(vertices)
 
-            for (i in 0 until triangles.size / 3) {
-                loop(vertices) {
-                    friction = 0f
-                    density = 500f / area
-                    injectInfo(LunaBodyTag, "luna_body")
-                }
+            loop(vertices) {
+                friction = 0f
+                density = 500f / area
+                injectInfo(LunaBodyTag, "luna_body")
             }
 
             box(

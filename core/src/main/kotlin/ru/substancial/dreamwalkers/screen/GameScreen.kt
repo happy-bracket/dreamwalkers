@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import org.luaj.vm2.lib.jse.JsePlatform
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
+import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
 import ru.substancial.dreamwalkers.ecs.system.*
 import ru.substancial.dreamwalkers.level.*
 import ru.substancial.dreamwalkers.utilities.ClearScreen
@@ -74,7 +75,7 @@ class GameScreen(
         core.commandExecutor.currentEngine = engine
 
         val interactor = GameScenarioCallbacks()
-        scenarioHolder = ScenarioHolder(scenarioName, interactor, engine, world)
+        scenarioHolder = ScenarioHolder("$scenarioPath/$scenarioName", interactor, engine, world, EntitySpawner(world, engine))
         scenarioHolder.initialize(saveFile)
     }
 
@@ -100,7 +101,7 @@ class GameScreen(
     inner class GameScenarioCallbacks : ScenarioCallbacks {
 
         override fun loadLevel(name: String): Level {
-            val levelFolder = Gdx.files.internal(scenarioPath + name)
+            val levelFolder = Gdx.files.internal("$scenarioPath/$name")
             val levelFolderContents = levelFolder.list()
 
             val levelPath = levelFolderContents.first { it.extension() == "tmx" }

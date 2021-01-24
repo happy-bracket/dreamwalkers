@@ -3,11 +3,6 @@ package ru.substancial.dreamwalkers.ecs
 import com.badlogic.ashley.core.Component
 import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
-import ru.substancial.dreamwalkers.ecs.component.AerialComponent
-import ru.substancial.dreamwalkers.ecs.component.BodyComponent
-import ru.substancial.dreamwalkers.ecs.component.LunaComponent
-import ru.substancial.dreamwalkers.ecs.component.WeaponComponent
-import kotlin.reflect.KClass
 
 inline operator fun <T : Component> Entity.contains(mapper: ComponentMapper<T>): Boolean =
         mapper.has(this)

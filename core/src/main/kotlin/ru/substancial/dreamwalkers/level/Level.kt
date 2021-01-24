@@ -18,6 +18,7 @@ import ru.substancial.dreamwalkers.bodies.GroundTag
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.component.PositionComponent
 import ru.substancial.dreamwalkers.physics.BodyInfo
+import ru.substancial.dreamwalkers.physics.injectInfo
 import ru.substancial.dreamwalkers.utilities.x
 import ru.substancial.dreamwalkers.utilities.y
 import java.util.*
@@ -30,15 +31,18 @@ class Level(private val map: TiledMap, private val scale: Int) : Disposable {
     private val entityById = HashMap<String, Entity>()
 
     fun inflate(world: World, engine: Engine) {
-        val objects = map.layers
-                .flatMap { it.objects }
-                .map { rigidnessNumberToType(it.properties[RIGIDNESS]) to it }
+        val allObjects = map.layers.flatMap { it.objects }
+        val objects = allObjects
+                .mapNotNull {
+                    it.properties[RIGIDNESS].let { rigidness -> rigidnessNumberToType(rigidness) to it }
+                }
 
         val entities = LinkedList<Entity>()
         world.body {
             for ((type, mapObject) in objects) {
 
                 if (type is ObjectType.Terrain) {
+                    userData = BodyInfo(GroundTag, "ground")
                     when (mapObject) {
                         is RectangleMapObject -> fromRectangle(mapObject)
                         is PolygonMapObject -> fromPolygon(mapObject)
@@ -71,7 +75,8 @@ class Level(private val map: TiledMap, private val scale: Int) : Disposable {
         entities.forEach(engine::addEntity)
     }
 
-    fun getEntityById(id: String): Entity = entityById[id] ?: throw LevelException("there was no map entity with id $id")
+    fun getEntityById(id: String): Entity = entityById[id]
+            ?: throw LevelException("there was no map entity with id $id")
 
     override fun dispose() {
         entityById.clear()
@@ -123,10 +128,10 @@ class Level(private val map: TiledMap, private val scale: Int) : Disposable {
 
     private fun rigidnessNumberToType(rigidness: Any?): ObjectType =
             when (rigidness) {
-                3, null -> ObjectType.Terrain
-                0 -> ObjectType.Ghost
+                0, null -> ObjectType.Ghost
                 1 -> ObjectType.Sensor
                 2 -> ObjectType.Rigid
+                3 -> ObjectType.Terrain
                 else -> throw LevelException("Rigidness was not any of: { null, 0, 1, 2, 3 }, it was: $rigidness")
             }
 
@@ -142,7 +147,7 @@ class Level(private val map: TiledMap, private val scale: Int) : Disposable {
         private const val TAG_SPAWN_POINT = "spawn_point"
         private const val TAG_TERRAIN = "ground"
         private const val RIGIDNESS = "rigidness"
-        private const val ID = "id"
+        private const val ID = "object_id"
 
     }
 

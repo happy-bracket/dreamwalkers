@@ -2,44 +2,102 @@ package ru.substancial.dreamwalkers.ecs.entity
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.math.EarClippingTriangulator
+import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
+import ktx.box2d.body
 import ru.substancial.dreamwalkers.bodies.LunaBody
+import ru.substancial.dreamwalkers.bodies.LunaBodyTag
+import ru.substancial.dreamwalkers.bodies.LunaHoovesTag
+import ru.substancial.dreamwalkers.bodies.LunaRootTag
 import ru.substancial.dreamwalkers.ecs.component.*
+import ru.substancial.dreamwalkers.physics.BodyInfo
+import ru.substancial.dreamwalkers.physics.injectInfo
+import kotlin.math.sqrt
 
-fun Entities.Luna(
-        spawnPoint: Vector2,
-        engine: Engine,
-        world: World
-) {
-    val lunaEntity = Entity()
+class EntitySpawner(private val world: World, private val engine: Engine) {
 
-    val lunaBody = world.LunaBody(spawnPoint)
+    fun spawnWithHitbox(
+            width: Float,
+            height: Float,
+            spawnPosition: Vector2,
+            maxSpeed: Float
+    ): Entity {
+        val entity = Entity()
+        val body = world.body {
+            type = BodyDef.BodyType.DynamicBody
+            linearDamping = 0f
+            fixedRotation = true
+            position.set(spawnPosition)
 
-    lunaEntity.add(BodyComponent(lunaBody))
-    lunaEntity.add(LunaComponent)
-    lunaEntity.add(AerialComponent())
-    lunaEntity.add(PositionComponent())
-    lunaEntity.add(LookComponent())
-    lunaEntity.add(MovementComponent(7.5f, lunaBody.mass, false))
+            val area = MathUtils.PI * (width / 2) * (height / 2)
 
-    val weaponEntity = Weapon(world, lunaBody)
+            val vertices = discreteEllipse(width, height)
+            val triangulator = EarClippingTriangulator()
+            val triangles = triangulator.computeTriangles(vertices)
 
-    engine.addEntity(lunaEntity)
-    engine.addEntity(weaponEntity)
+            for (i in 0 until triangles.size / 3) {
+                loop(vertices) {
+                    friction = 0f
+                    density = 500f / area
+                    injectInfo(LunaBodyTag, "luna_body")
+                }
+            }
+
+            box(
+                    width = width * 0.95f,
+                    height = 0.2f,
+                    position = Vector2(0f, -height / 2)
+            ) {
+                isSensor = true
+                density = 0f
+                injectInfo(LunaHoovesTag, "luna_hooves")
+            }
+            userData = BodyInfo(
+                    LunaRootTag,
+                    "luna"
+            )
+        }
+        entity.add(BodyComponent(body))
+        entity.add(PositionComponent())
+        entity.add(MovementComponent(maxSpeed, body.mass, false))
+        engine.addEntity(entity)
+        return entity
+    }
+
 }
 
-private fun World.CreateLuna(spawnPoint: Vector2): Entity {
-    val entity = Entity()
+private fun discreteEllipse(width: Float, height: Float, step: Float = 0.1f): FloatArray {
+    val halfWidth = width / 2
+    val halfHeight = height / 2
 
-    val body = LunaBody(spawnPoint)
+    val steps = (width / step).toInt() + 1
 
-    entity.add(BodyComponent(body))
-    entity.add(LunaComponent)
-    entity.add(AerialComponent())
-    entity.add(PositionComponent())
-    entity.add(LookComponent())
-    entity.add(MovementComponent(7.5f, body.mass, false))
+    val result = FloatArray(steps * 4 - 4) { Float.NaN }
 
-    return entity
+    for (i in 1 until steps) {
+        val x = i * step - halfWidth
+        val xbw = x / halfWidth
+        val y = halfHeight * sqrt((1 - xbw * xbw))
+
+        result[i * 2] = x
+        result[i * 2 + 1] = y
+
+        result[(steps * 4 - i * 2) - 4] = x
+        result[(steps * 4 - i * 2) - 3] = -y
+    }
+
+    result[0] = -halfWidth
+    result[1] = 0f
+
+    result[result.size / 2] = halfWidth
+    result[result.size / 2 + 1] = 0f
+
+    for (i in 0 until result.size / 2) {
+        println("${result[i * 2]}, ${result[i * 2 + 1]}")
+    }
+
+    return result
 }

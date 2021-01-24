@@ -1,13 +1,14 @@
 package ru.substancial.dreamwalkers
 
-import com.badlogic.gdx.*
+import com.badlogic.gdx.ApplicationLogger
+import com.badlogic.gdx.Game
+import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.InputMultiplexer
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.strongjoshua.console.Console
 import com.strongjoshua.console.GUIConsole
 import com.strongjoshua.console.LogLevel
 import ru.substancial.dreamwalkers.dev.DwCommandExecutor
-import ru.substancial.dreamwalkers.screen.ControllerSetupScreen
-import ru.substancial.dreamwalkers.screen.GameScreen
 import ru.substancial.dreamwalkers.screen.MainScreen
 import ru.substancial.dreamwalkers.utilities.addProcessor
 import ru.substancial.dreamwalkers.utilities.removeProcessor

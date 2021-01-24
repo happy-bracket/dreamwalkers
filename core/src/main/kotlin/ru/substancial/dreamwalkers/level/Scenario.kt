@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.physics.box2d.World
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.jse.JsePlatform
+import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
 import ru.substancial.dreamwalkers.utilities.lua
 import java.util.*
 
@@ -14,19 +15,24 @@ class ScenarioHolder(
         scenarioName: String,
         interactor: ScenarioCallbacks,
         engine: Engine,
-        world: World
-)  {
+        world: World,
+        spawner: EntitySpawner
+) {
 
     private val globals = JsePlatform.standardGlobals()
 
     private val cachedEntities: WeakHashMap<Entity, LuaValue> = WeakHashMap<Entity, LuaValue>()
 
     private val interactor = interactor.lua
+    private val spawner = spawner.lua
+    private val world = world.lua
 
+    // (initiator, target, interactor, level, engine, world, spawner)
     private val invoker: Array<LuaValue?> = arrayOf(
             null, null,
             this.interactor, null,
-            engine.lua, world.lua
+            engine.lua, this.world,
+            this.spawner
     )
 
     init {
@@ -35,7 +41,7 @@ class ScenarioHolder(
     }
 
     fun initialize(saveFile: SaveFile?) {
-        globals["init"](interactor, saveFile.lua)
+        globals["init"](arrayOf(interactor, saveFile.lua, world, spawner))
     }
 
     fun processInteraction(initiator: Entity, target: Entity) {

@@ -28,7 +28,7 @@ class MainScreen(private val core: Core) : ScreenAdapter(), HasDisplay by HasDis
 
         startButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                core.screen = GameScreen(core)
+                core.screen = GameScreen(core, "assets/scenarios/test", "scenario.lua", null)
             }
         })
 

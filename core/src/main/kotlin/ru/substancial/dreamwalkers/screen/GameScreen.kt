@@ -56,6 +56,7 @@ class GameScreen(
     private val lunaLookSystem = LunaLookSystem(controller)
     private val decelerationSystem = DecelerationSystem()
     private val aiSystem = AiSystem(world)
+    private val worldSystem = WorldSystem(world)
 
     private val engine = Engine()
             .apply {
@@ -68,6 +69,7 @@ class GameScreen(
                 addSystem(lunaLookSystem)
                 addSystem(decelerationSystem)
                 addSystem(aiSystem)
+                addSystem(worldSystem)
             }
 
     init {
@@ -81,7 +83,6 @@ class GameScreen(
 
     override fun render(delta: Float) {
         ClearScreen()
-        world.step(1 / 60f, 6, 2)
         engine.update(delta)
         stage.act(delta)
         stage.draw()

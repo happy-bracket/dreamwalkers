@@ -63,37 +63,33 @@ class EntitySpawner(private val world: World, private val engine: Engine) {
         return entity
     }
 
-}
+    private fun discreteEllipse(width: Float, height: Float, step: Float = 0.1f): FloatArray {
+        val halfWidth = width / 2
+        val halfHeight = height / 2
 
-private fun discreteEllipse(width: Float, height: Float, step: Float = 0.1f): FloatArray {
-    val halfWidth = width / 2
-    val halfHeight = height / 2
+        val steps = (width / step).toInt() + 1
 
-    val steps = (width / step).toInt() + 1
+        val result = FloatArray(steps * 4 - 4) { Float.NaN }
 
-    val result = FloatArray(steps * 4 - 4) { Float.NaN }
+        for (i in 1 until steps) {
+            val x = i * step - halfWidth
+            val xbw = x / halfWidth
+            val y = halfHeight * sqrt((1 - xbw * xbw))
 
-    for (i in 1 until steps) {
-        val x = i * step - halfWidth
-        val xbw = x / halfWidth
-        val y = halfHeight * sqrt((1 - xbw * xbw))
+            result[i * 2] = x
+            result[i * 2 + 1] = y
 
-        result[i * 2] = x
-        result[i * 2 + 1] = y
+            result[(steps * 4 - i * 2) - 4] = x
+            result[(steps * 4 - i * 2) - 3] = -y
+        }
 
-        result[(steps * 4 - i * 2) - 4] = x
-        result[(steps * 4 - i * 2) - 3] = -y
+        result[0] = -halfWidth
+        result[1] = 0f
+
+        result[result.size / 2] = halfWidth
+        result[result.size / 2 + 1] = 0f
+
+        return result
     }
 
-    result[0] = -halfWidth
-    result[1] = 0f
-
-    result[result.size / 2] = halfWidth
-    result[result.size / 2 + 1] = 0f
-
-    for (i in 0 until result.size / 2) {
-        println("${result[i * 2]}, ${result[i * 2 + 1]}")
-    }
-
-    return result
 }

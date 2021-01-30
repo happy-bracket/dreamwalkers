@@ -107,8 +107,8 @@ class GameScreen(
 
             val levelPath = levelFolderContents.first { it.extension() == "tmx" }
 
-            val map = TmxMapLoader().load(levelPath.path())
-            val loadedLevel = Level(map, 16)
+            val map = TmxMapLoader().load(levelPath.path(), TmxMapLoader.Parameters().apply { convertObjectToTileSpace = true })
+            val loadedLevel = Level(map)
             loadedLevel.inflate(world, engine)
 
             scenarioHolder.setLevel(loadedLevel)

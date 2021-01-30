@@ -26,7 +26,7 @@ function init(interactor, savefile, world, spawner)
     local aerial_comp = luajava.newInstance(comp_package .. "AerialComponent")
     local look_comp = luajava.newInstance(comp_package .. "LookComponent")
 
-    local luna = spawner:spawnWithHitbox(1.8, 1.7, xy, 7.5)
+    local luna = spawner:spawnWithPushbox(1.8, 1.7, xy, 7.5)
     luna:add(luna_comp)
     luna:add(aerial_comp)
     luna:add(look_comp)

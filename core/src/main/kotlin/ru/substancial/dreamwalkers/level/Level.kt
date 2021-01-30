@@ -24,7 +24,7 @@ import ru.substancial.dreamwalkers.utilities.y
 import java.util.*
 import kotlin.collections.HashMap
 
-class Level(private val map: TiledMap, private val scale: Int) : Disposable {
+class Level(private val map: TiledMap) : Disposable {
 
     private val triangulator by lazy { EarClippingTriangulator() }
 
@@ -52,7 +52,7 @@ class Level(private val map: TiledMap, private val scale: Int) : Disposable {
 
                 val entity = Entity()
                 entities.add(entity)
-                entity.add(PositionComponent(Vector2(mapObject.x / scale, mapObject.y / scale)))
+                entity.add(PositionComponent(Vector2(mapObject.x, mapObject.y)))
 
                 val id = mapObject.properties[ID] as String?
                 if (id != null)
@@ -85,11 +85,11 @@ class Level(private val map: TiledMap, private val scale: Int) : Disposable {
     private fun BodyDefinition.fromRectangle(mapObject: RectangleMapObject, additionally: FixtureDefinition.() -> Unit = {}) {
         val rect = mapObject.rectangle
         box(
-                width = rect.width / scale,
-                height = rect.height / scale,
+                width = rect.width,
+                height = rect.height,
                 position = Vector2(
-                        rect.x / scale + rect.width / (scale * 2),
-                        rect.y / scale + rect.height / (scale * 2)
+                        rect.x + rect.width / 2,
+                        rect.y + rect.height / 2
                 )
         ) {
             additionally()
@@ -99,11 +99,11 @@ class Level(private val map: TiledMap, private val scale: Int) : Disposable {
     private fun BodyDefinition.fromPolygon(mapObject: PolygonMapObject, additionally: FixtureDefinition.() -> Unit = {}) {
         val polygon = mapObject.polygon
         val vertices = polygon.vertices
-        val offsetX = polygon.x / scale
-        val offsetY = polygon.y / scale
+        val offsetX = polygon.x
+        val offsetY = polygon.y
 
         for (i in vertices.indices) {
-            vertices[i] = vertices[i] / scale
+            vertices[i] = vertices[i]
         }
         val triangles = triangulator.computeTriangles(vertices)
 

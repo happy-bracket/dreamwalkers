@@ -52,11 +52,5 @@
     <property name="object_id" value="spawn_point"/>
    </properties>
   </object>
-  <object id="20" x="697.667" y="2988.77">
-   <properties>
-    <property name="object_id" value="spawn_point"/>
-   </properties>
-   <point/>
-  </object>
  </objectgroup>
 </map>

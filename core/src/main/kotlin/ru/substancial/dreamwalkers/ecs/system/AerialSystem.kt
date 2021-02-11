@@ -2,16 +2,14 @@ package ru.substancial.dreamwalkers.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
-import com.badlogic.ashley.utils.ImmutableArray
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.Contact
 import com.badlogic.gdx.physics.box2d.World
-import ru.substancial.dreamwalkers.bodies.isGround
 import ru.substancial.dreamwalkers.ecs.component.AerialComponent
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.extract
-import ru.substancial.dreamwalkers.physics.GroundSensor
-import ru.substancial.dreamwalkers.physics.info
+import ru.substancial.dreamwalkers.physics.BodyProp
+import ru.substancial.dreamwalkers.physics.getProps
 import ru.substancial.dreamwalkers.utilities.ContactAdapter
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
 
@@ -19,47 +17,39 @@ class AerialSystem(
         world: World
 ) : RegisteringSystem() {
 
-    private val bodies: ImmutableArray<Entity> by multiple(family)
+    private val entityByBody by listener(
+            family,
+            HashMap<Body, Entity>(),
+            { s, e -> s[e.extract<BodyComponent>().body] = e },
+            { s, e -> s.remove(e.extract<BodyComponent>().body) },
+            { s -> s.clear() }
+    )
 
     init {
         world.setContactListener(
                 object : ContactAdapter() {
 
                     override fun beginContact(contact: Contact) {
-                        extractBodyIfGroundContact(contact) { body ->
-                            bodies.firstOrNull {
-                                it.extract<BodyComponent>().body.info.id == body.info.id
-                            }?.let {
-                                it.extract<AerialComponent>().terrainContacts += 1
-                            }
+                        reactToGroundContact(contact) { notGround ->
+                            entityByBody[notGround]!!.extract<AerialComponent>().terrainContacts += 1
                         }
                     }
 
                     override fun endContact(contact: Contact) {
-                        extractBodyIfGroundContact(contact) { body ->
-                            bodies.firstOrNull {
-                                it.extract<BodyComponent>().body.info.id == body.info.id
-                            }?.let {
-                                it.extract<AerialComponent>().terrainContacts -= 1
-                            }
+                        reactToGroundContact(contact) { notGround ->
+                            entityByBody[notGround]!!.extract<AerialComponent>().terrainContacts -= 1
                         }
                     }
 
-                    private fun extractBodyIfGroundContact(contact: Contact, ifExtracted: (Body) -> Unit) {
-                        val fa = contact.fixtureA
-                        val fb = contact.fixtureB
-                        val ba = fa.body
-                        val bb = fb.body
+                    private inline fun reactToGroundContact(contact: Contact, ifGroundContact: (notGround: Body) -> Unit) {
+                        val propsA = contact.fixtureA.getProps().props
+                        val propsB = contact.fixtureB.getProps().props
 
-                        val ga = ba.isGround()
-                        val gb = bb.isGround()
+                        if (BodyProp.Ground in propsA && BodyProp.Foot in propsB)
+                            ifGroundContact(contact.fixtureB.body)
 
-                        if (!(ga && gb).xor(ga || gb)) return
-
-                        val touch = if (ga) fb else fa
-
-                        if (touch.info?.tag is GroundSensor)
-                            ifExtracted(touch.body)
+                        if (BodyProp.Foot in propsA && BodyProp.Ground in propsB)
+                            ifGroundContact(contact.fixtureA.body)
                     }
 
                 }

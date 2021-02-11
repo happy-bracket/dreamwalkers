@@ -18,7 +18,9 @@ import ru.substancial.dreamwalkers.bodies.GroundTag
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.component.PositionComponent
 import ru.substancial.dreamwalkers.physics.BodyInfo
+import ru.substancial.dreamwalkers.physics.BodyProp
 import ru.substancial.dreamwalkers.physics.injectInfo
+import ru.substancial.dreamwalkers.physics.injectProps
 import ru.substancial.dreamwalkers.utilities.x
 import ru.substancial.dreamwalkers.utilities.y
 import java.util.*
@@ -42,10 +44,9 @@ class Level(private val map: TiledMap) : Disposable {
             for ((type, mapObject) in objects) {
 
                 if (type is ObjectType.Terrain) {
-                    userData = BodyInfo(GroundTag, "ground")
                     when (mapObject) {
-                        is RectangleMapObject -> fromRectangle(mapObject)
-                        is PolygonMapObject -> fromPolygon(mapObject)
+                        is RectangleMapObject -> fromRectangle(mapObject) { injectProps(BodyProp.Ground) }
+                        is PolygonMapObject -> fromPolygon(mapObject) { injectProps(BodyProp.Ground) }
                     }
                     continue
                 }

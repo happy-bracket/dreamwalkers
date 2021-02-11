@@ -14,7 +14,9 @@ import ru.substancial.dreamwalkers.bodies.LunaHoovesTag
 import ru.substancial.dreamwalkers.bodies.LunaRootTag
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.physics.BodyInfo
+import ru.substancial.dreamwalkers.physics.BodyProp
 import ru.substancial.dreamwalkers.physics.injectInfo
+import ru.substancial.dreamwalkers.physics.injectProps
 import kotlin.math.sqrt
 
 class EntitySpawner(private val world: World, private val engine: Engine) {
@@ -39,22 +41,17 @@ class EntitySpawner(private val world: World, private val engine: Engine) {
             loop(vertices) {
                 friction = 0f
                 density = 500f / area
-                injectInfo(LunaBodyTag, "luna_body")
             }
 
             box(
-                    width = width * 0.95f,
+                    width = width * 0.8f,
                     height = 0.2f,
                     position = Vector2(0f, -height / 2)
             ) {
                 isSensor = true
                 density = 0f
-                injectInfo(LunaHoovesTag, "luna_hooves")
+                injectProps(BodyProp.Foot)
             }
-            userData = BodyInfo(
-                    LunaRootTag,
-                    "luna"
-            )
         }
         entity.add(BodyComponent(body))
         entity.add(PositionComponent())

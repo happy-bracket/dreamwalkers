@@ -49,7 +49,7 @@ class GameScreen(
 
     private val cameraSystem = CameraSystem(camera)
     private val renderSystem = DebugRenderSystem(world, camera, debugRenderer)
-    private val aerialSystem = AerialSystem(world)
+    private val aerialSystem: AerialSystem
     private val lunaBodySystem = LunaBodySystem(controller)
     private val positionSystem = PositionSystem()
     private val weaponSystem = WeaponSystem(controller)
@@ -62,7 +62,6 @@ class GameScreen(
             .apply {
                 addSystem(cameraSystem)
                 addSystem(renderSystem)
-                addSystem(aerialSystem)
                 addSystem(lunaBodySystem)
                 addSystem(positionSystem)
                 addSystem(weaponSystem)
@@ -79,6 +78,9 @@ class GameScreen(
         val interactor = GameScenarioCallbacks()
         scenarioHolder = ScenarioHolder("$scenarioPath/$scenarioName", interactor, engine, world, EntitySpawner(world, engine))
         scenarioHolder.initialize(saveFile)
+
+        aerialSystem = AerialSystem(world, scenarioHolder)
+        engine.addSystem(aerialSystem)
     }
 
     override fun render(delta: Float) {

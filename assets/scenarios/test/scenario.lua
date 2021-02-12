@@ -31,3 +31,7 @@ function init(interactor, savefile, world, spawner)
     luna:add(aerial_comp)
     luna:add(look_comp)
 end
+
+function process_collision(initiator, target, interactor, level, engine, world, spawner)
+    print("egor2: collision hit")
+end

@@ -16,11 +16,9 @@ import ktx.box2d.FixtureDefinition
 import ktx.box2d.body
 import ru.substancial.dreamwalkers.bodies.GroundTag
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
+import ru.substancial.dreamwalkers.ecs.component.IdentityComponent
 import ru.substancial.dreamwalkers.ecs.component.PositionComponent
-import ru.substancial.dreamwalkers.physics.BodyInfo
-import ru.substancial.dreamwalkers.physics.BodyProp
-import ru.substancial.dreamwalkers.physics.injectInfo
-import ru.substancial.dreamwalkers.physics.injectProps
+import ru.substancial.dreamwalkers.physics.*
 import ru.substancial.dreamwalkers.utilities.x
 import ru.substancial.dreamwalkers.utilities.y
 import java.util.*
@@ -56,17 +54,33 @@ class Level(private val map: TiledMap) : Disposable {
                 entity.add(PositionComponent(Vector2(mapObject.x, mapObject.y)))
 
                 val id = mapObject.properties[ID] as String?
-                if (id != null)
+                if (id != null) {
                     entityById[id] = entity
+                    entity.add(IdentityComponent(id))
+                }
 
                 if (type is ObjectType.Ghost)
                     continue
 
                 val objectBody = world.body {
                     this.type = BodyDef.BodyType.StaticBody
+                    val onCollStart = mapObject.properties[REACT_TO_COLLISION_START]
+                    val props = mutableSetOf<BodyProp>()
+                    if (onCollStart != null) {
+                        if (id == null) {
+                            throw LevelException("interactive body must have an object_id set. Met a level object that reacts to collisions with Tiled id ${mapObject.properties["id"]}")
+                        }
+                        props.add(BodyProp.OnCollisionStart)
+                    }
                     when (mapObject) {
-                        is RectangleMapObject -> fromRectangle(mapObject) { isSensor = type is ObjectType.Sensor }
-                        is PolygonMapObject -> fromPolygon(mapObject) { isSensor = type is ObjectType.Sensor }
+                        is RectangleMapObject -> fromRectangle(mapObject) {
+                            isSensor = type is ObjectType.Sensor
+                            userData = FixtureProps(props)
+                        }
+                        is PolygonMapObject -> fromPolygon(mapObject) {
+                            isSensor = type is ObjectType.Sensor
+                            userData = FixtureProps(props)
+                        }
                     }
                 }
                 entity.add(BodyComponent(objectBody))
@@ -145,9 +159,9 @@ class Level(private val map: TiledMap) : Disposable {
 
     companion object Tag {
 
-        private const val TAG_SPAWN_POINT = "spawn_point"
-        private const val TAG_TERRAIN = "ground"
         private const val RIGIDNESS = "rigidness"
+        private const val REACT_TO_COLLISION_START = "on_collision"
+        private const val REACT_TO_COLLISION_END = "after_collision"
         private const val ID = "object_id"
 
     }

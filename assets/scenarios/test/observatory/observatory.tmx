@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="22">
+<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="24">
  <objectgroup id="2" name="ground">
   <object id="1" x="283.186" y="3051.7" width="2585.93" height="141.593">
    <properties>
@@ -52,5 +52,13 @@
     <property name="object_id" value="spawn_point"/>
    </properties>
   </object>
+  <object id="22" x="1252" y="2984" width="76" height="48">
+   <properties>
+    <property name="object_id" value="test_collision"/>
+    <property name="on_collision" value=""/>
+    <property name="rigidness" type="int" value="2"/>
+   </properties>
+  </object>
+  <object id="23" x="1476" y="3588"/>
  </objectgroup>
 </map>

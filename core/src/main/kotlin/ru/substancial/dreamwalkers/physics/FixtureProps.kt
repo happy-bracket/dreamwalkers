@@ -3,10 +3,8 @@ package ru.substancial.dreamwalkers.physics
 import com.badlogic.gdx.physics.box2d.Fixture
 import ktx.box2d.FixtureDefinition
 
-enum class BodyProp {
-    Ground, Foot,
-    OnCollisionStart, OnCollisionEnd,
-    OnInteraction
+sealed class BodyProp {
+    object Foot : BodyProp()
 }
 
 class FixtureProps(

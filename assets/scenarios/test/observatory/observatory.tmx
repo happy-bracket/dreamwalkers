@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="24">
+<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="right-up" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="4" nextobjectid="25">
  <objectgroup id="2" name="ground">
   <object id="1" x="283.186" y="3051.7" width="2585.93" height="141.593">
    <properties>
@@ -60,5 +60,10 @@
    </properties>
   </object>
   <object id="23" x="1476" y="3588"/>
+  <object id="24" x="1692" y="2956">
+   <properties>
+    <property name="object_id" value="dummy_spawner"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

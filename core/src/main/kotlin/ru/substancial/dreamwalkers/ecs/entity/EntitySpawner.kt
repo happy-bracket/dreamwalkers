@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
+import ktx.box2d.distanceJointWith
 import ru.substancial.dreamwalkers.bodies.LunaBody
 import ru.substancial.dreamwalkers.bodies.LunaBodyTag
 import ru.substancial.dreamwalkers.bodies.LunaHoovesTag
@@ -21,7 +22,7 @@ import kotlin.math.sqrt
 
 class EntitySpawner(private val world: World, private val engine: Engine) {
 
-    fun spawnWithPushbox(
+    fun spawn(
             width: Float,
             height: Float,
             spawnPosition: Vector2,

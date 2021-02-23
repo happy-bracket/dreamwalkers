@@ -4,6 +4,8 @@ import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.jse.CoerceJavaToLua
 import org.luaj.vm2.lib.jse.CoerceLuaToJava
 
+inline class LuaFunctionName(val name: String)
+
 val Any?.lua: LuaValue
     get() = CoerceJavaToLua.coerce(this)
 

@@ -4,25 +4,20 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.maps.objects.PolygonMapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
+import com.badlogic.gdx.maps.objects.TextureMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
 import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.BodyDef
-import com.badlogic.gdx.physics.box2d.FixtureDef
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.utils.Disposable
 import ktx.box2d.BodyDefinition
 import ktx.box2d.FixtureDefinition
 import ktx.box2d.body
-import ru.substancial.dreamwalkers.bodies.GroundTag
-import ru.substancial.dreamwalkers.ecs.component.BodyComponent
-import ru.substancial.dreamwalkers.ecs.component.IdentityComponent
-import ru.substancial.dreamwalkers.ecs.component.PositionComponent
-import ru.substancial.dreamwalkers.physics.*
+import ru.substancial.dreamwalkers.ecs.component.*
+import ru.substancial.dreamwalkers.physics.entity
 import ru.substancial.dreamwalkers.utilities.x
 import ru.substancial.dreamwalkers.utilities.y
-import java.util.*
-import kotlin.collections.HashMap
 
 class Level(private val map: TiledMap) : Disposable {
 
@@ -31,63 +26,54 @@ class Level(private val map: TiledMap) : Disposable {
     private val entityById = HashMap<String, Entity>()
 
     fun inflate(world: World, engine: Engine) {
-        val allObjects = map.layers.flatMap { it.objects }
-        val objects = allObjects
-                .mapNotNull {
-                    it.properties[RIGIDNESS].let { rigidness -> rigidnessNumberToType(rigidness) to it }
-                }
+        val objects = map.layers.flatMap { it.objects }.filterNot { it is TiledMapTileMapObject || it is TextureMapObject }
 
-        val entities = LinkedList<Entity>()
-        world.body {
-            for ((type, mapObject) in objects) {
-
-                if (type is ObjectType.Terrain) {
-                    when (mapObject) {
-                        is RectangleMapObject -> fromRectangle(mapObject) { injectProps(BodyProp.Ground) }
-                        is PolygonMapObject -> fromPolygon(mapObject) { injectProps(BodyProp.Ground) }
-                    }
-                    continue
-                }
-
-                val entity = Entity()
-                entities.add(entity)
-                entity.add(PositionComponent(Vector2(mapObject.x, mapObject.y)))
-
-                val id = mapObject.properties[ID] as String?
-                if (id != null) {
-                    entityById[id] = entity
-                    entity.add(IdentityComponent(id))
-                }
-
-                if (type is ObjectType.Ghost)
-                    continue
-
-                val objectBody = world.body {
-                    this.type = BodyDef.BodyType.StaticBody
-                    val onCollStart = mapObject.properties[REACT_TO_COLLISION_START]
-                    val props = mutableSetOf<BodyProp>()
-                    if (onCollStart != null) {
-                        if (id == null) {
-                            throw LevelException("interactive body must have an object_id set. Met a level object that reacts to collisions with Tiled id ${mapObject.properties["id"]}")
-                        }
-                        props.add(BodyProp.OnCollisionStart)
-                    }
-                    when (mapObject) {
-                        is RectangleMapObject -> fromRectangle(mapObject) {
-                            isSensor = type is ObjectType.Sensor
-                            userData = FixtureProps(props)
-                        }
-                        is PolygonMapObject -> fromPolygon(mapObject) {
-                            isSensor = type is ObjectType.Sensor
-                            userData = FixtureProps(props)
-                        }
-                    }
-                }
-                entity.add(BodyComponent(objectBody))
+        objects.forEach { mapObject ->
+            val entity = Entity()
+            val type = mapObject.properties[RIGIDNESS].let(::rigidnessNumberToType)
+            val id = try { mapObject.properties[ID] as String? } catch (e: ClassCastException) { throw LevelException("object_id in the level was not of type String") }
+            if (id != null) {
+                entity.add(IdentityComponent(id))
             }
+            entity.add(PositionComponent(Vector2(mapObject.x, mapObject.y)))
+            when (type) {
+                ObjectType.Ghost -> {
+                    entity.add(GhostComponent())
+                }
+                ObjectType.Terrain -> {
+                    val body = world.body {
+                        when (mapObject) {
+                            is RectangleMapObject -> fromRectangle(mapObject) {}
+                            is PolygonMapObject -> fromPolygon(mapObject) {}
+                        }
+                    }
+                    entity.add(BodyComponent(body))
+                    entity.add(TerrainComponent())
+                    body.entity = entity
+                }
+                ObjectType.Rigid -> {
+                    val body = world.body {
+                        when (mapObject) {
+                            is RectangleMapObject -> fromRectangle(mapObject) {}
+                            is PolygonMapObject -> fromPolygon(mapObject) {}
+                        }
+                    }
+                    entity.add(BodyComponent(body))
+                    body.entity = entity
+                }
+                ObjectType.Sensor -> {
+                    val body = world.body {
+                        when (mapObject) {
+                            is RectangleMapObject -> fromRectangle(mapObject) { isSensor = true }
+                            is PolygonMapObject -> fromPolygon(mapObject) { isSensor = true }
+                        }
+                    }
+                    entity.add(BodyComponent(body))
+                    body.entity = entity
+                }
+            }
+            engine.addEntity(entity)
         }
-
-        entities.forEach(engine::addEntity)
     }
 
     fun getEntityById(id: String): Entity = entityById[id]
@@ -141,14 +127,17 @@ class Level(private val map: TiledMap) : Disposable {
 
     class LevelException(message: String) : Exception(message)
 
+    private val rigidnessNumberToType = mapOf(
+            null to ObjectType.Ghost,
+            0 to ObjectType.Ghost,
+            1 to ObjectType.Sensor,
+            2 to ObjectType.Rigid,
+            3 to ObjectType.Terrain
+    )
+
     private fun rigidnessNumberToType(rigidness: Any?): ObjectType =
-            when (rigidness) {
-                0, null -> ObjectType.Ghost
-                1 -> ObjectType.Sensor
-                2 -> ObjectType.Rigid
-                3 -> ObjectType.Terrain
-                else -> throw LevelException("Rigidness was not any of: { null, 0, 1, 2, 3 }, it was: $rigidness")
-            }
+            rigidnessNumberToType[(rigidness as? Int?)]
+                    ?: throw LevelException("Rigidness was not any of: ${rigidnessNumberToType.keys.joinToString(prefix = "{", postfix = "}")}, it was: $rigidness")
 
     private sealed class ObjectType {
         object Ghost : ObjectType()

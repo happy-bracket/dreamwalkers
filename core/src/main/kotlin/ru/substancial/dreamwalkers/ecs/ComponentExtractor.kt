@@ -7,6 +7,9 @@ import com.badlogic.ashley.core.Entity
 inline operator fun <T : Component> Entity.contains(mapper: ComponentMapper<T>): Boolean =
         mapper.has(this)
 
+inline fun <reified T :Component> Entity.has(): Boolean =
+        gm<T>().has(this)
+
 val mappersCache = HashMap<Class<*>, ComponentMapper<*>>()
 inline fun <reified T : Component> gm(): ComponentMapper<*> {
     val type = T::class.java

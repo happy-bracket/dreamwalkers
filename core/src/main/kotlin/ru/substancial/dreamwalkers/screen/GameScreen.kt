@@ -11,14 +11,13 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.utils.viewport.FitViewport
-import org.luaj.vm2.lib.jse.JsePlatform
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
 import ru.substancial.dreamwalkers.ecs.system.*
 import ru.substancial.dreamwalkers.level.*
 import ru.substancial.dreamwalkers.utilities.ClearScreen
-import ru.substancial.dreamwalkers.utilities.lua
+import ru.substancial.dreamwalkers.utilities.IdentityRegistry
 
 class GameScreen(
         private val core: Core,
@@ -46,10 +45,11 @@ class GameScreen(
     private val stage = Stage(viewport)
 
     private val scenarioHolder: ScenarioHolder
+    private val registry: IdentityRegistry = IdentityRegistry()
 
     private val cameraSystem = CameraSystem(camera)
     private val renderSystem = DebugRenderSystem(world, camera, debugRenderer)
-    private val aerialSystem: AerialSystem
+    private val collisionSystem: CollisionSystem
     private val lunaBodySystem = LunaBodySystem(controller)
     private val positionSystem = PositionSystem()
     private val weaponSystem = WeaponSystem(controller)
@@ -57,6 +57,8 @@ class GameScreen(
     private val decelerationSystem = DecelerationSystem()
     private val aiSystem = AiSystem(world)
     private val worldSystem = WorldSystem(world)
+    private val vitalitySystem = VitalitySystem()
+    private val registrySystem = RegistrySystem(registry)
 
     private val engine = Engine()
             .apply {
@@ -69,6 +71,8 @@ class GameScreen(
                 addSystem(decelerationSystem)
                 addSystem(aiSystem)
                 addSystem(worldSystem)
+                addSystem(vitalitySystem)
+                addSystem(registrySystem)
             }
 
     init {
@@ -76,11 +80,11 @@ class GameScreen(
         core.commandExecutor.currentEngine = engine
 
         val interactor = GameScenarioCallbacks()
-        scenarioHolder = ScenarioHolder("$scenarioPath/$scenarioName", interactor, engine, world, EntitySpawner(world, engine))
+        scenarioHolder = ScenarioHolder("$scenarioPath/$scenarioName", interactor, engine, registry, EntitySpawner(world, engine))
         scenarioHolder.initialize(saveFile)
 
-        aerialSystem = AerialSystem(world, scenarioHolder)
-        engine.addSystem(aerialSystem)
+        collisionSystem = CollisionSystem(world, scenarioHolder)
+        engine.addSystem(collisionSystem)
     }
 
     override fun render(delta: Float) {
@@ -103,7 +107,7 @@ class GameScreen(
 
     inner class GameScenarioCallbacks : ScenarioCallbacks {
 
-        override fun loadLevel(name: String): Level {
+        override fun loadLevel(name: String) {
             val levelFolder = Gdx.files.internal("$scenarioPath/$name")
             val levelFolderContents = levelFolder.list()
 
@@ -112,10 +116,6 @@ class GameScreen(
             val map = TmxMapLoader().load(levelPath.path(), TmxMapLoader.Parameters().apply { convertObjectToTileSpace = true })
             val loadedLevel = Level(map)
             loadedLevel.inflate(world, engine)
-
-            scenarioHolder.setLevel(loadedLevel)
-
-            return loadedLevel
         }
     }
 

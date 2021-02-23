@@ -6,6 +6,8 @@ import com.badlogic.gdx.physics.box2d.World
 import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.jse.JsePlatform
 import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
+import ru.substancial.dreamwalkers.utilities.IdentityRegistry
+import ru.substancial.dreamwalkers.utilities.LuaFunctionName
 import ru.substancial.dreamwalkers.utilities.lua
 import java.util.*
 
@@ -15,25 +17,14 @@ class ScenarioHolder(
         scenarioName: String,
         interactor: ScenarioCallbacks,
         engine: Engine,
-        world: World,
+        registry: IdentityRegistry,
         spawner: EntitySpawner
 ) {
 
     private val globals = JsePlatform.standardGlobals()
 
-    private val cachedEntities: WeakHashMap<Entity, LuaValue> = WeakHashMap<Entity, LuaValue>()
-
-    private val interactor = interactor.lua
-    private val spawner = spawner.lua
-    private val world = world.lua
-
-    // (initiator, target, interactor, level, engine, world, spawner)
-    private val invoker: Array<LuaValue?> = arrayOf(
-            null, null,
-            this.interactor, null,
-            engine.lua, this.world,
-            this.spawner
-    )
+    private val invoker = Invoker(null, null, interactor, engine, registry, spawner, null)
+    private val invokerLua = invoker.lua
 
     init {
         val scenarioScript = globals.loadfile(scenarioName)
@@ -41,37 +32,30 @@ class ScenarioHolder(
     }
 
     fun initialize(saveFile: SaveFile?) {
-        globals["init"](arrayOf(interactor, saveFile.lua, world, spawner))
+        invoker.saveFile = saveFile
+        globals["init"](invokerLua)
     }
 
-    fun processInteraction(initiator: Entity, target: Entity) {
-        callEventFunction("process_interaction", initiator, target)
-    }
-
-    fun processCollision(initiator: Entity, target: Entity) {
-        callEventFunction("process_collision", initiator, target)
-    }
-
-    fun setLevel(level: Level) {
-        invoker[3] = level.lua
-    }
-
-    private fun callEventFunction(
-            functionName: String,
-            initiator: Entity,
-            target: Entity
-    ) {
-        val cachedInitiator = cachedEntities.getOrPut(initiator) { initiator.lua }
-        val cachedTarget = cachedEntities.getOrPut(target) { target.lua }
-        invoker[0] = cachedInitiator
-        invoker[1] = cachedTarget
-        globals[functionName](invoker)
+    fun call(functionName: LuaFunctionName, initiator: Entity, target: Entity) {
+        invoker.initiator = initiator
+        invoker.target = target
+        globals[functionName.name](invokerLua)
     }
 
 }
 
+class Invoker(
+        var initiator: Entity?,
+        var target: Entity?,
+        val interactor: ScenarioCallbacks,
+        val engine: Engine,
+        val registry: IdentityRegistry,
+        val spawner: EntitySpawner,
+        var saveFile: SaveFile?
+)
+
 interface ScenarioCallbacks {
 
-    fun loadLevel(name: String): Level
+    fun loadLevel(name: String)
 
 }

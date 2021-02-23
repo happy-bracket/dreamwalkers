@@ -63,7 +63,7 @@ class CollisionSystem(
             reactToTerrainContact(bodyA, begin)
         }
 
-        if ((entityA.has<OnCollisionStartComponent>()).xor(entityB.has<OnCollisionStartComponent>())) {
+        if (begin && (entityA.has<OnCollisionStartComponent>()).xor(entityB.has<OnCollisionStartComponent>())) {
             val functionName: String
             val initiator: Fixture
             val target: Fixture
@@ -84,26 +84,6 @@ class CollisionSystem(
                 )
             }
         }
-
-//        if (begin) {
-//            var hitBox: Fixture? = null
-//            var hurtBox: Fixture? = null
-//            when {
-//                BodyProp.HitBox in propsA && BodyProp.HurtBox in propsB -> {
-//                    hitBox = contact.fixtureA
-//                    hurtBox = contact.fixtureB
-//                }
-//                BodyProp.HurtBox in propsA && BodyProp.HitBox in propsB -> {
-//                    hitBox = contact.fixtureB
-//                    hurtBox = contact.fixtureA
-//                }
-//            }
-//            if (hitBox != null && hurtBox != null) {
-//                val hurtEntity = entityByBody[hurtBox.body]!!
-//                hurtEntity.extract<VitalityComponent>().vitalityLevel -= 10
-//            }
-//        }
-
     }
 
     private fun reactToTerrainContact(target: Body, begin: Boolean) {

@@ -2,14 +2,10 @@ package ru.substancial.dreamwalkers.level
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.physics.box2d.World
-import org.luaj.vm2.LuaValue
 import org.luaj.vm2.lib.jse.JsePlatform
 import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
 import ru.substancial.dreamwalkers.utilities.IdentityRegistry
-import ru.substancial.dreamwalkers.utilities.LuaFunctionName
 import ru.substancial.dreamwalkers.utilities.lua
-import java.util.*
 
 interface SaveFile
 
@@ -33,13 +29,17 @@ class ScenarioHolder(
 
     fun initialize(saveFile: SaveFile?) {
         invoker.saveFile = saveFile
-        globals["init"](invokerLua)
+        globals["init"]?.invoke(invokerLua)
     }
 
-    fun call(functionName: LuaFunctionName, initiator: Entity, target: Entity) {
+    fun update(delta: Float) {
+        globals["update"]?.invoke(delta.lua)
+    }
+
+    fun call(functionName: String, initiator: Entity, target: Entity) {
         invoker.initiator = initiator
         invoker.target = target
-        globals[functionName.name](invokerLua)
+        globals[functionName]?.invoke(invokerLua)
     }
 
 }

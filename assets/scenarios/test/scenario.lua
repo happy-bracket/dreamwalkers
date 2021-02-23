@@ -1,4 +1,4 @@
-require"scripting_utils/components"
+require "scripting_utils/components"
 
 function init(invoker)
     local level = invoker:getInteractor():loadLevel("observatory")
@@ -13,4 +13,21 @@ function init(invoker)
     luna:add(luna_comp)
     luna:add(aerial_comp)
     luna:add(look_comp)
+
+    local test_collision_entity = invoker:getRegistry():get("test_collision")
+    local on_collision = luajava.newInstance(on_collision_start_component, "test_spawn")
+    test_collision_entity:add(on_collision)
+end
+
+function test_spawn(invoker)
+    local registry = invoker:getRegistry()
+    if not registry:has("test_dummy") then
+        local spawnXy = position_mapper:get(registry:get("dummy_spawner")):getXy()
+        local dummy = invoker:getSpawner():spawn(0.8, 1.6, spawnXy, 0.0)
+        local identity = luajava.newInstance(identity_component, "test_dummy")
+        dummy:add(identity)
+    end
+end
+
+function update(delta)
 end

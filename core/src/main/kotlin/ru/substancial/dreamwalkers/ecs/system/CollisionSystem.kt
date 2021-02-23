@@ -15,7 +15,6 @@ import ru.substancial.dreamwalkers.level.ScenarioHolder
 import ru.substancial.dreamwalkers.physics.BodyProp
 import ru.substancial.dreamwalkers.physics.getProps
 import ru.substancial.dreamwalkers.utilities.ContactAdapter
-import ru.substancial.dreamwalkers.utilities.LuaFunctionName
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
 
 class CollisionSystem(
@@ -65,7 +64,7 @@ class CollisionSystem(
         }
 
         if ((entityA.has<OnCollisionStartComponent>()).xor(entityB.has<OnCollisionStartComponent>())) {
-            val functionName: LuaFunctionName
+            val functionName: String
             val initiator: Fixture
             val target: Fixture
             if (entityA.has<OnCollisionStartComponent>()) {

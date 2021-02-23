@@ -89,6 +89,7 @@ class GameScreen(
 
     override fun render(delta: Float) {
         ClearScreen()
+        scenarioHolder.update(delta)
         engine.update(delta)
         stage.act(delta)
         stage.draw()

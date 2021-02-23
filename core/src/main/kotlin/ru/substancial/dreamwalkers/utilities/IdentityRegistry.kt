@@ -26,6 +26,10 @@ class IdentityRegistry {
         return map[id] ?: throw IdentityException(id)
     }
 
+    fun has(id: String): Boolean {
+        return map.containsKey(id)
+    }
+
     class IdentityException(id: String) : Exception("No entity was found with id $id")
 
 }

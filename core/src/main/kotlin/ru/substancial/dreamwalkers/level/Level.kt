@@ -10,7 +10,6 @@ import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
 import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.World
-import com.badlogic.gdx.utils.Disposable
 import ktx.box2d.BodyDefinition
 import ktx.box2d.FixtureDefinition
 import ktx.box2d.body
@@ -19,11 +18,9 @@ import ru.substancial.dreamwalkers.physics.entity
 import ru.substancial.dreamwalkers.utilities.x
 import ru.substancial.dreamwalkers.utilities.y
 
-class Level(private val map: TiledMap) : Disposable {
+class Level(private val map: TiledMap) {
 
     private val triangulator by lazy { EarClippingTriangulator() }
-
-    private val entityById = HashMap<String, Entity>()
 
     fun inflate(world: World, engine: Engine) {
         val objects = map.layers.flatMap { it.objects }.filterNot { it is TiledMapTileMapObject || it is TextureMapObject }
@@ -74,13 +71,6 @@ class Level(private val map: TiledMap) : Disposable {
             }
             engine.addEntity(entity)
         }
-    }
-
-    fun getEntityById(id: String): Entity = entityById[id]
-            ?: throw LevelException("there was no map entity with id $id")
-
-    override fun dispose() {
-        entityById.clear()
     }
 
     private fun BodyDefinition.fromRectangle(mapObject: RectangleMapObject, additionally: FixtureDefinition.() -> Unit = {}) {

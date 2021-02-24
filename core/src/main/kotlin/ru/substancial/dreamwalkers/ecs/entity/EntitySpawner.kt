@@ -8,13 +8,12 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
-import ktx.box2d.distanceJointWith
 import ktx.box2d.ropeJointWith
-import ru.substancial.dreamwalkers.bodies.LunaRootTag
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
-import ru.substancial.dreamwalkers.physics.*
-import kotlin.math.abs
+import ru.substancial.dreamwalkers.physics.BodyProp
+import ru.substancial.dreamwalkers.physics.entity
+import ru.substancial.dreamwalkers.physics.injectProps
 import kotlin.math.sqrt
 
 class EntitySpawner(private val world: World, private val engine: Engine) {

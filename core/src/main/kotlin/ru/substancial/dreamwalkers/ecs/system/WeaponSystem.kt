@@ -1,6 +1,8 @@
 package ru.substancial.dreamwalkers.ecs.system
 
+import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.component.*
@@ -13,6 +15,20 @@ class WeaponSystem(
 
     private val weapon by optional(weaponFamily)
     private val luna by optional(lunaFamily)
+
+    override fun addedToEngine(engine: Engine) {
+        super.addedToEngine(engine)
+        controller.rightTriggerDownListener = {
+        }
+        controller.rightTriggerUpListener = {
+        }
+    }
+
+    override fun removedFromEngine(engine: Engine) {
+        super.removedFromEngine(engine)
+        controller.rightTriggerDownListener = {}
+        controller.rightTriggerUpListener = {}
+    }
 
     override fun update(deltaTime: Float) {
         val luna = this.luna ?: return

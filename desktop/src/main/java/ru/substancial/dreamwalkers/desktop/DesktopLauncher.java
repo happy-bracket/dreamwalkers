@@ -18,8 +18,8 @@ public class DesktopLauncher {
     private static LwjglApplicationConfiguration getDefaultConfiguration() {
         LwjglApplicationConfiguration configuration = new LwjglApplicationConfiguration();
         configuration.title = "dreamwalkers";
-        configuration.width = 640;
-        configuration.height = 360;
+        configuration.width = 1280;
+        configuration.height = 720;
         // TODO: remove for release
         configuration.x = 2160 + 1920 / 2;
         configuration.y = 320;

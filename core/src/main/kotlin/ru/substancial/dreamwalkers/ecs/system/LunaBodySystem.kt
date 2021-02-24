@@ -18,8 +18,8 @@ class LunaBodySystem(
 
     override fun addedToEngine(engine: Engine) {
         super.addedToEngine(engine)
-        controller.airTriggerDownListener = ::leftTriggerDown
-        controller.airTriggerUpListener = ::leftTriggerUp
+        controller.leftTriggerDownListener = ::leftTriggerDown
+        controller.leftTriggerUpListener = ::leftTriggerUp
     }
 
     override fun update(deltaTime: Float) {
@@ -39,7 +39,7 @@ class LunaBodySystem(
                 movement.desiresToMove = false
             }
         } else {
-            if (controller.airTriggerDown) {
+            if (controller.leftTriggerDown) {
                 lunaBody.gravityScale = 0.1f
             } else {
                 lunaBody.gravityScale = 1f

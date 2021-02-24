@@ -22,12 +22,19 @@ class TheController : ControllerAdapter() {
             _rightStick.cpy()
         } else Vector2()
 
-    private var _airTriggerDown = false
-    val airTriggerDown: Boolean
-        get() = _airTriggerDown
+    private var _leftTriggerDown = false
+    val leftTriggerDown: Boolean
+        get() = _leftTriggerDown
 
-    var airTriggerDownListener = {}
-    var airTriggerUpListener = {}
+    var leftTriggerDownListener = {}
+    var leftTriggerUpListener = {}
+
+    private var _rightTriggerDown = false
+    val rightTriggerDown: Boolean
+        get() = _rightTriggerDown
+
+    var rightTriggerDownListener = {}
+    var rightTriggerUpListener = {}
 
     override fun axisMoved(controller: Controller?, axisIndex: Int, value: Float): Boolean {
         if (latestUsedController?.uniqueId != controller?.uniqueId) {
@@ -43,14 +50,27 @@ class TheController : ControllerAdapter() {
             }
             ControllerAxis.TRIGGERLEFT.ordinal -> {
                 if (value >= 0.4f) {
-                    if (!_airTriggerDown) {
-                        _airTriggerDown = true
-                        airTriggerDownListener()
+                    if (!_leftTriggerDown) {
+                        _leftTriggerDown = true
+                        leftTriggerDownListener()
                     }
                 } else {
-                    if (_airTriggerDown) {
-                        _airTriggerDown = false
-                        airTriggerUpListener()
+                    if (_leftTriggerDown) {
+                        _leftTriggerDown = false
+                        leftTriggerUpListener()
+                    }
+                }
+            }
+            ControllerAxis.TRIGGERRIGHT.ordinal -> {
+                if (value >= 0.4f) {
+                    if (!_rightTriggerDown) {
+                        _rightTriggerDown = true
+                        rightTriggerDownListener()
+                    }
+                } else {
+                    if (_rightTriggerDown) {
+                        _rightTriggerDown = false
+                        rightTriggerUpListener()
                     }
                 }
             }

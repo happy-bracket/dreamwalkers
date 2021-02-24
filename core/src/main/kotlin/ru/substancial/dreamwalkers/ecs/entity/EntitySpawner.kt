@@ -2,6 +2,7 @@ package ru.substancial.dreamwalkers.ecs.entity
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.math.DelaunayTriangulator
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
@@ -13,9 +14,12 @@ import ru.substancial.dreamwalkers.bodies.LunaRootTag
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.physics.*
+import kotlin.math.abs
 import kotlin.math.sqrt
 
 class EntitySpawner(private val world: World, private val engine: Engine) {
+
+    private val triangulator by lazy { DelaunayTriangulator() }
 
     fun spawn(
             width: Float,
@@ -30,13 +34,27 @@ class EntitySpawner(private val world: World, private val engine: Engine) {
             fixedRotation = true
             position.set(spawnPosition)
 
-            val area = MathUtils.PI * (width / 2) * (height / 2)
+            val totalArea = MathUtils.PI * (width / 2) * (height / 2)
+            val bodyDensity = 500f / totalArea
 
             val vertices = discreteEllipse(width, height)
+            val triangles = triangulator.computeTriangles(vertices, true)
 
-            loop(vertices) {
-                friction = 0f
-                density = 500f / area
+            for (i in 0 until triangles.size / 3) {
+
+                val x1 = vertices[triangles[i * 3 + 0].toInt() * 2]
+                val y1 = vertices[triangles[i * 3 + 0].toInt() * 2 + 1]
+
+                val x2 = vertices[triangles[i * 3 + 1].toInt() * 2]
+                val y2 = vertices[triangles[i * 3 + 1].toInt() * 2 + 1]
+
+                val x3 = vertices[triangles[i * 3 + 2].toInt() * 2]
+                val y3 = vertices[triangles[i * 3 + 2].toInt() * 2 + 1]
+
+                polygon(floatArrayOf(x1, y1, x2, y2, x3, y3)) {
+                    friction = 0f
+                    density = bodyDensity
+                }
             }
 
             box(

@@ -60,20 +60,22 @@ class GameScreen(
     private val worldSystem = WorldSystem(world)
     private val vitalitySystem = VitalitySystem()
     private val registrySystem = RegistrySystem(registry)
+    private val hurtboxSystem = HurtboxFollowSystem()
 
     private val engine = Engine()
             .apply {
+                addSystem(worldSystem)
                 addSystem(cameraSystem)
-                addSystem(renderSystem)
                 addSystem(lunaBodySystem)
                 addSystem(positionSystem)
                 addSystem(weaponSystem)
                 addSystem(lunaLookSystem)
                 addSystem(decelerationSystem)
                 addSystem(aiSystem)
-                addSystem(worldSystem)
                 addSystem(vitalitySystem)
                 addSystem(registrySystem)
+                addSystem(hurtboxSystem)
+                addSystem(renderSystem)
             }
 
     init {

@@ -58,9 +58,6 @@ class EntitySpawner(private val world: World, private val engine: Engine) {
                 isSensor = true
             }
         }
-        body.distanceJointWith(hurtbox) {
-            length = 0f
-        }
         entity.add(HurtboxComponent(listOf(hurtbox)))
         entity.add(BodyComponent(body))
         entity.add(PositionComponent())

@@ -13,6 +13,7 @@ function init(invoker)
     luna:add(luna_comp)
     luna:add(aerial_comp)
     luna:add(look_comp)
+    invoker:getSpawner():equip(luna)
 
     local test_collision_entity = invoker:getRegistry():get("test_collision")
     local on_collision = luajava.newInstance(on_collision_start_component, "test_spawn")
@@ -25,7 +26,9 @@ function test_spawn(invoker)
         local spawnXy = position_mapper:get(registry:get("dummy_spawner")):getXy()
         local dummy = invoker:getSpawner():spawn(0.8, 1.6, spawnXy, 0.0)
         local identity = luajava.newInstance(identity_component, "test_dummy")
+        local vitality = luajava.newInstance(vitality_component, 30, 10, 20)
         dummy:add(identity)
+        dummy:add(vitality)
     end
 end
 

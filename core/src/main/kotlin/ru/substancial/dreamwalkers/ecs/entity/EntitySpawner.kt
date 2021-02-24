@@ -2,22 +2,17 @@ package ru.substancial.dreamwalkers.ecs.entity
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
-import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
 import ktx.box2d.distanceJointWith
-import ru.substancial.dreamwalkers.bodies.LunaBody
-import ru.substancial.dreamwalkers.bodies.LunaBodyTag
-import ru.substancial.dreamwalkers.bodies.LunaHoovesTag
+import ktx.box2d.ropeJointWith
 import ru.substancial.dreamwalkers.bodies.LunaRootTag
 import ru.substancial.dreamwalkers.ecs.component.*
-import ru.substancial.dreamwalkers.physics.BodyInfo
-import ru.substancial.dreamwalkers.physics.BodyProp
-import ru.substancial.dreamwalkers.physics.injectInfo
-import ru.substancial.dreamwalkers.physics.injectProps
+import ru.substancial.dreamwalkers.ecs.extract
+import ru.substancial.dreamwalkers.physics.*
 import kotlin.math.sqrt
 
 class EntitySpawner(private val world: World, private val engine: Engine) {
@@ -54,11 +49,57 @@ class EntitySpawner(private val world: World, private val engine: Engine) {
                 injectProps(BodyProp.Foot)
             }
         }
+        val hurtbox = world.body {
+            type = BodyDef.BodyType.DynamicBody
+            gravityScale = 0f
+            position.set(spawnPosition)
+            box(width = width * 0.9f, height = height * 0.9f) {
+                density = 0f
+                isSensor = true
+            }
+        }
+        body.distanceJointWith(hurtbox) {
+            length = 0f
+        }
+        entity.add(HurtboxComponent(listOf(hurtbox)))
         entity.add(BodyComponent(body))
         entity.add(PositionComponent())
         entity.add(MovementComponent(maxSpeed, body.mass, false))
         engine.addEntity(entity)
+
+        body.entity = entity
+        hurtbox.entity = entity
+
         return entity
+    }
+
+    fun equip(luna: Entity) {
+        val body = world.body {
+            type = BodyDef.BodyType.DynamicBody
+            this.gravityScale = 0f
+            linearDamping = 0.8f
+            this.fixedRotation = true
+
+            box(width = 0.1f, height = 1.5f) {
+                isSensor = true
+                density = 1f
+            }
+        }
+
+        val props = WeaponComponent()
+
+        body.ropeJointWith(luna.extract<BodyComponent>().pushbox) {
+            this.maxLength = props.weaponDistance
+        }
+
+        val e = Entity()
+        e.add(BodyComponent(body))
+        e.add(HitboxComponent(luna))
+        e.add(props)
+
+        body.entity = e
+
+        engine.addEntity(e)
     }
 
     private fun discreteEllipse(width: Float, height: Float, step: Float = 0.1f): FloatArray {

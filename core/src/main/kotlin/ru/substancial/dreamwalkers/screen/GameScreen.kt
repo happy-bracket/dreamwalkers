@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
+import ru.substancial.dreamwalkers.ecs.other.HitMediator
 import ru.substancial.dreamwalkers.ecs.system.*
 import ru.substancial.dreamwalkers.level.*
 import ru.substancial.dreamwalkers.utilities.ClearScreen
@@ -83,7 +84,7 @@ class GameScreen(
         scenarioHolder = ScenarioHolder("$scenarioPath/$scenarioName", interactor, engine, registry, EntitySpawner(world, engine))
         scenarioHolder.initialize(saveFile)
 
-        collisionSystem = CollisionSystem(world, scenarioHolder)
+        collisionSystem = CollisionSystem(world, scenarioHolder, HitMediator())
         engine.addSystem(collisionSystem)
     }
 

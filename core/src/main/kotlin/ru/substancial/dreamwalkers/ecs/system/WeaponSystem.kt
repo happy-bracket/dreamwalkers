@@ -18,8 +18,8 @@ class WeaponSystem(
         val luna = this.luna ?: return
         val weapon = this.weapon ?: return
         val weaponProps = weapon.extract<WeaponComponent>()
-        val weaponBody = weapon.extract<BodyComponent>().body
-        val lunaBody = luna.extract<BodyComponent>().body
+        val weaponBody = weapon.extract<BodyComponent>().pushbox
+        val lunaBody = luna.extract<BodyComponent>().pushbox
 
         val isLookingRight = luna.extract<LookComponent>().isLookingRight()
 

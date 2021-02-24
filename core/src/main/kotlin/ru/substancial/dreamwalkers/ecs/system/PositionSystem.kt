@@ -14,7 +14,7 @@ class PositionSystem : RegisteringSystem() {
         entities.forEach {
             val body = it.extract<BodyComponent>()
             val position = it.extract<PositionComponent>()
-            position.xy.set(body.body.worldCenter)
+            position.xy.set(body.pushbox.worldCenter)
         }
     }
 

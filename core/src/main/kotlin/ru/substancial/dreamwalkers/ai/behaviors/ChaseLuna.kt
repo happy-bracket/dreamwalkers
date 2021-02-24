@@ -19,7 +19,7 @@ class ChaseLuna : LeafTask<AiEnvironment>() {
         val lunaPosition = luna.extract<PositionComponent>().xy
         val thisPosition = thisEntity.extract<PositionComponent>().xy
         val thisMovement = thisEntity.extract<MovementComponent>()
-        val thisBody = thisEntity.extract<BodyComponent>().body
+        val thisBody = thisEntity.extract<BodyComponent>().pushbox
         val pullForce = Vector2(lunaPosition.x - thisPosition.x, 0f).nor().scl(thisMovement.pullForceMagnitude)
         thisMovement.desiresToMove = true
         thisBody.applyForceToCenter(pullForce, true)

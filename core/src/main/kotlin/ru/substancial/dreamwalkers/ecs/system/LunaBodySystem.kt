@@ -24,7 +24,7 @@ class LunaBodySystem(
 
     override fun update(deltaTime: Float) {
         val luna = this.luna ?: return
-        val lunaBody = luna.extract<BodyComponent>().body
+        val lunaBody = luna.extract<BodyComponent>().pushbox
         val aerial = luna.extract<AerialComponent>()
 
         if (!aerial.isAirborne) {
@@ -54,7 +54,7 @@ class LunaBodySystem(
             val rawDir = controller.leftStick
             if (rawDir.checkDeadzone(0.3f)) {
                 val direction = rawDir.nor().scl(8f)
-                luna.extract<BodyComponent>().body.addVelocityViaImpulse(direction)
+                luna.extract<BodyComponent>().pushbox.addVelocityViaImpulse(direction)
             }
         }
     }
@@ -63,7 +63,7 @@ class LunaBodySystem(
         val luna = this.luna ?: return
         val aerial = luna.extract<AerialComponent>()
         if (!aerial.isAirborne) {
-            luna.extract<BodyComponent>().body.addVelocityViaImpulse(Vector2(0f, 10f))
+            luna.extract<BodyComponent>().pushbox.addVelocityViaImpulse(Vector2(0f, 10f))
         }
     }
 

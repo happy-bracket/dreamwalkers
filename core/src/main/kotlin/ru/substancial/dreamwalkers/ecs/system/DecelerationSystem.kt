@@ -18,7 +18,7 @@ class DecelerationSystem : RegisteringSystem() {
         val tmp = Vector2()
         entities.forEach { entity ->
             val movement = entity.extract<MovementComponent>()
-            val body = entity.extract<BodyComponent>().body
+            val body = entity.extract<BodyComponent>().pushbox
             val aerial = entity.maybeExtract<AerialComponent>()
             val velocity2 = body.linearVelocity.len2()
             if (velocity2 >= movement.maxSpeed2 || !movement.desiresToMove) {

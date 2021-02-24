@@ -11,22 +11,25 @@ import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.has
 import ru.substancial.dreamwalkers.ecs.maybeExtract
+import ru.substancial.dreamwalkers.ecs.other.HitMediator
 import ru.substancial.dreamwalkers.level.ScenarioHolder
 import ru.substancial.dreamwalkers.physics.BodyProp
+import ru.substancial.dreamwalkers.physics.entity
 import ru.substancial.dreamwalkers.physics.getProps
 import ru.substancial.dreamwalkers.utilities.ContactAdapter
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
 
 class CollisionSystem(
         world: World,
-        private val scenario: ScenarioHolder
+        private val scenario: ScenarioHolder,
+        private val hitMediator: HitMediator
 ) : RegisteringSystem() {
 
     private val entityByBody by listener(
             family,
             HashMap<Body, Entity>(),
-            { s, e -> s[e.extract<BodyComponent>().body] = e },
-            { s, e -> s.remove(e.extract<BodyComponent>().body) },
+            { s, e -> s[e.extract<BodyComponent>().pushbox] = e },
+            { s, e -> s.remove(e.extract<BodyComponent>().pushbox) },
             { s -> s.clear() }
     )
 
@@ -46,12 +49,12 @@ class CollisionSystem(
 
     private fun reactToContact(contact: Contact, begin: Boolean) {
         val bodyA = contact.fixtureA.body
-        val entityA = entityByBody[bodyA]!!
+        val entityA = bodyA.entity
         val fixtureA = contact.fixtureA
         val propsA = fixtureA.getProps().props
 
         val bodyB = contact.fixtureB.body
-        val entityB = entityByBody[bodyB]!!
+        val entityB = bodyB.entity
         val fixtureB = contact.fixtureB
         val propsB = fixtureB.getProps().props
 
@@ -79,15 +82,17 @@ class CollisionSystem(
             Gdx.app.postRunnable {
                 scenario.call(
                         functionName,
-                        entityByBody[initiator.body]!!,
-                        entityByBody[target.body]!!
+                        initiator.body.entity,
+                        target.body.entity
                 )
             }
         }
+
+        hitMediator.process(entityA, entityB)
     }
 
     private fun reactToTerrainContact(target: Body, begin: Boolean) {
-        entityByBody[target]!!
+        target.entity
                 .maybeExtract<AerialComponent>()
                 ?.let { it.terrainContacts += if (begin) 1 else -1 }
     }

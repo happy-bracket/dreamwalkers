@@ -1,8 +1,8 @@
 package ru.substancial.dreamwalkers.ecs.component
 
 import com.badlogic.ashley.core.Component
-import com.badlogic.gdx.physics.box2d.Body
+import com.badlogic.ashley.core.Entity
 
-data class BodyComponent(
-    val pushbox: Body
+class HitboxComponent(
+        val owner: Entity
 ) : Component

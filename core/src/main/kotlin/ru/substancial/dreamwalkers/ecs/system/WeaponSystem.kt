@@ -2,7 +2,6 @@ package ru.substancial.dreamwalkers.ecs.system
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Family
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.component.*
@@ -19,8 +18,14 @@ class WeaponSystem(
     override fun addedToEngine(engine: Engine) {
         super.addedToEngine(engine)
         controller.rightTriggerDownListener = {
+            val w = weapon
+            val l = luna
+            if (w != null && l != null) {
+                w.add(HitboxComponent(l))
+            }
         }
         controller.rightTriggerUpListener = {
+            weapon?.remove(HitboxComponent::class.java)
         }
     }
 
@@ -39,7 +44,9 @@ class WeaponSystem(
 
         val isLookingRight = luna.extract<LookComponent>().isLookingRight()
 
-        val rs = controller.rightStick
+        val isWeaponActive = controller.rightTriggerDown
+
+        val rs = if (isWeaponActive) controller.rightStick else Vector2()
         val destinationRelativeToLuna = when {
             rs.isZero ->
                 Vector2(weaponProps.weaponDistance, 0f).rotate(

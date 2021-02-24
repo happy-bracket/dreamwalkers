@@ -109,7 +109,6 @@ class EntitySpawner(private val world: World, private val engine: Engine) {
 
         val e = Entity()
         e.add(BodyComponent(body))
-        e.add(HitboxComponent(luna))
         e.add(props)
 
         body.entity = e

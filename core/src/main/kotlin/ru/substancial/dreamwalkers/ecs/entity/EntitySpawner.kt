@@ -75,7 +75,7 @@ class EntitySpawner(private val world: World, private val engine: Engine) {
                 isSensor = true
             }
         }
-        entity.add(HurtboxComponent(listOf(hurtbox)))
+        entity.add(HurtboxComponent(setOf(hurtbox)))
         entity.add(BodyComponent(body))
         entity.add(PositionComponent())
         entity.add(MovementComponent(maxSpeed, body.mass, false))
@@ -109,6 +109,7 @@ class EntitySpawner(private val world: World, private val engine: Engine) {
         val e = Entity()
         e.add(BodyComponent(body))
         e.add(props)
+        e.add(IdentityComponent("NightsEdge"))
 
         body.entity = e
 

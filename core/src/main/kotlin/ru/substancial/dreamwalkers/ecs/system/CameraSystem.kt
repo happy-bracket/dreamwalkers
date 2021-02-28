@@ -14,7 +14,7 @@ class CameraSystem(
     private val luna by optional(family)
 
     init {
-        camera.zoom = 200f
+        camera.zoom = 2f
     }
 
     override fun update(deltaTime: Float) {

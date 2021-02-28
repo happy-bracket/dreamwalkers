@@ -88,7 +88,8 @@ class CollisionSystem(
             }
         }
 
-        hitMediator.process(entityA, entityB)
+        if (begin)
+            hitMediator.process(contact)
     }
 
     private fun reactToTerrainContact(target: Body, begin: Boolean) {

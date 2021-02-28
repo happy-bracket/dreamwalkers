@@ -8,11 +8,13 @@ function init(invoker)
     local luna_comp = luajava.newInstance(luna_component)
     local aerial_comp = luajava.newInstance(aerial_component)
     local look_comp = luajava.newInstance(look_component)
+    local identity_comp = luajava.newInstance(identity_component, "Luna")
 
     local luna = invoker:getSpawner():spawn(1.8, 1.7, xy, 7.5)
     luna:add(luna_comp)
     luna:add(aerial_comp)
     luna:add(look_comp)
+    luna:add(identity_comp)
     invoker:getSpawner():equip(luna)
 
     local test_collision_entity = invoker:getRegistry():get("test_collision")

@@ -15,9 +15,7 @@ import ru.substancial.dreamwalkers.physics.entity
 
 class HitMediator {
 
-    /* TODO: when there will be more than one hurtbox per body, this will not account for that
-     resulting in way more damage than should properly be */
-    fun process(contact: Contact) {
+    fun process(contact: Contact, begin: Boolean) {
         val fixtureA = contact.fixtureA
         val fixtureB = contact.fixtureB
         val bodyA = fixtureA.body
@@ -42,7 +40,16 @@ class HitMediator {
 
         if (hit.extract<HitboxComponent>().owner == hurt) return
 
-        hurt.extract<VitalityComponent>().vitalityLevel -= 10
+        val hurtboxComponent = hurt.extract<HurtboxComponent>()
+        if (begin) {
+            if (hit in hurtboxComponent.hitBy) return
+            hurtboxComponent.hitBy.add(hit)
+            hurt.extract<VitalityComponent>().vitalityLevel -= 10
+        } else {
+            hurtboxComponent.hitBy.remove(hit)
+        }
+        if (hit in hurtboxComponent.hitBy) return
+
     }
 
     private fun checkHitContact(assumedHitbox: Entity, assumedHurtbox: Entity, testedBody: Body): Boolean {

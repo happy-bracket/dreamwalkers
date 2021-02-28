@@ -55,7 +55,7 @@ class WeaponSystem(
             else -> rs.nor().setLength(weaponProps.weaponDistance)
         }
         val destination = lunaBody.getWorldPoint(destinationRelativeToLuna).cpy()
-        val force = destination.sub(weaponBody.worldCenter).nor().setLength(7f)
+        val force = destination.sub(weaponBody.worldCenter).nor().setLength(21f)
         weaponBody.applyForceToCenter(force, true)
 
         val weaponToLuna = lunaBody.worldCenter.cpy().sub(weaponBody.worldCenter)

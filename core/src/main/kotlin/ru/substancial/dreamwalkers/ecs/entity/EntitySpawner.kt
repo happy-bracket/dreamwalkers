@@ -75,7 +75,7 @@ class EntitySpawner(private val world: World, private val engine: Engine) {
                 isSensor = true
             }
         }
-        entity.add(HurtboxComponent(setOf(hurtbox)))
+        entity.add(HurtboxComponent(mutableSetOf(), setOf(hurtbox)))
         entity.add(BodyComponent(body))
         entity.add(PositionComponent())
         entity.add(MovementComponent(maxSpeed, body.mass, false))

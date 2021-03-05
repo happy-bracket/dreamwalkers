@@ -18,14 +18,10 @@ class WeaponSystem(
     override fun addedToEngine(engine: Engine) {
         super.addedToEngine(engine)
         controller.rightTriggerDownListener = {
-            val w = weapon
-            val l = luna
-            if (w != null && l != null) {
-                w.add(HitboxComponent(l))
-            }
+            weapon?.extract<HitboxComponent>()?.isActive = true
         }
         controller.rightTriggerUpListener = {
-            weapon?.remove(HitboxComponent::class.java)
+            weapon?.extract<HitboxComponent>()?.isActive = false
         }
     }
 
@@ -38,7 +34,7 @@ class WeaponSystem(
     override fun update(deltaTime: Float) {
         val luna = this.luna ?: return
         val weapon = this.weapon ?: return
-        val weaponProps = weapon.extract<WeaponComponent>()
+        val weaponProps = weapon.extract<NightsEdgeComponent>()
         val weaponBody = weapon.extract<BodyComponent>().pushbox
         val lunaBody = luna.extract<BodyComponent>().pushbox
 
@@ -67,7 +63,7 @@ class WeaponSystem(
     companion object {
 
         private val weaponFamily = Family.all(
-                WeaponComponent::class.java,
+                NightsEdgeComponent::class.java,
                 BodyComponent::class.java
         ).get()
 

@@ -26,7 +26,7 @@ function test_spawn(invoker)
     local registry = invoker:getRegistry()
     if not registry:has("test_dummy") then
         local spawnXy = position_mapper:get(registry:get("dummy_spawner")):getXy()
-        local dummy = invoker:getSpawner():spawn(0.8, 1.6, spawnXy, 0.0)
+        local dummy = invoker:getSpawner():spawn(0.8, 1.6, spawnXy, 10.0)
         local identity = luajava.newInstance(identity_component, "test_dummy")
         local vitality = luajava.newInstance(vitality_component, 30, 10, 20)
         dummy:add(identity)

@@ -48,6 +48,7 @@ class CollisionSystem(
     }
 
     private fun reactToContact(contact: Contact, begin: Boolean) {
+        if (begin && !contact.isTouching) return
         val bodyA = contact.fixtureA.body
         val entityA = bodyA.entity
         val fixtureA = contact.fixtureA

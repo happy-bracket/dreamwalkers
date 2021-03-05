@@ -1,9 +1,9 @@
 package ru.substancial.dreamwalkers.controls
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.controllers.Controller
 import com.badlogic.gdx.controllers.ControllerAdapter
 import com.badlogic.gdx.math.Vector2
-import com.studiohartman.jamepad.ControllerAxis
 import ru.substancial.dreamwalkers.utilities.checkDeadzone
 
 class TheController : ControllerAdapter() {
@@ -46,9 +46,9 @@ class TheController : ControllerAdapter() {
                 _leftStick.x = value
             }
             m.axisLeftY -> {
-                _leftStick.y = value
+                _leftStick.y = -value
             }
-            ControllerAxis.TRIGGERLEFT.ordinal -> {
+            4 -> {
                 if (value >= 0.4f) {
                     if (!_leftTriggerDown) {
                         _leftTriggerDown = true
@@ -61,7 +61,7 @@ class TheController : ControllerAdapter() {
                     }
                 }
             }
-            ControllerAxis.TRIGGERRIGHT.ordinal -> {
+            5 -> {
                 if (value >= 0.4f) {
                     if (!_rightTriggerDown) {
                         _rightTriggerDown = true
@@ -78,7 +78,7 @@ class TheController : ControllerAdapter() {
                 _rightStick.x = value
             }
             m.axisRightY -> {
-                _rightStick.y = value
+                _rightStick.y = -value
             }
         }
         return false

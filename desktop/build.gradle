@@ -12,6 +12,9 @@ dependencies {
     compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
     compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
     implementation "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:$gdxControllersVersion"
+    implementation("com.badlogicgames.jamepad:jamepad:2.0.14.1") {
+        exclude group: 'com.badlogicgames.gdx', module: 'gdx-jnigen-loader'
+    }
 }
 
 jar {

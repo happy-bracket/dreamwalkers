@@ -89,22 +89,17 @@ class EntitySpawner(private val world: World, private val engine: Engine) {
 
     fun equip(luna: Entity) {
         val body = world.body {
-            type = BodyDef.BodyType.DynamicBody
+            type = BodyDef.BodyType.KinematicBody
             this.gravityScale = 0f
             linearDamping = 0.8f
             this.fixedRotation = true
 
             box(width = 0.1f, height = 1.5f) {
                 isSensor = true
-                density = 1f
             }
         }
 
         val props = WeaponComponent()
-
-        body.ropeJointWith(luna.extract<BodyComponent>().pushbox) {
-            this.maxLength = props.weaponDistance
-        }
 
         val e = Entity()
         e.add(BodyComponent(body))

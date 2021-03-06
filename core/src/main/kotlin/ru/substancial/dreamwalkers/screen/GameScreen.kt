@@ -61,7 +61,7 @@ class GameScreen(
     private val vitalitySystem = VitalitySystem()
     private val registrySystem = RegistrySystem(registry)
     private val hurtboxSystem = HurtboxFollowSystem()
-    private val stuckSystem = ImpaleSystem()
+    private val stuckSystem = ImpaleSystem(world)
 
     private val engine = Engine()
             .apply {

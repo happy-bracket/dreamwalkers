@@ -89,7 +89,18 @@ class CollisionSystem(
             }
         }
 
+        if (begin && entityA.has<ImpaleComponent>().xor(entityB.has<ImpaleComponent>())) {
+            if (!tryCancelImpale(entityA)) tryCancelImpale(entityB)
+        }
+
         hitMediator.process(contact, begin)
+    }
+
+    private fun tryCancelImpale(entity: Entity): Boolean {
+        return entity.maybeExtract<ImpaleComponent>()?.let {
+            it.durationLeft = -1f
+            true
+        } ?: false
     }
 
     private fun reactToTerrainContact(target: Body, begin: Boolean) {

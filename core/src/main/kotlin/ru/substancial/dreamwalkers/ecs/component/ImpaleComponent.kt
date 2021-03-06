@@ -6,7 +6,6 @@ import com.badlogic.gdx.physics.box2d.Joint
 
 class ImpaleComponent(
         val anchor: Entity,
-        val dragged: Entity,
         var durationLeft: Float = 3f,
         var joint: Joint? = null
 ) : Component

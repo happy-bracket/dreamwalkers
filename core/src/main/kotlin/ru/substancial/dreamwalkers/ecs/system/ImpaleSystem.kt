@@ -22,15 +22,13 @@ class ImpaleSystem(
             { _, e ->
                 val sc = e.extract<ImpaleComponent>()
                 val anchorBody = sc.anchor.maybeExtract<BodyComponent>()?.pushbox ?: return@listener
-                val draggedBody = sc.dragged.maybeExtract<BodyComponent>()?.pushbox ?: return@listener
+                val draggedBody = e.maybeExtract<BodyComponent>()?.pushbox ?: return@listener
                 sc.joint = anchorBody.distanceJointWith(draggedBody) {
                     length = 0f
                     collideConnected = false
                 }
             },
-            { _, e ->
-                world.destroyJoint(e.extract<ImpaleComponent>().joint!!)
-            },
+            { _, _ -> },
             {}
     )
 
@@ -38,8 +36,10 @@ class ImpaleSystem(
         impales.forEach {
             val sc = it.extract<ImpaleComponent>()
             sc.durationLeft -= deltaTime
-            if (sc.durationLeft <= 0f)
-                engine.removeEntity(it)
+            if (sc.durationLeft <= 0f) {
+                world.destroyJoint(sc.joint)
+                it.remove(ImpaleComponent::class.java)
+            }
         }
     }
 

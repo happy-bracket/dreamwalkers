@@ -123,6 +123,16 @@ class GameScreen(
             val loadedLevel = Level(map)
             loadedLevel.inflate(world, engine)
         }
+
+        override fun gameOver(iconFile: String, title: String, description: String) {
+            core.screen = GameOverScreen(
+                    core,
+                    iconFile,
+                    title,
+                    description
+            )
+        }
+
     }
 
 }

@@ -5,7 +5,6 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.OrthographicCamera
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
@@ -62,7 +61,7 @@ class GameScreen(
     private val vitalitySystem = VitalitySystem()
     private val registrySystem = RegistrySystem(registry)
     private val hurtboxSystem = HurtboxFollowSystem()
-    private val stuckSystem = StuckSystem()
+    private val stuckSystem = ImpaleSystem()
 
     private val engine = Engine()
             .apply {

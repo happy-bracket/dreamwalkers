@@ -3,7 +3,6 @@ package ru.substancial.dreamwalkers.ecs.other
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.Contact
 import com.badlogic.gdx.physics.box2d.Fixture
@@ -66,26 +65,12 @@ class HitMediator(private val engine: Engine) {
                 val velocityAngle = hitBody.linearVelocity.typedAngleDegrees()
                 val difference = abs(velocityAngle.value - rotation.value)
                 if (difference <= 15f) {
-                    engine.addEntity(Entity().apply { add(StuckComponent(hit, hurt)) })
+                    engine.addEntity(Entity().apply { add(ImpaleComponent(hit, hurt)) })
                 }
-                Gdx.app.log("rotation", rotation.toString())
-                Gdx.app.log("velocity", velocityAngle.toString())
-                Gdx.app.log("difference", difference.toString())
-                Gdx.app.log("------", "-----------------------")
             }
         } else {
             hurtboxComponent.hitBy.remove(hit)
         }
-
-//        val hurtboxComponent = hurt.extract<HurtboxComponent>()
-//        if (begin) {
-//            if (hit in hurtboxComponent.hitBy) return
-//            hurtboxComponent.hitBy.add(hit)
-//            hurt.extract<VitalityComponent>().vitalityLevel -= 10
-//        } else {
-//            hurtboxComponent.hitBy.remove(hit)
-//        }
-//        if (hit in hurtboxComponent.hitBy) return
 
     }
 

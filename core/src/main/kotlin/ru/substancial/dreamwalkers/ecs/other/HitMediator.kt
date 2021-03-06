@@ -60,7 +60,7 @@ class HitMediator(private val engine: Engine) {
             if (fragment.damageType is DamageType.Pierce) {
                 val hitBody = fragment.fixture.body
                 val rotation = hitBody.typedAngle.toDegrees().withValue {
-                    val norm = it + 90
+                    val norm = it + 90 - fragment.damageType.offsetAngle
                     if (norm <= 0f) norm + 360 else norm
                 }
                 val velocityAngle = hitBody.linearVelocity.typedAngleDegrees()

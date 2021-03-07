@@ -25,10 +25,7 @@ class GameScreen(
         private val scenarioPath: String,
         scenarioName: String,
         saveFile: SaveFile?
-) : ScreenAdapter() {
-
-    private val camera = OrthographicCamera()
-    private val viewport = FitViewport(16f, 9f, camera)
+) : HasDisplayScreenAdapter() {
 
     private val world = World(Vector2(0f, -10f), false)
 
@@ -98,10 +95,6 @@ class GameScreen(
         engine.update(delta)
         stage.act(delta)
         stage.draw()
-    }
-
-    override fun resize(width: Int, height: Int) {
-        viewport.update(width, height)
     }
 
     override fun dispose() {

@@ -16,10 +16,10 @@ import ru.substancial.dreamwalkers.utilities.ClearScreen
 import ru.substancial.dreamwalkers.utilities.addProcessor
 import ru.substancial.dreamwalkers.utilities.removeProcessor
 
-class MainScreen(private val core: Core) : ScreenAdapter(), HasDisplay by HasDisplayMixin() {
+class MainScreen(private val core: Core) : HasDisplayScreenAdapter() {
 
     private val skin = Skin(Gdx.files.internal("assets/testskin/uiskin.json"))
-    private val stage: Stage = Stage(FitViewport(Gdx.graphics.width.toFloat(), Gdx.graphics.height.toFloat(), camera))
+    private val stage: Stage = Stage(viewport)
 
     init {
         val textLogo = Label("DREAMWALKERS", skin)
@@ -49,10 +49,6 @@ class MainScreen(private val core: Core) : ScreenAdapter(), HasDisplay by HasDis
         ClearScreen()
         stage.act(delta)
         stage.draw()
-    }
-
-    override fun resize(width: Int, height: Int) {
-        stage.viewport.update(width, height, true)
     }
 
     override fun dispose() {

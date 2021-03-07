@@ -4,20 +4,20 @@ import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.math.Vector2
 import ru.substancial.dreamwalkers.ecs.component.AerialComponent
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
-import ru.substancial.dreamwalkers.ecs.component.MovementComponent
+import ru.substancial.dreamwalkers.ecs.component.TerrainMovementComponent
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.maybeExtract
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
 import ru.substancial.dreamwalkers.utilities.addVelocityViaImpulse
 
-class DecelerationSystem : RegisteringSystem() {
+class GroundFrictionSystem : RegisteringSystem() {
 
-    private val entities by multiple(Family.all(MovementComponent::class.java, BodyComponent::class.java).get())
+    private val entities by multiple(Family.all(TerrainMovementComponent::class.java, BodyComponent::class.java).get())
 
     override fun update(deltaTime: Float) {
         val tmp = Vector2()
         entities.forEach { entity ->
-            val movement = entity.extract<MovementComponent>()
+            val movement = entity.extract<TerrainMovementComponent>()
             val body = entity.extract<BodyComponent>().pushbox
             val aerial = entity.maybeExtract<AerialComponent>()
             val velocity2 = body.linearVelocity.len2()

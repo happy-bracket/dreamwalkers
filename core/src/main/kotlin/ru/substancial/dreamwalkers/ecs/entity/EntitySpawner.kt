@@ -6,7 +6,6 @@ import com.badlogic.gdx.math.DelaunayTriangulator
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
-import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
 import ru.substancial.dreamwalkers.ecs.component.*
@@ -82,7 +81,7 @@ class EntitySpawner(
         entity.add(HurtboxComponent(mutableSetOf(), setOf(hurtbox)))
         entity.add(BodyComponent(body))
         entity.add(PositionComponent())
-        entity.add(MovementComponent(maxSpeed, body.mass, false))
+        entity.add(TerrainMovementComponent(maxSpeed, body.mass, false))
         engine.addEntity(entity)
 
         body.entity = entity

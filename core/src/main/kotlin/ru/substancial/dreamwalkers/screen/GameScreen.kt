@@ -2,21 +2,20 @@ package ru.substancial.dreamwalkers.screen
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.ScreenAdapter
 import com.badlogic.gdx.controllers.Controllers
-import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
+import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.utils.viewport.FitViewport
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
 import ru.substancial.dreamwalkers.ecs.other.HitMediator
 import ru.substancial.dreamwalkers.ecs.system.*
 import ru.substancial.dreamwalkers.level.*
+import ru.substancial.dreamwalkers.nightsedge.NightsEdgeLoader
 import ru.substancial.dreamwalkers.utilities.ClearScreen
 import ru.substancial.dreamwalkers.utilities.IdentityRegistry
 
@@ -52,7 +51,8 @@ class GameScreen(
     private val positionSystem = PositionSystem()
     private val weaponSystem = WeaponSystem(controller)
     private val lunaLookSystem = LunaLookSystem(controller)
-    private val decelerationSystem = DecelerationSystem()
+    private val groundFrictionSystem = GroundFrictionSystem()
+    private val airFrictionSystem = AirFrictionSystem()
     private val aiSystem = AiSystem(world)
     private val worldSystem = WorldSystem(world)
     private val vitalitySystem = VitalitySystem()
@@ -68,7 +68,8 @@ class GameScreen(
                 addSystem(positionSystem)
                 addSystem(weaponSystem)
                 addSystem(lunaLookSystem)
-                addSystem(decelerationSystem)
+                addSystem(groundFrictionSystem)
+                addSystem(airFrictionSystem)
                 addSystem(aiSystem)
                 addSystem(vitalitySystem)
                 addSystem(registrySystem)
@@ -82,7 +83,14 @@ class GameScreen(
         core.commandExecutor.currentEngine = engine
 
         val interactor = GameScenarioCallbacks()
-        scenarioHolder = ScenarioHolder("$scenarioPath/$scenarioName", interactor, engine, registry, EntitySpawner(world, engine))
+        scenarioHolder = ScenarioHolder(
+                "$scenarioPath/$scenarioName",
+                interactor,
+                engine, registry,
+                EntitySpawner(
+                        world, engine,
+                        NightsEdgeLoader(EarClippingTriangulator(), TmxMapLoader(), world)
+                ))
         scenarioHolder.initialize(saveFile)
 
         collisionSystem = CollisionSystem(world, scenarioHolder, HitMediator(engine))

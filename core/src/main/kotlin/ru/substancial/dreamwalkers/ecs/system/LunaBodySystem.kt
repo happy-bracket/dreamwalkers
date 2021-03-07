@@ -30,7 +30,7 @@ class LunaBodySystem(
         if (!aerial.isAirborne) {
             lunaBody.gravityScale = 1f
             val ls = controller.leftStick
-            val movement = luna.extract<MovementComponent>()
+            val movement = luna.extract<TerrainMovementComponent>()
             val pullForce = ls.scl(1f, 0f).nor().scl(movement.pullForceMagnitude)
             if (!controller.leftStick.isZero) {
                 movement.desiresToMove = true

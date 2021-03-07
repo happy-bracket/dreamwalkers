@@ -2,7 +2,7 @@ package ru.substancial.dreamwalkers.ecs.component
 
 import com.badlogic.ashley.core.Component
 
-class MovementComponent(
+class TerrainMovementComponent(
         val maxSpeed: Float,
         val mass: Float,
         var desiresToMove: Boolean

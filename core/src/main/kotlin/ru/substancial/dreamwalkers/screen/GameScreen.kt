@@ -59,6 +59,7 @@ class GameScreen(
     private val registrySystem = RegistrySystem(registry)
     private val hurtboxSystem = HurtboxFollowSystem()
     private val stuckSystem = ImpaleSystem(world)
+    private val cooldownsSystem = CooldownsSystem()
 
     private val engine = Engine()
             .apply {
@@ -76,6 +77,7 @@ class GameScreen(
                 addSystem(hurtboxSystem)
                 addSystem(renderSystem)
                 addSystem(stuckSystem)
+                addSystem(cooldownsSystem)
             }
 
     init {

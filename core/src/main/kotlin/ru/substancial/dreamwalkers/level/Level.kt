@@ -15,6 +15,8 @@ import ktx.box2d.FixtureDefinition
 import ktx.box2d.body
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.physics.entity
+import ru.substancial.dreamwalkers.utilities.fromPolygon
+import ru.substancial.dreamwalkers.utilities.fromRectangle
 import ru.substancial.dreamwalkers.utilities.x
 import ru.substancial.dreamwalkers.utilities.y
 
@@ -41,7 +43,7 @@ class Level(private val map: TiledMap) {
                     val body = world.body {
                         when (mapObject) {
                             is RectangleMapObject -> fromRectangle(mapObject) {}
-                            is PolygonMapObject -> fromPolygon(mapObject) {}
+                            is PolygonMapObject -> fromPolygon(triangulator, mapObject) {}
                         }
                     }
                     entity.add(BodyComponent(body))
@@ -52,7 +54,7 @@ class Level(private val map: TiledMap) {
                     val body = world.body {
                         when (mapObject) {
                             is RectangleMapObject -> fromRectangle(mapObject) {}
-                            is PolygonMapObject -> fromPolygon(mapObject) {}
+                            is PolygonMapObject -> fromPolygon(triangulator, mapObject) {}
                         }
                     }
                     entity.add(BodyComponent(body))
@@ -62,7 +64,7 @@ class Level(private val map: TiledMap) {
                     val body = world.body {
                         when (mapObject) {
                             is RectangleMapObject -> fromRectangle(mapObject) { isSensor = true }
-                            is PolygonMapObject -> fromPolygon(mapObject) { isSensor = true }
+                            is PolygonMapObject -> fromPolygon(triangulator, mapObject) { isSensor = true }
                         }
                     }
                     entity.add(BodyComponent(body))
@@ -70,48 +72,6 @@ class Level(private val map: TiledMap) {
                 }
             }
             engine.addEntity(entity)
-        }
-    }
-
-    private fun BodyDefinition.fromRectangle(mapObject: RectangleMapObject, additionally: FixtureDefinition.() -> Unit = {}) {
-        val rect = mapObject.rectangle
-        box(
-                width = rect.width,
-                height = rect.height,
-                position = Vector2(
-                        rect.x + rect.width / 2,
-                        rect.y + rect.height / 2
-                )
-        ) {
-            additionally()
-        }
-    }
-
-    private fun BodyDefinition.fromPolygon(mapObject: PolygonMapObject, additionally: FixtureDefinition.() -> Unit = {}) {
-        val polygon = mapObject.polygon
-        val vertices = polygon.vertices
-        val offsetX = polygon.x
-        val offsetY = polygon.y
-
-        for (i in vertices.indices) {
-            vertices[i] = vertices[i]
-        }
-        val triangles = triangulator.computeTriangles(vertices)
-
-        for (i in 0 until triangles.size / 3) {
-
-            val x1 = vertices[triangles[i * 3 + 0].toInt() * 2] + offsetX
-            val y1 = vertices[triangles[i * 3 + 0].toInt() * 2 + 1] + offsetY
-
-            val x2 = vertices[triangles[i * 3 + 1].toInt() * 2] + offsetX
-            val y2 = vertices[triangles[i * 3 + 1].toInt() * 2 + 1] + offsetY
-
-            val x3 = vertices[triangles[i * 3 + 2].toInt() * 2] + offsetX
-            val y3 = vertices[triangles[i * 3 + 2].toInt() * 2 + 1] + offsetY
-
-            polygon(floatArrayOf(x1, y1, x2, y2, x3, y3)) {
-                additionally()
-            }
         }
     }
 
@@ -139,8 +99,6 @@ class Level(private val map: TiledMap) {
     companion object Tag {
 
         private const val RIGIDNESS = "rigidness"
-        private const val REACT_TO_COLLISION_START = "on_collision"
-        private const val REACT_TO_COLLISION_END = "after_collision"
         private const val ID = "object_id"
 
     }

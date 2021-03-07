@@ -10,12 +10,17 @@ import com.badlogic.gdx.physics.box2d.Fixture
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
 import ru.substancial.dreamwalkers.ecs.component.*
+import ru.substancial.dreamwalkers.nightsedge.NightsEdgeLoader
 import ru.substancial.dreamwalkers.physics.BodyProp
 import ru.substancial.dreamwalkers.physics.entity
 import ru.substancial.dreamwalkers.physics.injectProps
 import kotlin.math.sqrt
 
-class EntitySpawner(private val world: World, private val engine: Engine) {
+class EntitySpawner(
+        private val world: World,
+        private val engine: Engine,
+        private val nightsEdgeLoader: NightsEdgeLoader
+) {
 
     private val triangulator by lazy { DelaunayTriangulator() }
 
@@ -86,30 +91,15 @@ class EntitySpawner(private val world: World, private val engine: Engine) {
         return entity
     }
 
-    fun equip(luna: Entity) {
-        val fragmentParts = mutableListOf<Fixture>()
-        val body = world.body {
-            type = BodyDef.BodyType.KinematicBody
-            this.gravityScale = 0f
-            linearDamping = 0.8f
-            this.fixedRotation = true
-
-            box(width = 0.1f, height = 1.5f) {
-                isSensor = true
-                creationCallback = {
-                    fragmentParts.add(it)
-                }
-            }
-        }
+    fun equip(luna: Entity, weaponModel: String) {
+        val model = nightsEdgeLoader.load(weaponModel)
+        val body = model.body
+        val fragments = model.fragments.associateBy { it.fixture }
 
         val e = Entity()
         e.add(BodyComponent(body))
-        e.add(NightsEdgeComponent())
+        e.add(NightsEdgeComponent(model.handleLength))
         e.add(IdentityComponent("NightsEdge"))
-
-        val fragments = fragmentParts.associateWith {
-            HitboxFragment(it, DamageType.Pierce())
-        }
 
         e.add(HitboxComponent(luna, fragments))
 

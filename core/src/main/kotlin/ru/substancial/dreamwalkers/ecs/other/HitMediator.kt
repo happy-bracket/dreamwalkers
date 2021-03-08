@@ -65,7 +65,7 @@ class HitMediator(private val engine: Engine) {
                 val velocityAngle = hitBody.linearVelocity.typedAngleDegrees()
                 val difference = abs(velocityAngle.value - rotation.value)
                 if (difference <= 15f) {
-                    engine.addEntity(Entity().apply { add(ImpaleComponent(hit, hurt)) })
+                    hurt.add(ImpaleComponent(hit))
                 }
             }
         } else {

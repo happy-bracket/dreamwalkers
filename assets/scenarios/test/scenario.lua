@@ -6,7 +6,7 @@ function init(invoker)
     local xy = position_mapper:get(spawn_point):getXy()
 
     local luna_comp = luajava.newInstance(luna_component)
-    local aerial_comp = luajava.newInstance(aerial_component)
+    local aerial_comp = luajava.newInstance(aerial_component, 0, 10.0, 500.0)
     local look_comp = luajava.newInstance(look_component)
     local identity_comp = luajava.newInstance(identity_component, "Luna")
 
@@ -15,7 +15,7 @@ function init(invoker)
     luna:add(aerial_comp)
     luna:add(look_comp)
     luna:add(identity_comp)
-    invoker:getSpawner():equip(luna)
+    invoker:getSpawner():equip(luna, "armory/sword.tmx")
 
     local test_collision_entity = invoker:getRegistry():get("test_collision")
     local on_collision = luajava.newInstance(on_collision_start_component, "test_spawn")

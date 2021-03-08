@@ -19,7 +19,7 @@ import ru.substancial.dreamwalkers.utilities.removeProcessor
 class MainScreen(private val core: Core) : HasDisplayScreenAdapter() {
 
     private val skin = Skin(Gdx.files.internal("assets/testskin/uiskin.json"))
-    private val stage: Stage = Stage(viewport)
+    private val stage: Stage = Stage()
 
     init {
         val textLogo = Label("DREAMWALKERS", skin)

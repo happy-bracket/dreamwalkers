@@ -25,7 +25,6 @@ class ImpaleSystem(
                 val draggedBody = e.maybeExtract<BodyComponent>()?.pushbox ?: return@listener
                 sc.joint = anchorBody.distanceJointWith(draggedBody) {
                     length = 0f
-                    collideConnected = false
                 }
             },
             { _, _ -> },

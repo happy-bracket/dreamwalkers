@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.4" tiledversion="1.4.3" orientation="orthogonal" renderorder="left-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="7" nextobjectid="11">
+ <properties>
+  <property name="world_height" type="float" value="1.2"/>
+ </properties>
+ <objectgroup id="5" name="bounding_box">
+  <object id="9" x="1430" y="1506" width="125.5" height="399"/>
+ </objectgroup>
+ <objectgroup id="4" name="model" offsetx="-7" offsety="-8">
+  <object id="2" x="1478" y="1538" width="42" height="251">
+   <properties>
+    <property name="damage_type" type="int" value="0"/>
+   </properties>
+  </object>
+  <object id="3" x="1500" y="1515">
+   <properties>
+    <property name="damage_type" type="int" value="1"/>
+   </properties>
+   <polygon points="0,0 13,30 -15,31"/>
+  </object>
+  <object id="4" x="1514" y="1787">
+   <properties>
+    <property name="damage_type" type="int" value="2"/>
+    <property name="impact_scale" type="float" value="0.25"/>
+   </properties>
+   <polygon points="0,0 31,-28 48,0 8,36 -10,37 -10,90 1,107 -8,126 -21,125 -32,109 -21,89 -22,38 -35,38 -76,1 -60,-24 -36,2"/>
+  </object>
+ </objectgroup>
+</map>

@@ -10,15 +10,16 @@ import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
 import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.World
-import ktx.box2d.BodyDefinition
-import ktx.box2d.FixtureDefinition
 import ktx.box2d.body
+import ktx.box2d.filter
 import ru.substancial.dreamwalkers.ecs.component.*
+import ru.substancial.dreamwalkers.physics.Filters
 import ru.substancial.dreamwalkers.physics.entity
 import ru.substancial.dreamwalkers.utilities.fromPolygon
 import ru.substancial.dreamwalkers.utilities.fromRectangle
 import ru.substancial.dreamwalkers.utilities.x
 import ru.substancial.dreamwalkers.utilities.y
+import kotlin.experimental.or
 
 class Level(private val map: TiledMap) {
 
@@ -42,29 +43,41 @@ class Level(private val map: TiledMap) {
                 ObjectType.Terrain -> {
                     val body = world.body {
                         when (mapObject) {
-                            is RectangleMapObject -> fromRectangle(mapObject) {}
-                            is PolygonMapObject -> fromPolygon(triangulator, mapObject) {}
+                            is RectangleMapObject -> fromRectangle(mapObject) {
+                                filter {
+                                    categoryBits = Filters.LevelPushbox
+                                    maskBits = Filters.Pushbox.or(Filters.Foot)
+                                }
+                            }
+                            is PolygonMapObject -> fromPolygon(triangulator, mapObject) {
+                                filter {
+                                    categoryBits = Filters.LevelPushbox
+                                    maskBits = Filters.Pushbox.or(Filters.Foot)
+                                }
+                            }
                         }
                     }
                     entity.add(BodyComponent(body))
                     entity.add(TerrainComponent())
                     body.entity = entity
                 }
-                ObjectType.Rigid -> {
-                    val body = world.body {
-                        when (mapObject) {
-                            is RectangleMapObject -> fromRectangle(mapObject) {}
-                            is PolygonMapObject -> fromPolygon(triangulator, mapObject) {}
-                        }
-                    }
-                    entity.add(BodyComponent(body))
-                    body.entity = entity
-                }
                 ObjectType.Sensor -> {
                     val body = world.body {
                         when (mapObject) {
-                            is RectangleMapObject -> fromRectangle(mapObject) { isSensor = true }
-                            is PolygonMapObject -> fromPolygon(triangulator, mapObject) { isSensor = true }
+                            is RectangleMapObject -> fromRectangle(mapObject) {
+                                filter {
+                                    categoryBits = Filters.LevelPushbox
+                                    maskBits = Filters.Pushbox
+                                }
+                                isSensor = true
+                            }
+                            is PolygonMapObject -> fromPolygon(triangulator, mapObject) {
+                                isSensor = true
+                                filter {
+                                    categoryBits = Filters.LevelPushbox
+                                    maskBits = Filters.Pushbox
+                                }
+                            }
                         }
                     }
                     entity.add(BodyComponent(body))
@@ -81,7 +94,6 @@ class Level(private val map: TiledMap) {
             null to ObjectType.Ghost,
             0 to ObjectType.Ghost,
             1 to ObjectType.Sensor,
-            2 to ObjectType.Rigid,
             3 to ObjectType.Terrain
     )
 
@@ -92,7 +104,6 @@ class Level(private val map: TiledMap) {
     private sealed class ObjectType {
         object Ghost : ObjectType()
         object Sensor : ObjectType()
-        object Rigid : ObjectType()
         object Terrain : ObjectType()
     }
 

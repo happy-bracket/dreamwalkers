@@ -40,6 +40,8 @@ class ScenarioHolder(
         invoker.initiator = initiator
         invoker.target = target
         globals[functionName]?.invoke(invokerLua)
+        invoker.initiator = null
+        invoker.target = null
     }
 
 }

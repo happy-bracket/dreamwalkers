@@ -8,9 +8,11 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
+import ktx.box2d.filter
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.nightsedge.NightsEdgeLoader
 import ru.substancial.dreamwalkers.physics.BodyProp
+import ru.substancial.dreamwalkers.physics.Filters
 import ru.substancial.dreamwalkers.physics.entity
 import ru.substancial.dreamwalkers.physics.injectProps
 import kotlin.math.sqrt
@@ -56,6 +58,10 @@ class EntitySpawner(
                 polygon(floatArrayOf(x1, y1, x2, y2, x3, y3)) {
                     friction = 0f
                     density = bodyDensity
+                    filter {
+                        categoryBits = Filters.Pushbox
+                        maskBits = Filters.LevelPushbox
+                    }
                 }
             }
 
@@ -67,6 +73,10 @@ class EntitySpawner(
                 isSensor = true
                 density = 0f
                 injectProps(BodyProp.Foot)
+                filter {
+                    categoryBits = Filters.Foot
+                    maskBits = Filters.LevelPushbox
+                }
             }
         }
         val hurtbox = world.body {
@@ -76,6 +86,10 @@ class EntitySpawner(
             box(width = width * 0.9f, height = height * 0.9f) {
                 density = 0f
                 isSensor = true
+                filter {
+                    categoryBits = Filters.Hurtbox
+                    maskBits = Filters.Hitbox
+                }
             }
         }
         entity.add(HurtboxComponent(mutableSetOf(), setOf(hurtbox)))

@@ -10,12 +10,15 @@ import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
+import ktx.box2d.filter
 import ru.substancial.dreamwalkers.ecs.component.DamageType
 import ru.substancial.dreamwalkers.ecs.component.HitboxFragment
+import ru.substancial.dreamwalkers.physics.Filters
 import ru.substancial.dreamwalkers.utilities.complement
 import ru.substancial.dreamwalkers.utilities.fromPolygon
 import ru.substancial.dreamwalkers.utilities.fromRectangle
 import ru.substancial.dreamwalkers.utilities.safeCast
+import kotlin.experimental.or
 
 class NightsEdgeLoader(
         private val triangulator: EarClippingTriangulator,
@@ -68,6 +71,10 @@ class NightsEdgeLoader(
                                 )
                                 fragments.add(fragment)
                             }
+                            filter {
+                                categoryBits = Filters.Hitbox
+                                maskBits = Filters.Hitbox.or(Filters.Hurtbox)
+                            }
                         }
                     }
                     is PolygonMapObject -> {
@@ -104,6 +111,10 @@ class NightsEdgeLoader(
                                             extractImpactScale(mo.properties)
                                     )
                                     fragments.add(fragment)
+                                }
+                                filter {
+                                    categoryBits = Filters.Hitbox
+                                    maskBits = Filters.Hitbox.or(Filters.Hurtbox)
                                 }
                             }
                         }

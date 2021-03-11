@@ -46,7 +46,6 @@ class GameScreen(
 
     private val cameraSystem = CameraSystem(camera)
     private val renderSystem = DebugRenderSystem(world, camera, debugRenderer)
-    private val collisionSystem: CollisionSystem
     private val lunaBodySystem = LunaBodySystem(controller)
     private val positionSystem = PositionSystem()
     private val weaponSystem = WeaponSystem(controller)
@@ -60,25 +59,10 @@ class GameScreen(
     private val hurtboxSystem = HurtboxFollowSystem()
     private val stuckSystem = ImpaleSystem(world)
     private val cooldownsSystem = CooldownsSystem()
+    private val aerialSystem = AerialSystem()
+    private val scenarioCollisionSystem: ScenarioCollisionSystem
 
     private val engine = Engine()
-            .apply {
-                addSystem(worldSystem)
-                addSystem(cameraSystem)
-                addSystem(lunaBodySystem)
-                addSystem(positionSystem)
-                addSystem(weaponSystem)
-                addSystem(lunaLookSystem)
-                addSystem(groundFrictionSystem)
-                addSystem(airFrictionSystem)
-                addSystem(aiSystem)
-                addSystem(vitalitySystem)
-                addSystem(registrySystem)
-                addSystem(hurtboxSystem)
-                addSystem(renderSystem)
-                addSystem(stuckSystem)
-                addSystem(cooldownsSystem)
-            }
 
     init {
         Controllers.addListener(controller)
@@ -93,10 +77,31 @@ class GameScreen(
                         world, engine,
                         NightsEdgeLoader(EarClippingTriangulator(), TmxMapLoader(), world)
                 ))
-        scenarioHolder.initialize(saveFile)
 
-        collisionSystem = CollisionSystem(world, scenarioHolder, HitMediator(engine))
-        engine.addSystem(collisionSystem)
+        scenarioCollisionSystem = ScenarioCollisionSystem(scenarioHolder)
+
+        engine.apply {
+            addSystem(worldSystem)
+            addSystem(cameraSystem)
+            addSystem(lunaBodySystem)
+            addSystem(positionSystem)
+            addSystem(weaponSystem)
+            addSystem(lunaLookSystem)
+            addSystem(groundFrictionSystem)
+            addSystem(airFrictionSystem)
+            addSystem(aiSystem)
+            addSystem(vitalitySystem)
+            addSystem(registrySystem)
+            addSystem(hurtboxSystem)
+            addSystem(renderSystem)
+            addSystem(stuckSystem)
+            addSystem(cooldownsSystem)
+            addSystem(aerialSystem)
+            addSystem(CollisionSystem(world))
+            addSystem(scenarioCollisionSystem)
+        }
+
+        scenarioHolder.initialize(saveFile)
     }
 
     override fun render(delta: Float) {

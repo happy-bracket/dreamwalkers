@@ -55,7 +55,7 @@
   <object id="22" x="1252" y="2984" width="76" height="48">
    <properties>
     <property name="object_id" value="test_collision"/>
-    <property name="rigidness" type="int" value="2"/>
+    <property name="rigidness" type="int" value="1"/>
    </properties>
   </object>
   <object id="23" x="1476" y="3588"/>

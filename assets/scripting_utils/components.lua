@@ -12,6 +12,7 @@ movement_component = comp_package .. "TerrainMovementComponent"
 vitality_component = comp_package .. "VitalityComponent"
 identity_component = comp_package .. "IdentityComponent"
 on_collision_start_component = comp_package .. "OnCollisionStartComponent"
+dash_component = comp_package .. "DashComponent"
 
 position_class = luajava.bindClass(position_component)
 aerial_class = luajava.bindClass(aerial_component)
@@ -22,6 +23,7 @@ movement_class = luajava.bindClass(movement_component)
 vitality_class = luajava.bindClass(vitality_component)
 identity_class = luajava.bindClass(identity_component)
 on_collision_start_class = luajava.bindClass(on_collision_start_component)
+dash_class = luajava.bindClass(dash_component)
 
 position_mapper = cm_factory:getFor(position_class)
 identity_mapper = cm_factory:getFor(identity_class)

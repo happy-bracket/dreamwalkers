@@ -52,9 +52,11 @@ class LunaBodySystem(
         val aerial = luna.extract<AerialComponent>()
         if (aerial.isAirborne) {
             val rawDir = controller.leftStick
-            if (rawDir.checkDeadzone(0.3f)) {
+            val dash = luna.extract<DashComponent>()
+            if (rawDir.checkDeadzone(0.3f) && dash.isAvailable()) {
                 val direction = rawDir.nor().scl(8f)
                 luna.extract<BodyComponent>().pushbox.addVelocityViaImpulse(direction)
+                dash.startCooldown()
             }
         }
     }

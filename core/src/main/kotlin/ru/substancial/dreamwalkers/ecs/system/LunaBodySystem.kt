@@ -40,9 +40,9 @@ class LunaBodySystem(
             }
         } else {
             if (controller.leftTriggerDown) {
-                lunaBody.gravityScale = 0.1f
-            } else {
-                lunaBody.gravityScale = 1f
+                val forces = luna.extract<ForcesComponent>().forces
+                forces.remove(AirFriction)
+                forces[FloatPressed] = PendingForce(lunaBody.world.gravity.cpy().scl(-0.9f), FloatPressed)
             }
         }
     }
@@ -72,9 +72,12 @@ class LunaBodySystem(
         private val lunaFamily = Family.all(
                 LunaComponent::class.java,
                 AerialComponent::class.java,
+                ForcesComponent::class.java,
                 BodyComponent::class.java
         ).get()
 
     }
 
 }
+
+object FloatPressed : Reason

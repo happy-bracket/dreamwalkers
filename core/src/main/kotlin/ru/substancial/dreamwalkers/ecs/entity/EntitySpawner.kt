@@ -96,6 +96,7 @@ class EntitySpawner(
         entity.add(BodyComponent(body))
         entity.add(PositionComponent())
         entity.add(TerrainMovementComponent(maxSpeed, body.mass, false))
+        entity.add(ForcesComponent())
         engine.addEntity(entity)
 
         body.entity = entity

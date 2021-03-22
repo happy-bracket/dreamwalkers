@@ -26,3 +26,43 @@ inline fun <reified T : Component> Entity.maybeExtract(): T? {
         mapper[this] as T
     } else null
 }
+
+inline operator fun <reified T : Component> Entity.component1(): T {
+    return gm<T>()[this] as T
+}
+
+inline operator fun <reified T : Component> Entity.component2(): T {
+    return gm<T>()[this] as T
+}
+
+inline operator fun <reified T : Component> Entity.component3(): T {
+    return gm<T>()[this] as T
+}
+
+inline operator fun <reified T : Component> Entity.component4(): T {
+    return gm<T>()[this] as T
+}
+
+inline operator fun <reified T : Component> Entity.component5(): T {
+    return gm<T>()[this] as T
+}
+
+inline operator fun <reified T : Component> Entity.component6(): T {
+    return gm<T>()[this] as T
+}
+
+inline operator fun <reified T : Component> Entity.component7(): T {
+    return gm<T>()[this] as T
+}
+
+inline operator fun <reified T : Component> Entity.component8(): T {
+    return gm<T>()[this] as T
+}
+
+inline operator fun <reified T : Component> Entity.component9(): T {
+    return gm<T>()[this] as T
+}
+
+inline operator fun <reified T : Component> Entity.component10(): T {
+    return gm<T>()[this] as T
+}

@@ -81,10 +81,6 @@ class GameScreen(
         scenarioCollisionSystem = ScenarioCollisionSystem(scenarioHolder)
 
         engine.apply {
-            addSystem(worldSystem)
-            addSystem(cameraSystem)
-            addSystem(lunaBodySystem)
-            addSystem(positionSystem)
             addSystem(weaponSystem)
             addSystem(lunaLookSystem)
             addSystem(groundFrictionSystem)
@@ -92,13 +88,18 @@ class GameScreen(
             addSystem(aiSystem)
             addSystem(vitalitySystem)
             addSystem(registrySystem)
-            addSystem(hurtboxSystem)
-            addSystem(renderSystem)
             addSystem(stuckSystem)
             addSystem(cooldownsSystem)
             addSystem(aerialSystem)
+            addSystem(lunaBodySystem)
+            addSystem(ForcesSystem())
+            addSystem(worldSystem)
             addSystem(CollisionSystem(world))
             addSystem(scenarioCollisionSystem)
+            addSystem(positionSystem)
+            addSystem(hurtboxSystem)
+            addSystem(cameraSystem)
+            addSystem(renderSystem)
         }
 
         scenarioHolder.initialize(saveFile)

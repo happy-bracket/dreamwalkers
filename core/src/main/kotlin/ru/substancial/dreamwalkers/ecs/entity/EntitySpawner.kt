@@ -29,7 +29,8 @@ class EntitySpawner(
             width: Float,
             height: Float,
             spawnPosition: Vector2,
-            maxSpeed: Float
+            maxSpeed: Float,
+            mass: Float
     ): Entity {
         val entity = Entity()
         val body = world.body {
@@ -39,7 +40,7 @@ class EntitySpawner(
             position.set(spawnPosition)
 
             val totalArea = MathUtils.PI * (width / 2) * (height / 2)
-            val bodyDensity = 500f / totalArea
+            val bodyDensity = mass / totalArea
 
             val vertices = discreteEllipse(width, height)
             val triangles = triangulator.computeTriangles(vertices, true)
@@ -95,8 +96,9 @@ class EntitySpawner(
         entity.add(HurtboxComponent(mutableSetOf(), setOf(hurtbox)))
         entity.add(BodyComponent(body))
         entity.add(PositionComponent())
-        entity.add(TerrainMovementComponent(maxSpeed, body.mass, false))
+        entity.add(TerrainMovementComponent(maxSpeed, mass, false))
         entity.add(ForcesComponent())
+        entity.add(AerialComponent())
         engine.addEntity(entity)
 
         body.entity = entity

@@ -9,6 +9,10 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
+import ktx.scene2d.table
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
@@ -39,7 +43,7 @@ class GameScreen(
 
     private val controller = TheController()
 
-    private val stage = Stage(viewport)
+    private val stage = Stage()
 
     private val scenarioHolder: ScenarioHolder
     private val registry: IdentityRegistry = IdentityRegistry()
@@ -51,7 +55,6 @@ class GameScreen(
     private val weaponSystem = WeaponSystem(controller)
     private val lunaLookSystem = LunaLookSystem(controller)
     private val groundFrictionSystem = GroundFrictionSystem()
-    private val airFrictionSystem = AirFrictionSystem()
     private val aiSystem = AiSystem(world)
     private val worldSystem = WorldSystem(world)
     private val vitalitySystem = VitalitySystem()
@@ -84,7 +87,6 @@ class GameScreen(
             addSystem(weaponSystem)
             addSystem(lunaLookSystem)
             addSystem(groundFrictionSystem)
-            addSystem(airFrictionSystem)
             addSystem(aiSystem)
             addSystem(vitalitySystem)
             addSystem(registrySystem)

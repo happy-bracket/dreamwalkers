@@ -19,6 +19,7 @@ class ForcesSystem : RegisteringSystem() {
             fc.forces.values.forEach { force ->
                 bc.pushbox.applyForce(force.vector, force.applicationPoint, true)
             }
+            fc.forces.clear()
         }
     }
 

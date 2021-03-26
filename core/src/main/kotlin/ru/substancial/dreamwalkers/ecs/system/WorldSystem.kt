@@ -1,6 +1,7 @@
 package ru.substancial.dreamwalkers.ecs.system
 
 import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.physics.box2d.World
 import ru.substancial.dreamwalkers.ecs.component.BodyComponent
 import ru.substancial.dreamwalkers.ecs.component.HurtboxComponent

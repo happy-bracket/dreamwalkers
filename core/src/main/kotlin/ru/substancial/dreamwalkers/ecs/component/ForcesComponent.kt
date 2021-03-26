@@ -35,6 +35,5 @@ class AnyReason : Reason {
 
 class PendingForce(
         val vector: Vector2,
-        val reason: Reason = AnyReason(),
         val applicationPoint: Vector2 = Vector2.Zero
 )

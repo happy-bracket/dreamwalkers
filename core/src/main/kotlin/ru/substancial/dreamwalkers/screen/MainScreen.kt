@@ -41,7 +41,6 @@ class MainScreen(private val core: Core) : HasDisplayScreenAdapter() {
 
         stage.addActor(root)
 
-        stage.isDebugAll = true
         Gdx.input.addProcessor(stage)
     }
 

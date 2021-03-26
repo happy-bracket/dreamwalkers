@@ -2,6 +2,7 @@ package ru.substancial.dreamwalkers.ecs.system
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.component.*
@@ -9,6 +10,7 @@ import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
 import ru.substancial.dreamwalkers.utilities.checkDeadzone
 import ru.substancial.dreamwalkers.utilities.addVelocityViaImpulse
+import ru.substancial.dreamwalkers.utilities.cancelGravity
 
 class LunaBodySystem(
         private val controller: TheController
@@ -28,7 +30,6 @@ class LunaBodySystem(
         val aerial = luna.extract<AerialComponent>()
 
         if (!aerial.isAirborne) {
-            lunaBody.gravityScale = 1f
             val ls = controller.leftStick
             val movement = luna.extract<TerrainMovementComponent>()
             val pullForce = ls.scl(1f, 0f).nor().scl(movement.pullForceMagnitude)
@@ -41,8 +42,7 @@ class LunaBodySystem(
         } else {
             if (controller.leftTriggerDown) {
                 val forces = luna.extract<ForcesComponent>().forces
-                forces.remove(AirFriction)
-                forces[FloatPressed] = PendingForce(lunaBody.world.gravity.cpy().scl(-0.9f), FloatPressed)
+                forces[FloatPressed] = PendingForce(lunaBody.cancelGravity().scl(0.7f), lunaBody.massData.center)
             }
         }
     }
@@ -58,6 +58,8 @@ class LunaBodySystem(
                 luna.extract<BodyComponent>().pushbox.addVelocityViaImpulse(direction)
                 dash.startCooldown()
             }
+        } else {
+            luna.extract<BodyComponent>().pushbox.addVelocityViaImpulse(Vector2(0f, 10f))
         }
     }
 
@@ -65,7 +67,6 @@ class LunaBodySystem(
         val luna = this.luna ?: return
         val aerial = luna.extract<AerialComponent>()
         if (!aerial.isAirborne) {
-            luna.extract<BodyComponent>().pushbox.addVelocityViaImpulse(Vector2(0f, 10f))
         }
     }
 
@@ -83,3 +84,4 @@ class LunaBodySystem(
 }
 
 object FloatPressed : Reason
+object TerrainMovement : Reason

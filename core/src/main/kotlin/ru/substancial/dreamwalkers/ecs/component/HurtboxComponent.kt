@@ -6,5 +6,10 @@ import com.badlogic.gdx.physics.box2d.Body
 
 class HurtboxComponent(
         val hitBy: MutableSet<Entity>,
-        val hurtboxes: Set<Body>
+        val hurtboxes: Map<Body, HurtboxFragment>
 ) : Component
+
+class HurtboxFragment(
+        val impactToDestroy: Float,
+        val armorImpact: Float
+)

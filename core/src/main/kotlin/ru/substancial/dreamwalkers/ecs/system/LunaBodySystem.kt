@@ -2,15 +2,14 @@ package ru.substancial.dreamwalkers.ecs.system
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Family
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Vector2
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
-import ru.substancial.dreamwalkers.utilities.checkDeadzone
 import ru.substancial.dreamwalkers.utilities.addVelocityViaImpulse
 import ru.substancial.dreamwalkers.utilities.cancelGravity
+import ru.substancial.dreamwalkers.utilities.checkDeadzone
 
 class LunaBodySystem(
         private val controller: TheController

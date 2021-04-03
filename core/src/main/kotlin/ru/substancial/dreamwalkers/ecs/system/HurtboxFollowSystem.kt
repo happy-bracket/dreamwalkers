@@ -14,7 +14,7 @@ class HurtboxFollowSystem : RegisteringSystem() {
     override fun update(deltaTime: Float) {
         entitiesWithHurtboxes.forEach { e ->
             val pushboxXy = e.extract<PositionComponent>().xy
-            e.extract<HurtboxComponent>().hurtboxes.forEach { hurtbox ->
+            e.extract<HurtboxComponent>().hurtboxes.keys.forEach { hurtbox ->
                 hurtbox.setTransform(pushboxXy, hurtbox.angle)
             }
         }

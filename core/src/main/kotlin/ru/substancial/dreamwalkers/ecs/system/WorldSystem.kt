@@ -19,7 +19,7 @@ class WorldSystem(
             { _, _ -> },
             { _, e ->
                 world.destroyBody(e.extract<BodyComponent>().pushbox)
-                e.maybeExtract<HurtboxComponent>()?.hurtboxes?.forEach(world::destroyBody)
+                e.maybeExtract<HurtboxComponent>()?.hurtboxes?.keys?.forEach(world::destroyBody)
             },
             {}
     )

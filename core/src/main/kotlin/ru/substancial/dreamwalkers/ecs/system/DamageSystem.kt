@@ -4,10 +4,7 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.physics.box2d.Body
-import ru.substancial.dreamwalkers.ecs.component.BodyComponent
-import ru.substancial.dreamwalkers.ecs.component.ContactComponent
-import ru.substancial.dreamwalkers.ecs.component.HitboxComponent
-import ru.substancial.dreamwalkers.ecs.component.HurtboxComponent
+import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.has
 import ru.substancial.dreamwalkers.physics.entity
@@ -20,11 +17,12 @@ class DamageSystem : RegisteringSystem() {
 
     private val listener by justListen(
             Family.all(ContactComponent::class.java).get(),
-            { e -> tryProcessContactStart(e.extract()) },
-            { e -> }
+            { e -> tryProcessContact(e.extract(), true) },
+            { e -> tryProcessContact(e.extract(), false) }
     )
 
-    private fun tryProcessContactStart(contact: ContactComponent) {
+    private fun tryProcessContact(contact: ContactComponent, begin: Boolean) {
+        if (!contact.isTouching) return
         val fa = contact.fixtureA
         val fb = contact.fixtureB
         val ea = fa.body.entity
@@ -48,10 +46,17 @@ class DamageSystem : RegisteringSystem() {
         val hitbox = hitboxEntity.extract<HitboxComponent>()
         val hurtbox = hurtboxEntity.extract<HurtboxComponent>()
         if (hitbox.owner === hurtboxEntity) return
-        val hurtboxFragment = hurtbox.hurtboxes.getValue(hurtboxBody)
-        val hitboxBody = hitboxEntity.extract<BodyComponent>().pushbox
-        if (hitboxBody.linearVelocity.len() < hurtboxFragment.armorImpact) {
-            hitboxBody.setVelocityViaImpulse(hitboxBody.linearVelocity.cpy().scl(-1f))
+        if (begin) {
+            if (hurtbox.hitBy.contains(hitboxEntity)) return
+            hurtbox.hitBy.add(hitboxEntity)
+            val hurtboxFragment = hurtbox.hurtboxes.getValue(hurtboxBody)
+            val hitboxBody = hitboxEntity.extract<BodyComponent>().pushbox
+            if (hurtboxFragment.armor is ArmorProperties.HasArmor && hitboxBody.linearVelocity.len() < hurtboxFragment.armor.criticalImpact) {
+                hitboxBody.setVelocityViaImpulse(hitboxBody.linearVelocity.cpy().setLength(hurtboxFragment.armor.restitution).scl(-1f))
+                return
+            }
+        } else {
+            hurtbox.hitBy.remove(hitboxEntity)
         }
     }
 

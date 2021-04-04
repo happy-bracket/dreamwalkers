@@ -47,6 +47,7 @@ class NightsEdgeLoader(
             gravityScale = 0f
             linearDamping = 0.8f
             fixedRotation = true
+            bullet = true
 
             relevantObjects.forEach { mo ->
                 when (mo) {
@@ -79,8 +80,7 @@ class NightsEdgeLoader(
                     }
                     is PolygonMapObject -> {
                         val polygon = mo.polygon
-//                        val vertices = polygon.vertices
-                        val vertices = polygon.transformedVertices/*.map { it * scale }.toFloatArray()*/
+                        val vertices = polygon.transformedVertices
                         for (i in vertices.indices) {
                             if (i % 2 == 0) {
                                 vertices[i] = (vertices[i] - offset.x) * scale

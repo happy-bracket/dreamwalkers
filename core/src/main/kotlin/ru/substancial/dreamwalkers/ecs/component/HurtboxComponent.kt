@@ -11,5 +11,17 @@ class HurtboxComponent(
 
 class HurtboxFragment(
         val impactToDestroy: Float,
-        val armorImpact: Float
+        val armor: ArmorProperties
 )
+
+sealed class ArmorProperties {
+
+    object NoArmor : ArmorProperties()
+
+    /**
+     * @property criticalImpact weapon velocity required to break armor
+     * @property restitution defines impulse length with which striking weapon will be repelled in case of unsuccessful attack
+     */
+    class HasArmor(val criticalImpact: Float, val restitution: Float) : ArmorProperties()
+
+}

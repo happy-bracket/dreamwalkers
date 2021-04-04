@@ -95,7 +95,7 @@ class EntitySpawner(
                 }
             }
         }
-        entity.add(HurtboxComponent(mutableSetOf(), mapOf(hurtbox to HurtboxFragment(1f, 1f))))
+        entity.add(HurtboxComponent(mutableSetOf(), mapOf(hurtbox to HurtboxFragment(1f, 20f))))
         entity.add(BodyComponent(body))
         entity.add(PositionComponent())
         entity.add(TerrainMovementComponent(maxSpeed, mass, false))

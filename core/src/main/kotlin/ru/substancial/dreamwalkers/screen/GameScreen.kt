@@ -95,6 +95,7 @@ class GameScreen(
             addSystem(ForcesSystem())
             addSystem(worldSystem)
             addSystem(CollisionSystem(world))
+            addSystem(DamageSystem())
             addSystem(scenarioCollisionSystem)
             addSystem(positionSystem)
             addSystem(hurtboxSystem)

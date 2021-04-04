@@ -43,7 +43,7 @@ class NightsEdgeLoader(
         val relevantObjects = allObjects.filter { it is RectangleMapObject || it is PolygonMapObject }
         val fragments = mutableListOf<HitboxFragment>()
         val body = world.body {
-            type = BodyDef.BodyType.KinematicBody
+            type = BodyDef.BodyType.DynamicBody
             gravityScale = 0f
             linearDamping = 0.8f
             fixedRotation = true

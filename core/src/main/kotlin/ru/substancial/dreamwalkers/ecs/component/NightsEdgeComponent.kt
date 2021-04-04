@@ -1,7 +1,14 @@
 package ru.substancial.dreamwalkers.ecs.component
 
 import com.badlogic.ashley.core.Component
+import com.badlogic.gdx.physics.box2d.joints.RopeJoint
 
-private const val WeaponDistance = 5f
+data class NightsEdgeComponent(
+        val handleJoint: RopeJoint,
+        val mass: Float,
+        val handleLength: Float
+) : Component {
 
-data class NightsEdgeComponent(val weaponDistance: Float = WeaponDistance) : Component
+    val pullForceMagnitude = (2 * handleLength * mass) / (0.5f * 0.5f)
+
+}

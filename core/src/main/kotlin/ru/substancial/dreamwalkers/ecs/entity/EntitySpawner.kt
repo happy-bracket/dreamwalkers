@@ -9,7 +9,9 @@ import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
 import ktx.box2d.filter
+import ktx.box2d.ropeJointWith
 import ru.substancial.dreamwalkers.ecs.component.*
+import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.nightsedge.NightsEdgeLoader
 import ru.substancial.dreamwalkers.physics.BodyProp
 import ru.substancial.dreamwalkers.physics.Filters
@@ -93,7 +95,7 @@ class EntitySpawner(
                 }
             }
         }
-        entity.add(HurtboxComponent(mutableSetOf(), setOf(hurtbox)))
+        entity.add(HurtboxComponent(mutableSetOf(), mapOf(hurtbox to HurtboxFragment(1f, 1f))))
         entity.add(BodyComponent(body))
         entity.add(PositionComponent())
         entity.add(TerrainMovementComponent(maxSpeed, mass, false))
@@ -112,9 +114,13 @@ class EntitySpawner(
         val body = model.body
         val fragments = model.fragments.associateBy { it.fixture }
 
+        val joint = luna.extract<BodyComponent>().pushbox.ropeJointWith(body) {
+            maxLength = model.handleLength
+        }
+
         val e = Entity()
         e.add(BodyComponent(body))
-        e.add(NightsEdgeComponent(model.handleLength))
+        e.add(NightsEdgeComponent(joint, model.body.mass, model.handleLength))
         e.add(IdentityComponent("NightsEdge"))
 
         e.add(HitboxComponent(luna, fragments))

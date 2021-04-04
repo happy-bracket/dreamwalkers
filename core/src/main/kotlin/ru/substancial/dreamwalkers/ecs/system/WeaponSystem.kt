@@ -45,16 +45,18 @@ class WeaponSystem(
         val rs = if (isWeaponActive) controller.rightStick else Vector2()
         val destinationRelativeToLuna = when {
             rs.isZero ->
-                Vector2(weaponProps.weaponDistance, 0f).rotate(
+                Vector2(weaponProps.handleLength, 0f).rotate(
                         if (isLookingRight) 225f else -45f
                 )
-            else -> rs.nor().setLength(weaponProps.weaponDistance)
+            else -> rs.nor().setLength(weaponProps.handleLength)
         }
         val destination = lunaBody.getWorldPoint(destinationRelativeToLuna).cpy()
-        val v0 = destination.sub(weaponBody.position).scl(10f)
-        val vw = v0.add(lunaBody.linearVelocity)
+        val direction = destination.sub(weaponBody.position)
+        val force = direction.setLength(weaponProps.pullForceMagnitude)
+        weaponBody.applyForceToCenter(force, true)
 
-        weaponBody.setLinearVelocity(vw.x, vw.y)
+        val reactionForce = weaponProps.handleJoint.getReactionForce(1f / deltaTime)
+        lunaBody.applyForceToCenter(reactionForce, true)
 
         val weaponToLuna = lunaBody.worldCenter.cpy().sub(weaponBody.worldCenter)
         weaponBody.setTransform(weaponBody.worldCenter, weaponToLuna.rotate90(1).angleRad())

@@ -30,7 +30,7 @@ function test_spawn(invoker)
         local spawnXy = position_mapper:get(registry:get("dummy_spawner")):getXy()
         local dummy = invoker:getSpawner():spawn(2.0, 1.6, spawnXy, 10.0, 500.0)
         local identity = luajava.newInstance(identity_component, "test_dummy")
-        local vitality = luajava.newInstance(vitality_component, 30, 10, 20)
+        local vitality = luajava.newInstance(vitality_component, 30, 10, 0)
         dummy:add(identity)
         dummy:add(vitality)
     end

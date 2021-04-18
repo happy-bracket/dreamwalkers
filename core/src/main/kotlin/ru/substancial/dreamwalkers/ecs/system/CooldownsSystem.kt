@@ -14,9 +14,7 @@ class CooldownsSystem : RegisteringSystem() {
 
     override fun update(deltaTime: Float) {
         entities.forEach {
-            it.extract<DashComponent>().let { dash ->
-                dash.tickAway(deltaTime)
-            }
+            it.extract<DashComponent>().tickAway(deltaTime)
         }
     }
 

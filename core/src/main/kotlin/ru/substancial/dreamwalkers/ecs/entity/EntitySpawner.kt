@@ -95,7 +95,9 @@ class EntitySpawner(
                 }
             }
         }
-        entity.add(HurtboxComponent(mutableSetOf(), mapOf(hurtbox to HurtboxFragment(1f, 20f))))
+        val armor = ArmorProperties.HasArmor(1f, 7.5f)
+        val fragments = mapOf(hurtbox to HurtboxFragment(1f, armor))
+        entity.add(HurtboxComponent(mutableSetOf(), fragments))
         entity.add(BodyComponent(body))
         entity.add(PositionComponent())
         entity.add(TerrainMovementComponent(maxSpeed, mass, false))

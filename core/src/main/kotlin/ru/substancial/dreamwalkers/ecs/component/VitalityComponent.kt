@@ -4,6 +4,5 @@ import com.badlogic.ashley.core.Component
 
 class VitalityComponent(
         var vitalityLevel: Int,
-        val terminalThreshold: Int,
-        val exhaustionThreshold: Int
+        val terminalThreshold: Int
 ) : Component

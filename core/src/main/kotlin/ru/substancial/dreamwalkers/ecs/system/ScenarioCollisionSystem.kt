@@ -23,8 +23,8 @@ class ScenarioCollisionSystem(
     )
 
     private fun onBegin(contact: ContactComponent) {
-        val entityA = contact.fixtureA.body.entity
-        val entityB = contact.fixtureB.body.entity
+        val entityA = contact.fixtureA.body.entity ?: return
+        val entityB = contact.fixtureB.body.entity ?: return
         if ((entityA.has<OnCollisionStartComponent>()).xor(entityB.has<OnCollisionStartComponent>())) {
             val functionName: String
             val initiator: Fixture
@@ -40,8 +40,8 @@ class ScenarioCollisionSystem(
             }
             scenario.call(
                     functionName,
-                    initiator.body.entity,
-                    target.body.entity
+                    initiator.body.entity!!,
+                    target.body.entity!!
             )
         }
     }

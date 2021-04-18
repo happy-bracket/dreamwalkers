@@ -9,6 +9,8 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
+import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
@@ -41,6 +43,7 @@ class GameScreen(
 
     private val controller = TheController()
 
+    private val skin = Skin(Gdx.files.internal("assets/testskin/uiskin.json"))
     private val stage = Stage()
 
     private val scenarioHolder: ScenarioHolder
@@ -55,7 +58,6 @@ class GameScreen(
     private val groundFrictionSystem = GroundFrictionSystem()
     private val aiSystem = AiSystem(world)
     private val worldSystem = WorldSystem(world)
-    private val vitalitySystem = VitalitySystem()
     private val registrySystem = RegistrySystem(registry)
     private val hurtboxSystem = HurtboxFollowSystem()
     private val stuckSystem = ImpaleSystem(world)
@@ -68,6 +70,9 @@ class GameScreen(
     init {
         Controllers.addListener(controller)
         core.commandExecutor.currentEngine = engine
+
+        val label = Label("", skin)
+        stage.addActor(label)
 
         val interactor = GameScenarioCallbacks()
         scenarioHolder = ScenarioHolder(
@@ -86,7 +91,6 @@ class GameScreen(
             addSystem(lunaLookSystem)
             addSystem(groundFrictionSystem)
             addSystem(aiSystem)
-            addSystem(vitalitySystem)
             addSystem(registrySystem)
             addSystem(stuckSystem)
             addSystem(cooldownsSystem)

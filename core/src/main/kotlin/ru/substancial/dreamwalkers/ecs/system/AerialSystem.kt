@@ -2,6 +2,7 @@ package ru.substancial.dreamwalkers.ecs.system
 
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.physics.box2d.Fixture
 import ru.substancial.dreamwalkers.ecs.component.AerialComponent
 import ru.substancial.dreamwalkers.ecs.component.ContactComponent
@@ -31,14 +32,21 @@ class AerialSystem : RegisteringSystem() {
 
     private fun tryReactToTerrainContact(fixtureA: Fixture, fixtureB: Fixture, begin: Boolean) {
         val target: Entity
-        val ea = fixtureA.body.entity
-        val eb = fixtureB.body.entity
-        target = when {
-            fixtureA.getProps().props.contains(BodyProp.Foot) && eb.has<TerrainComponent>() -> ea
-            fixtureB.getProps().props.contains(BodyProp.Foot) && ea.has<TerrainComponent>() -> eb
-            else -> return
+        try {
+            val ea = fixtureA.body.entity ?: return
+            val eb = fixtureB.body.entity ?: return
+
+            target = when {
+                fixtureA.getProps().props.contains(BodyProp.Foot) && eb.has<TerrainComponent>() -> ea
+                fixtureB.getProps().props.contains(BodyProp.Foot) && ea.has<TerrainComponent>() -> eb
+                else -> return
+            }
+            target.maybeExtract<AerialComponent>()?.let { it.terrainContacts += if (begin) 1 else -1 }
+        } catch (e: TypeCastException) {
+            Gdx.app.log("egor2", "${fixtureA.getProps().props}")
+            Gdx.app.log("egor2", "${fixtureB.getProps().props}")
+            return
         }
-        target.maybeExtract<AerialComponent>()?.let { it.terrainContacts += if (begin) 1 else -1 }
     }
 
 }

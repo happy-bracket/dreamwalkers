@@ -7,8 +7,16 @@ sealed class BodyProp {
     object Foot : BodyProp()
 }
 
+private var unityCounter = 0L
+    get() {
+        val res = field
+        field += 1
+        return res
+    }
+
 class FixtureProps(
-        val props: Set<BodyProp>
+    val props: Set<BodyProp>,
+    val unityFactor: Long = unityCounter
 )
 
 fun FixtureDefinition.injectProps(vararg props: BodyProp) {

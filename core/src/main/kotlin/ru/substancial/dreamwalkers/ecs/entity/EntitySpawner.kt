@@ -2,21 +2,27 @@ package ru.substancial.dreamwalkers.ecs.entity
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.DelaunayTriangulator
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.BodyDef
+import com.badlogic.gdx.physics.box2d.CircleShape
+import com.badlogic.gdx.physics.box2d.FixtureDef
 import com.badlogic.gdx.physics.box2d.World
 import ktx.box2d.body
 import ktx.box2d.filter
 import ktx.box2d.ropeJointWith
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
+import ru.substancial.dreamwalkers.ecs.has
+import ru.substancial.dreamwalkers.ecs.maybeExtract
 import ru.substancial.dreamwalkers.nightsedge.NightsEdgeLoader
 import ru.substancial.dreamwalkers.physics.BodyProp
 import ru.substancial.dreamwalkers.physics.Filters
 import ru.substancial.dreamwalkers.physics.entity
 import ru.substancial.dreamwalkers.physics.injectProps
+import kotlin.experimental.or
 import kotlin.math.sqrt
 
 class EntitySpawner(
@@ -27,6 +33,40 @@ class EntitySpawner(
 
     private val triangulator by lazy { DelaunayTriangulator() }
 
+    fun addInteraction(
+        entity: Entity,
+        callbackName: String,
+        prompt: String,
+        radius: Float
+    ) {
+        val interaction = entity.maybeExtract<InteractionComponent>() ?: run {
+            Gdx.app.error("EntitySpawner", "tried to add interaction to entity that is not interactive; skip")
+            return
+        }
+        val fd = FixtureDef()
+        fd.shape = CircleShape().apply { this.radius = radius }
+        fd.isSensor = true
+        fd.filter {
+            categoryBits = Filters.Interactive
+            maskBits = Filters.Pushbox
+        }
+        val fixture = interaction.sensorBody.createFixture(fd)
+        interaction.interactions[fixture] = Interaction(callbackName, prompt)
+    }
+
+    fun makeInteractive(
+        entity: Entity,
+        interactiveName: String
+    ) {
+        if (entity.has<InteractionComponent>()) {
+            Gdx.app.debug("EntitySpawner", "tried to make an entity interactive, but it already was; skip")
+        }
+        val sensorBody = world.body {
+            this.userData = entity
+        }
+        entity.add(InteractionComponent(sensorBody, interactiveName))
+    }
+
     fun spawn(
             width: Float,
             height: Float,
@@ -35,7 +75,7 @@ class EntitySpawner(
             mass: Float
     ): Entity {
         val entity = Entity()
-        val body = world.body {
+        val pushbox = world.body {
             type = BodyDef.BodyType.DynamicBody
             linearDamping = 0f
             fixedRotation = true
@@ -63,7 +103,7 @@ class EntitySpawner(
                     density = bodyDensity
                     filter {
                         categoryBits = Filters.Pushbox
-                        maskBits = Filters.LevelPushbox
+                        maskBits = Filters.LevelPushbox or Filters.Interactive
                     }
                 }
             }
@@ -98,14 +138,14 @@ class EntitySpawner(
         val armor = ArmorProperties.HasArmor(1f, 7.5f)
         val fragments = mapOf(hurtbox to HurtboxFragment(1f, armor))
         entity.add(HurtboxComponent(mutableSetOf(), fragments))
-        entity.add(BodyComponent(body))
+        entity.add(BodyComponent(pushbox))
         entity.add(PositionComponent())
         entity.add(TerrainMovementComponent(maxSpeed, mass, false))
         entity.add(ForcesComponent())
         entity.add(AerialComponent())
         engine.addEntity(entity)
 
-        body.entity = entity
+        pushbox.entity = entity
         hurtbox.entity = entity
 
         return entity

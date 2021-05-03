@@ -103,8 +103,10 @@ class GameScreen(
             addSystem(scenarioCollisionSystem)
             addSystem(positionSystem)
             addSystem(hurtboxSystem)
+            addSystem(InteractionSystem())
             addSystem(cameraSystem)
             addSystem(renderSystem)
+            addSystem(DisposalSystem())
         }
 
         scenarioHolder.initialize(saveFile)

@@ -5,4 +5,10 @@ import com.badlogic.gdx.physics.box2d.Body
 
 data class BodyComponent(
     val pushbox: Body
-) : Component
+) : Component, DisposableComponent {
+
+    override fun dispose() {
+        pushbox.world.destroyBody(pushbox)
+    }
+
+}

@@ -1,6 +1,7 @@
 package ru.substancial.dreamwalkers.utilities
 
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.Gdx
 import ru.substancial.dreamwalkers.ecs.component.IdentityComponent
 import ru.substancial.dreamwalkers.ecs.maybeExtract
 

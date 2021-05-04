@@ -10,7 +10,9 @@ import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
+import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.badlogic.gdx.scenes.scene2d.ui.Table
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
@@ -71,8 +73,16 @@ class GameScreen(
         Controllers.addListener(controller)
         core.commandExecutor.currentEngine = engine
 
-        val label = Label("", skin)
-        stage.addActor(label)
+        val root = Table()
+        root.setFillParent(true)
+        stage.addActor(root)
+
+        root.row()
+
+        val dashCooldown = ProgressBar(0f, 1f, 0.01f, false, skin)
+        root.add(dashCooldown)
+
+        stage.isDebugAll = true
 
         val interactor = GameScenarioCallbacks()
         scenarioHolder = ScenarioHolder(
@@ -105,6 +115,7 @@ class GameScreen(
             addSystem(hurtboxSystem)
             addSystem(InteractionSystem())
             addSystem(cameraSystem)
+            addSystem(DisplaySystem(dashCooldown))
             addSystem(renderSystem)
             addSystem(DisposalSystem())
         }

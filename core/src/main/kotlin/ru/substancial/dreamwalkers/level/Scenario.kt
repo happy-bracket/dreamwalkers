@@ -36,6 +36,10 @@ class ScenarioHolder(
         globals["update"]?.invoke(delta.lua)
     }
 
+    fun playerDeath() {
+        globals["playerDeath"]?.invoke(invokerLua)
+    }
+
     fun call(functionName: String, initiator: Entity, target: Entity) {
         invoker.initiator = initiator
         invoker.target = target

@@ -82,6 +82,8 @@ class GameScreen(
         val dashCooldown = ProgressBar(0f, 1f, 0.01f, false, skin)
         root.add(dashCooldown)
 
+        dashCooldown.isVisible = false // temporal
+
         stage.isDebugAll = true
 
         val interactor = GameScenarioCallbacks()
@@ -132,6 +134,8 @@ class GameScreen(
     }
 
     override fun dispose() {
+        engine.removeAllEntities()
+        engine.systems.forEach(engine::removeSystem)
         world.dispose()
         debugRenderer.dispose()
         Controllers.clearListeners()
@@ -152,12 +156,15 @@ class GameScreen(
         }
 
         override fun gameOver(iconFile: String, title: String, description: String) {
-            core.screen = GameOverScreen(
+            Gdx.app.log("egor2", "jopa")
+            Gdx.app.postRunnable {
+                core.screen = GameOverScreen(
                     core,
                     iconFile,
                     title,
                     description
-            )
+                )
+            }
         }
 
     }

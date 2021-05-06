@@ -1,9 +1,6 @@
 package ru.substancial.dreamwalkers
 
-import com.badlogic.gdx.ApplicationLogger
-import com.badlogic.gdx.Game
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.InputMultiplexer
+import com.badlogic.gdx.*
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.strongjoshua.console.Console
 import com.strongjoshua.console.GUIConsole
@@ -44,6 +41,11 @@ class Core : Game() {
         super.dispose()
         console.dispose()
         Gdx.input.removeProcessor(console.inputProcessor)
+    }
+
+    override fun setScreen(screen: Screen?) {
+        this.screen?.dispose()
+        super.setScreen(screen)
     }
 
     private fun setupLogger(console: Console) {

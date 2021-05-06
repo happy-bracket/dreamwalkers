@@ -56,29 +56,45 @@ class DamageSystem : RegisteringSystem() {
             hurtbox.hitBy.add(hitboxEntity)
             val hurtboxFragment = hurtbox.hurtboxes.getValue(hurtboxBody)
             val hitboxBody = hitboxEntity.extract<BodyComponent>().pushbox
+
             when {
                 hurtboxEntity.has<VitalityComponent>() -> {
                     val vitality = hurtboxEntity.extract<VitalityComponent>()
-                    val fragment = hitbox.fragments.getValue(hitboxFixture)
-                    val impact = hitboxBody.linearVelocity.len() * fragment.impactScale
-                    if (hurtboxFragment.armor is ArmorProperties.HasArmor && impact < hurtboxFragment.armor.criticalImpact) {
-                        hitboxBody.setVelocityViaImpulse(
-                            hitboxBody.linearVelocity.cpy().setLength(hurtboxFragment.armor.restitution).scl(-1f)
-                        )
-                        return
-                    }
+                    val impact = getImpact(hitboxBody, hitbox.fragments.getValue(hitboxFixture))
+                    if (!processArmor(impact, hurtboxFragment, hitboxBody)) return
+                    processHurtbox(impact, hurtboxFragment, hurtboxEntity)
                     vitality.vitalityLevel -= impact.toInt()
-                    if (vitality.vitalityLevel <= vitality.terminalThreshold) {
+                    if (vitality.vitalityLevel <= 0f) {
                         engine.removeEntity(hurtboxEntity)
                     }
                     wounds.add(OpeningWound(hitboxEntity, hurtboxEntity, impact))
                 }
             }
+
         } else {
             hurtbox.hitBy.remove(hitboxEntity)
             val wound = wounds.firstOrNull { it.target === hurtboxEntity && it.weapon === hitboxEntity } ?: return
             wounds.remove(wound)
         }
+    }
+
+    private fun getImpact(hitboxBody: Body, fragment: HitboxFragment): Float {
+        return hitboxBody.linearVelocity.len() * fragment.impactScale
+    }
+
+    private fun processHurtbox(impact: Float, hurtboxFragment: HurtboxFragment, hurtboxEntity: Entity) {
+        if (impact >= hurtboxFragment.impactToDestroy) {
+            hurtboxFragment.onDestroy(engine, hurtboxEntity)
+        }
+    }
+
+    private fun processArmor(impact: Float, hurtboxFragment: HurtboxFragment, hitboxBody: Body): Boolean {
+        return if (hurtboxFragment.armor is ArmorProperties.HasArmor && impact < hurtboxFragment.armor.criticalImpact) {
+            hitboxBody.setVelocityViaImpulse(
+                hitboxBody.linearVelocity.cpy().setLength(hurtboxFragment.armor.restitution).scl(-1f)
+            )
+            true
+        } else false
     }
 
     class OpeningWound(

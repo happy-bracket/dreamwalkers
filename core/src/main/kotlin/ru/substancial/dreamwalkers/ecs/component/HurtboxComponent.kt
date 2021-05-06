@@ -1,6 +1,7 @@
 package ru.substancial.dreamwalkers.ecs.component
 
 import com.badlogic.ashley.core.Component
+import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.physics.box2d.Body
 import ru.substancial.dreamwalkers.physics.destroy
@@ -18,7 +19,8 @@ class HurtboxComponent(
 
 class HurtboxFragment(
     val impactToDestroy: Float,
-    val armor: ArmorProperties
+    val armor: ArmorProperties,
+    val onDestroy: (Engine, Entity) -> Unit = { _, _ -> }
 )
 
 sealed class ArmorProperties {

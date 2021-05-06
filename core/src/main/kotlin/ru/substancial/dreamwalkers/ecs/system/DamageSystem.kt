@@ -69,6 +69,9 @@ class DamageSystem : RegisteringSystem() {
                     }
                     wounds.add(OpeningWound(hitboxEntity, hurtboxEntity, impact))
                 }
+                hurtboxEntity.has<LunaVitalityComponent>() -> {
+
+                }
             }
 
         } else {

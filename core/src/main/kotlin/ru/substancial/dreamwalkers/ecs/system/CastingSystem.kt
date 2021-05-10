@@ -9,6 +9,11 @@ import ru.substancial.dreamwalkers.ecs.system.Symbol.*
 import ru.substancial.dreamwalkers.ui.CastingBufferDisplay
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
 
+/* TODO
+ * so, this thing revealed a lot of problems with the current state of things.
+ * 1) physics World should be an Entity
+ * 2) player's input should be an Entity
+ */
 class CastingSystem(
     private val controller: TheController,
     private val display: CastingBufferDisplay

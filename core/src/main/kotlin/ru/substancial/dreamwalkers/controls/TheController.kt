@@ -1,6 +1,5 @@
 package ru.substancial.dreamwalkers.controls
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.controllers.Controller
 import com.badlogic.gdx.controllers.ControllerAdapter
 import com.badlogic.gdx.math.Vector2
@@ -35,11 +34,27 @@ class TheController : ControllerAdapter() {
 
     var rightTriggerDownListener = {}
     var rightTriggerUpListener = {}
+    var aListener = {}
+    var bListener = {}
+    var xListener = {}
+    var yListener = {}
+    var r1Listener = {}
+
+    override fun buttonUp(controller: Controller?, buttonIndex: Int): Boolean {
+        switchControllerIfNeeded(controller)
+        val m = latestUsedController?.mapping ?: return false
+        when (buttonIndex) {
+            m.buttonA -> aListener()
+            m.buttonB -> bListener()
+            m.buttonX -> xListener()
+            m.buttonY -> yListener()
+            m.buttonR1 -> r1Listener()
+        }
+        return false
+    }
 
     override fun axisMoved(controller: Controller?, axisIndex: Int, value: Float): Boolean {
-        if (latestUsedController?.uniqueId != controller?.uniqueId) {
-            latestUsedController = controller
-        }
+        switchControllerIfNeeded(controller)
         val m = latestUsedController?.mapping ?: return false
         when (axisIndex) {
             m.axisLeftX -> {
@@ -82,6 +97,12 @@ class TheController : ControllerAdapter() {
             }
         }
         return false
+    }
+
+    private fun switchControllerIfNeeded(controller: Controller?) {
+        if (latestUsedController?.uniqueId != controller?.uniqueId) {
+            latestUsedController = controller
+        }
     }
 
 }

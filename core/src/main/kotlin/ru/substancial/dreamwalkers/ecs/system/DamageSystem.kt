@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.Fixture
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.has
@@ -58,13 +57,13 @@ class DamageSystem : RegisteringSystem() {
             val hitboxBody = hitboxEntity.extract<BodyComponent>().pushbox
 
             when {
-                hurtboxEntity.has<VitalityComponent>() -> {
-                    val vitality = hurtboxEntity.extract<VitalityComponent>()
+                hurtboxEntity.has<PrismaticComponent>() -> {
+                    val vitality = hurtboxEntity.extract<PrismaticComponent>()
                     val impact = getImpact(hitboxBody, hitbox.fragments.getValue(hitboxFixture))
                     if (!processArmor(impact, hurtboxFragment, hitboxBody)) return
                     processHurtbox(impact, hurtboxFragment, hurtboxEntity)
-                    vitality.vitalityLevel -= impact.toInt()
-                    if (vitality.vitalityLevel <= 0f) {
+                    vitality.integrity -= impact.toInt()
+                    if (vitality.integrity <= 0f) {
                         engine.removeEntity(hurtboxEntity)
                     }
                     wounds.add(OpeningWound(hitboxEntity, hurtboxEntity, impact))

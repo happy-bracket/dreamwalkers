@@ -58,18 +58,20 @@ class DamageSystem : RegisteringSystem() {
 
             when {
                 hurtboxEntity.has<PrismaticComponent>() -> {
-                    val vitality = hurtboxEntity.extract<PrismaticComponent>()
+                    val prism = hurtboxEntity.extract<PrismaticComponent>()
                     val impact = getImpact(hitboxBody, hitbox.fragments.getValue(hitboxFixture))
                     if (!processArmor(impact, hurtboxFragment, hitboxBody)) return
                     processHurtbox(impact, hurtboxFragment, hurtboxEntity)
-                    vitality.integrity -= impact.toInt()
-                    if (vitality.integrity <= 0f) {
+                    if (prism.shield.points <= impact) {
+                        prism.integrity.decreaseBy(impact - prism.shield.points)
+                        prism.shield.set(0f)
+                    } else {
+                        prism.shield.decreaseBy(impact)
+                    }
+                    if (prism.isBroken()) {
                         engine.removeEntity(hurtboxEntity)
                     }
                     wounds.add(OpeningWound(hitboxEntity, hurtboxEntity, impact))
-                }
-                hurtboxEntity.has<LunaVitalityComponent>() -> {
-
                 }
             }
 

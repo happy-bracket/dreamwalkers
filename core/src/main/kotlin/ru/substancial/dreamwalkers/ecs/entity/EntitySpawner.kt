@@ -151,7 +151,20 @@ class EntitySpawner(
         return entity
     }
 
-    fun equip(luna: Entity, weaponModel: String) {
+    fun spawnLuna(
+        spawnPosition: Vector2
+    ): Entity {
+        val entity = spawn(1.8f, 1.7f, spawnPosition, 7.5f, 500f)
+        entity.add(LunaComponent())
+        entity.add(AerialComponent())
+        entity.add(LookComponent())
+        entity.add(IdentityComponent("Luna"))
+        entity.add(DashComponent(1.0f))
+        equip(entity, "armory/sword.tmx")
+        return entity
+    }
+
+    private fun equip(luna: Entity, weaponModel: String) {
         val model = nightsEdgeLoader.load(weaponModel)
         val body = model.body
         val fragments = model.fragments.associateBy { it.fixture }

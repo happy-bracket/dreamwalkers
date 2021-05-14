@@ -112,6 +112,7 @@ class GameScreen(
             addSystem(worldSystem)
             addSystem(CollisionSystem(world))
             addSystem(DamageSystem())
+            addSystem(LunaVitalitySystem(interactor))
             addSystem(scenarioCollisionSystem)
             addSystem(positionSystem)
             addSystem(hurtboxSystem)

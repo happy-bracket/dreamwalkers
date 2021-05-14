@@ -1,5 +1,6 @@
 package ru.substancial.dreamwalkers.screen
 
+import box2dLight.RayHandler
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.controllers.Controllers
@@ -9,12 +10,13 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.Label
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
+import ru.substancial.dreamwalkers.ecs.component.CameraComponent
+import ru.substancial.dreamwalkers.ecs.component.RayHandlerComponent
 import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
 import ru.substancial.dreamwalkers.ecs.system.*
 import ru.substancial.dreamwalkers.level.Level
@@ -23,6 +25,7 @@ import ru.substancial.dreamwalkers.level.ScenarioCallbacks
 import ru.substancial.dreamwalkers.level.ScenarioHolder
 import ru.substancial.dreamwalkers.nightsedge.NightsEdgeLoader
 import ru.substancial.dreamwalkers.utilities.ClearScreen
+import ru.substancial.dreamwalkers.utilities.EntityOf
 import ru.substancial.dreamwalkers.utilities.IdentityRegistry
 
 class GameScreen(
@@ -43,6 +46,8 @@ class GameScreen(
             true
     )
 
+    private val rayHandler = RayHandler(world)
+
     private val controller = TheController()
 
     private val skin = Skin(Gdx.files.internal("assets/testskin/uiskin.json"))
@@ -50,22 +55,6 @@ class GameScreen(
 
     private val scenarioHolder: ScenarioHolder
     private val registry: IdentityRegistry = IdentityRegistry()
-
-    private val cameraSystem = CameraSystem(camera)
-    private val renderSystem = DebugRenderSystem(world, camera, debugRenderer)
-    private val lunaBodySystem = LunaBodySystem(controller)
-    private val positionSystem = PositionSystem()
-    private val weaponSystem = WeaponSystem(controller)
-    private val lunaLookSystem = LunaLookSystem(controller)
-    private val groundFrictionSystem = GroundFrictionSystem()
-    private val aiSystem = AiSystem(world)
-    private val worldSystem = WorldSystem(world)
-    private val registrySystem = RegistrySystem(registry)
-    private val hurtboxSystem = HurtboxFollowSystem()
-    private val stuckSystem = ImpaleSystem(world)
-    private val cooldownsSystem = CooldownsSystem()
-    private val aerialSystem = AerialSystem()
-    private val scenarioCollisionSystem: ScenarioCollisionSystem
 
     private val engine = Engine()
 
@@ -96,30 +85,32 @@ class GameScreen(
                         NightsEdgeLoader(EarClippingTriangulator(), TmxMapLoader(), world)
                 ))
 
-        scenarioCollisionSystem = ScenarioCollisionSystem(scenarioHolder)
+        engine.addEntity(EntityOf(RayHandlerComponent(rayHandler)))
+        engine.addEntity(EntityOf(CameraComponent(camera)))
 
         engine.apply {
-            addSystem(weaponSystem)
-            addSystem(lunaLookSystem)
-            addSystem(groundFrictionSystem)
-            addSystem(aiSystem)
-            addSystem(registrySystem)
-            addSystem(stuckSystem)
-            addSystem(cooldownsSystem)
-            addSystem(aerialSystem)
-            addSystem(lunaBodySystem)
+            addSystem(WeaponSystem(controller))
+            addSystem(LunaLookSystem(controller))
+            addSystem(GroundFrictionSystem())
+            addSystem(AiSystem(world))
+            addSystem(RegistrySystem(registry))
+            addSystem(ImpaleSystem(world))
+            addSystem(CooldownsSystem())
+            addSystem(AerialSystem())
+            addSystem(LunaBodySystem(controller))
             addSystem(ForcesSystem())
-            addSystem(worldSystem)
+            addSystem(WorldSystem(world))
             addSystem(CollisionSystem(world))
             addSystem(DamageSystem())
             addSystem(LunaVitalitySystem(interactor))
-            addSystem(scenarioCollisionSystem)
-            addSystem(positionSystem)
-            addSystem(hurtboxSystem)
+            addSystem(ScenarioCollisionSystem(scenarioHolder))
+            addSystem(PositionSystem())
+            addSystem(HurtboxFollowSystem())
             addSystem(InteractionSystem())
-            addSystem(cameraSystem)
+            addSystem(CameraSystem())
             addSystem(DisplaySystem(dashCooldown))
-            addSystem(renderSystem)
+            addSystem(DebugRenderSystem(world, debugRenderer))
+            addSystem(LightsSystem())
             addSystem(DisposalSystem())
         }
 
@@ -157,7 +148,6 @@ class GameScreen(
         }
 
         override fun gameOver(iconFile: String, title: String, description: String) {
-            Gdx.app.log("egor2", "jopa")
             Gdx.app.postRunnable {
                 core.screen = GameOverScreen(
                     core,

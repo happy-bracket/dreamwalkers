@@ -1,15 +1,15 @@
 package ru.substancial.dreamwalkers.ecs.entity
 
+import box2dLight.PointLight
+import box2dLight.RayHandler
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.math.DelaunayTriangulator
 import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.BodyDef
-import com.badlogic.gdx.physics.box2d.CircleShape
-import com.badlogic.gdx.physics.box2d.FixtureDef
-import com.badlogic.gdx.physics.box2d.World
+import com.badlogic.gdx.physics.box2d.*
 import ktx.box2d.body
 import ktx.box2d.filter
 import ktx.box2d.ropeJointWith
@@ -26,9 +26,10 @@ import kotlin.experimental.or
 import kotlin.math.sqrt
 
 class EntitySpawner(
-        private val world: World,
-        private val engine: Engine,
-        private val nightsEdgeLoader: NightsEdgeLoader
+    private val world: World,
+    private val engine: Engine,
+    private val nightsEdgeLoader: NightsEdgeLoader,
+    private val rayHandler: RayHandler
 ) {
 
     private val triangulator by lazy { DelaunayTriangulator() }
@@ -68,11 +69,11 @@ class EntitySpawner(
     }
 
     fun spawn(
-            width: Float,
-            height: Float,
-            spawnPosition: Vector2,
-            maxSpeed: Float,
-            mass: Float
+        width: Float,
+        height: Float,
+        spawnPosition: Vector2,
+        maxSpeed: Float,
+        mass: Float
     ): Entity {
         val entity = Entity()
         val pushbox = world.body {
@@ -109,9 +110,9 @@ class EntitySpawner(
             }
 
             box(
-                    width = width * 0.8f,
-                    height = 0.2f,
-                    position = Vector2(0f, -height / 2)
+                width = width * 0.8f,
+                height = 0.2f,
+                position = Vector2(0f, -height / 2)
             ) {
                 isSensor = true
                 density = 0f
@@ -161,6 +162,12 @@ class EntitySpawner(
         entity.add(IdentityComponent("Luna"))
         entity.add(DashComponent(1.0f))
         equip(entity, "armory/sword.tmx")
+//        val lightSpellEntity = Entity()
+//        val light = PointLight(rayHandler, 60, Color.BLUE, 7.5f, 0.0f, 0.0f)
+//        lightSpellEntity.add(LightComponent(light))
+//        light.attachToBody(entity.extract<BodyComponent>().pushbox)
+//        light.ignoreAttachedBody = true
+//        engine.addEntity(lightSpellEntity)
         return entity
     }
 
@@ -212,6 +219,48 @@ class EntitySpawner(
         result[result.size / 2 + 1] = 0f
 
         return result
+    }
+
+    /**
+     * @param color color in RGBA hex format
+     */
+    fun spawnLightAt(
+        position: Vector2,
+        color: String,
+        rays: Int,
+        distance: Float,
+        id: String?
+    ) {
+        val entity = spawnLight(color, rays, distance, id)
+        entity.add(PositionComponent(position.cpy()))
+        val light = entity.extract<LightComponent>().light
+        light.position = position
+    }
+
+    fun spawnAttachedLight(
+        anchor: Body,
+        color: String,
+        rays: Int,
+        distance: Float,
+        id: String?
+    ) {
+        val entity = spawnLight(color, rays, distance, id)
+        val light = entity.extract<LightComponent>().light
+        light.attachToBody(anchor)
+    }
+
+    private fun spawnLight(
+        color: String,
+        rays: Int,
+        distance: Float,
+        id: String?
+    ): Entity {
+        val light = PointLight(rayHandler, rays, Color.valueOf(color), distance, 0f, 0f)
+        val entity = Entity()
+        entity.add(LightComponent(light))
+        if (id != null)
+            entity.add(IdentityComponent(id))
+        return entity
     }
 
 }

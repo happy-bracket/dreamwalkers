@@ -29,21 +29,21 @@ import ru.substancial.dreamwalkers.utilities.EntityOf
 import ru.substancial.dreamwalkers.utilities.IdentityRegistry
 
 class GameScreen(
-        private val core: Core,
-        private val scenarioPath: String,
-        scenarioName: String,
-        saveFile: SaveFile?
+    private val core: Core,
+    private val scenarioPath: String,
+    scenarioName: String,
+    saveFile: SaveFile?
 ) : HasDisplayScreenAdapter() {
 
     private val world = World(Vector2(0f, -10f), false)
 
     private val debugRenderer = Box2DDebugRenderer(
-            true,
-            true,
-            false,
-            true,
-            true,
-            true
+        true,
+        true,
+        false,
+        true,
+        true,
+        true
     )
 
     private val rayHandler = RayHandler(world)
@@ -77,13 +77,15 @@ class GameScreen(
 
         val interactor = GameScenarioCallbacks()
         scenarioHolder = ScenarioHolder(
-                "$scenarioPath/$scenarioName",
-                interactor,
-                engine, registry,
-                EntitySpawner(
-                        world, engine,
-                        NightsEdgeLoader(EarClippingTriangulator(), TmxMapLoader(), world)
-                ))
+            "$scenarioPath/$scenarioName",
+            interactor,
+            engine, registry,
+            EntitySpawner(
+                world, engine,
+                NightsEdgeLoader(EarClippingTriangulator(), TmxMapLoader(), world),
+                rayHandler
+            )
+        )
 
         engine.addEntity(EntityOf(RayHandlerComponent(rayHandler)))
         engine.addEntity(EntityOf(CameraComponent(camera)))
@@ -105,12 +107,13 @@ class GameScreen(
             addSystem(LunaVitalitySystem(interactor))
             addSystem(ScenarioCollisionSystem(scenarioHolder))
             addSystem(PositionSystem())
+            addSystem(PositionalLightsSystem())
             addSystem(HurtboxFollowSystem())
             addSystem(InteractionSystem())
             addSystem(CameraSystem())
             addSystem(DisplaySystem(dashCooldown))
             addSystem(DebugRenderSystem(world, debugRenderer))
-            addSystem(LightsSystem())
+            addSystem(LightsRenderingSystem())
             addSystem(DisposalSystem())
         }
 
@@ -132,6 +135,7 @@ class GameScreen(
         debugRenderer.dispose()
         Controllers.clearListeners()
         core.commandExecutor.currentEngine = null
+        rayHandler.dispose()
     }
 
     inner class GameScenarioCallbacks : ScenarioCallbacks {

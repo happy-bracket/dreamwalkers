@@ -7,7 +7,7 @@ import ru.substancial.dreamwalkers.ecs.component.RayHandlerComponent
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
 
-class LightsSystem : RegisteringSystem() {
+class LightsRenderingSystem : RegisteringSystem() {
 
     private val cameraEntity by singular(Family.all(CameraComponent::class.java).get())
     private val handlerEntity by singular(Family.all(RayHandlerComponent::class.java).get())

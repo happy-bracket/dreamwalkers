@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
@@ -16,6 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.component.CameraComponent
+import ru.substancial.dreamwalkers.ecs.component.LevelComponent
+import ru.substancial.dreamwalkers.ecs.component.MapRendererComponent
 import ru.substancial.dreamwalkers.ecs.component.RayHandlerComponent
 import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
 import ru.substancial.dreamwalkers.ecs.system.*
@@ -113,6 +116,7 @@ class GameScreen(
             addSystem(CameraSystem())
             addSystem(DisplaySystem(dashCooldown))
             addSystem(DebugRenderSystem(world, debugRenderer))
+            addSystem(MapRenderSystem())
             addSystem(LightsRenderingSystem())
             addSystem(DisposalSystem())
         }
@@ -148,6 +152,8 @@ class GameScreen(
 
             val map = TmxMapLoader().load(levelPath.path(), TmxMapLoader.Parameters().apply { convertObjectToTileSpace = true })
             val loadedLevel = Level(map)
+            engine.addEntity(EntityOf(LevelComponent(loadedLevel)))
+            engine.addEntity(EntityOf(MapRendererComponent(OrthogonalTiledMapRenderer(map))))
             loadedLevel.inflate(world, engine)
         }
 

@@ -2,6 +2,7 @@ package ru.substancial.dreamwalkers.level
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
+import com.badlogic.gdx.maps.MapLayer
 import com.badlogic.gdx.maps.objects.PolygonMapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.objects.TextureMapObject
@@ -24,6 +25,9 @@ import kotlin.experimental.or
 class Level(private val map: TiledMap) {
 
     private val triangulator by lazy { EarClippingTriangulator() }
+
+    val rigidMapTextures: MapLayer
+        get() = map.layers["visual"]
 
     fun inflate(world: World, engine: Engine) {
         val objects = map.layers.flatMap { it.objects }.filterNot { it is TiledMapTileMapObject || it is TextureMapObject }

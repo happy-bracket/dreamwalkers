@@ -24,8 +24,8 @@ fun <K> RegisteringSystem.map(
 
 fun RegisteringSystem.justListen(
         family: Family,
-        onAdded: (Entity) -> Unit,
-        onRemoved: (Entity) -> Unit
+        onAdded: (Entity) -> Unit = {},
+        onRemoved: (Entity) -> Unit = {}
 ): RegisteringSystem.Storage.FromListener<Unit> {
     return this.listener(
             family,

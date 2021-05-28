@@ -22,12 +22,11 @@ import ru.substancial.dreamwalkers.utilities.x
 import ru.substancial.dreamwalkers.utilities.y
 import kotlin.experimental.or
 
-class Level(private val map: TiledMap) {
+class Level(val map: TiledMap) {
 
     private val triangulator by lazy { EarClippingTriangulator() }
 
-    val rigidMapTextures: MapLayer
-        get() = map.layers["visual"]
+
 
     fun inflate(world: World, engine: Engine) {
         val objects = map.layers.flatMap { it.objects }.filterNot { it is TiledMapTileMapObject || it is TextureMapObject }

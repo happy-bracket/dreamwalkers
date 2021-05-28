@@ -1,16 +1,24 @@
 package ru.substancial.dreamwalkers.ecs.system
 
+import box2dLight.ConeLight
+import box2dLight.Light
+import box2dLight.PointLight
+import box2dLight.RayHandler
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.assets.loaders.AssetLoader
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.MapObject
+import com.badlogic.gdx.maps.tiled.TiledMap
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.maybeExtract
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
+import ru.substancial.dreamwalkers.utilities.extractIdentityInto
+import ru.substancial.dreamwalkers.utilities.extractPositionInto
 import ru.substancial.dreamwalkers.utilities.justListen
 import java.util.*
 import java.util.regex.Pattern
@@ -89,15 +97,43 @@ class RenderSystem : RegisteringSystem() {
             }
         }
 
+        inflateLights(map)
+    }
+
+    private fun inflateLights(map: TiledMap) {
+        val lightObjectsLayer = map.layers["lights"]
+        // 0 - point, 1 - cone
+        val handler = handlerEntity.extract<RayHandlerComponent>().handler
+        lightObjectsLayer.objects.forEach {
+            inflateLight(it, handler)
+        }
+    }
+
+    private fun inflateLight(obj: MapObject, handler: RayHandler) {
+        val entity = Entity()
+        obj.extractIdentityInto(entity)
+        val position = obj.extractPositionInto(entity)
+        val rays = obj.properties["light_rays"] as Int
+        val distance = obj.properties["light_distance"] as Float
+        val color = obj.properties["light_color"] as Color
+        val light = when (obj.properties["light_type"] as Int) {
+            0 -> PointLight(handler, rays, color, distance, position.xy.x, position.xy.y)
+            1 -> {
+                val direction = obj.properties["light_direction"] as Float
+                val coneDegree = obj.properties["light_cone_degree"] as Float
+                ConeLight(handler, rays, color, distance, position.xy.x, position.xy.y, direction, coneDegree)
+            }
+            else -> throw IllegalArgumentException("unknown light type.")
+        }
+        entity.add(LightComponent(light))
+        engine.addEntity(entity)
     }
 
     private fun inflateObject(parentAtlas: TextureAtlas, obj: MapObject, layerIx: Int) {
         val type = (obj.properties["drawable_type"] ?: return) as Int
-        val id = (obj.properties["object_id"]) as? String?
         val entity = Entity()
+        obj.extractIdentityInto(entity)
         entity.add(DrawingLayerComponent(layerIx))
-        if (id != null)
-            entity.add(IdentityComponent(id))
         when (type) {
             0 -> {
                 val drawableName = (obj.properties["drawable_name"] ?: return) as String

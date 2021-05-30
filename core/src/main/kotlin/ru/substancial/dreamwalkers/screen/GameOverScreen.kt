@@ -1,6 +1,7 @@
 package ru.substancial.dreamwalkers.screen
 
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
@@ -11,20 +12,22 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import ktx.scene2d.label
 import ktx.scene2d.textButton
 import ktx.scene2d.verticalGroup
+import ru.substancial.dreamwalkers.Assets
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.utilities.ClearScreen
 import ru.substancial.dreamwalkers.utilities.addProcessor
 import ru.substancial.dreamwalkers.utilities.removeProcessor
 
 class GameOverScreen(
-        private val core: Core,
-        iconFile: String,
-        title: String,
-        description: String
+    private val assetManager: AssetManager,
+    private val core: Core,
+    iconFile: String,
+    title: String,
+    description: String
 ) : HasDisplayScreenAdapter() {
 
     private val stage = Stage()
-    private val skin = Skin(Gdx.files.internal("assets/testskin/uiskin.json"))
+    private val skin: Skin = assetManager[Assets.Skin]
 
     init {
         val root = VerticalGroup()
@@ -33,7 +36,7 @@ class GameOverScreen(
         val toMainMenu = TextButton("To Main Menu", skin)
         toMainMenu.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                core.screen = MainScreen(core)
+                core.setScreen(ScreenImage.MainMenu)
             }
         })
         root.addActor(titleLabel)

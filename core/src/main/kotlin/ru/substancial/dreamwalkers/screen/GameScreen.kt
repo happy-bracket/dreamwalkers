@@ -3,6 +3,7 @@ package ru.substancial.dreamwalkers.screen
 import box2dLight.RayHandler
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.EarClippingTriangulator
@@ -13,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import ru.substancial.dreamwalkers.Assets
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
 import ru.substancial.dreamwalkers.ecs.component.CameraComponent
@@ -30,6 +32,7 @@ import ru.substancial.dreamwalkers.utilities.EntityOf
 import ru.substancial.dreamwalkers.utilities.IdentityRegistry
 
 class GameScreen(
+    private val assetManager: AssetManager,
     private val core: Core,
     private val scenarioPath: String,
     scenarioName: String,
@@ -51,7 +54,7 @@ class GameScreen(
 
     private val controller = TheController()
 
-    private val skin = Skin(Gdx.files.internal("assets/testskin/uiskin.json"))
+    private val skin: Skin = assetManager[Assets.Skin]
     private val stage = Stage()
 
     private val scenarioHolder: ScenarioHolder
@@ -155,12 +158,7 @@ class GameScreen(
 
         override fun gameOver(iconFile: String, title: String, description: String) {
             Gdx.app.postRunnable {
-                core.screen = GameOverScreen(
-                    core,
-                    iconFile,
-                    title,
-                    description
-                )
+                core.setScreen(ScreenImage.GameOver(iconFile, title, description))
             }
         }
 

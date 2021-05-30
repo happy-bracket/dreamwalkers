@@ -35,10 +35,10 @@ class RenderSystem : RegisteringSystem() {
     )
     private val handlerEntity by singular(Family.all(RayHandlerComponent::class.java).get())
 
-    private val levelLoaded by justListen(
-        Family.all(LevelComponent::class.java).get(),
-        onAdded = ::inflateDrawingEntities
-    )
+//    private val levelLoaded by justListen(
+//        Family.all(LevelComponent::class.java).get(),
+//        onAdded = ::inflateDrawingEntities
+//    )
 
     private val batch = SpriteBatch()
 

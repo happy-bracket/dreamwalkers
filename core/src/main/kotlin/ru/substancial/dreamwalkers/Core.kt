@@ -1,12 +1,13 @@
 package ru.substancial.dreamwalkers
 
 import com.badlogic.gdx.*
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.strongjoshua.console.Console
 import com.strongjoshua.console.GUIConsole
 import com.strongjoshua.console.LogLevel
 import ru.substancial.dreamwalkers.dev.DwCommandExecutor
-import ru.substancial.dreamwalkers.screen.MainScreen
+import ru.substancial.dreamwalkers.screen.*
 import ru.substancial.dreamwalkers.utilities.addProcessor
 import ru.substancial.dreamwalkers.utilities.removeProcessor
 
@@ -14,15 +15,28 @@ class Core : Game() {
 
     private lateinit var console: GUIConsole
     lateinit var commandExecutor: DwCommandExecutor
+    private val assetManager = AssetManager()
+
+    fun setScreen(image: ScreenImage) {
+        setScreen(
+            when (image) {
+                is ScreenImage.Splash -> SplashScreen(assetManager, this)
+                is ScreenImage.Game -> GameScreen(assetManager, this, "assets/scenarios/test", "scenario.lua", null)
+                is ScreenImage.MainMenu -> MainScreen(assetManager, this)
+                is ScreenImage.GameOver -> GameOverScreen(assetManager, this, image.iconFile, image.title, image.description)
+            }
+        )
+    }
 
     override fun create() {
         Gdx.input.inputProcessor = InputMultiplexer()
-        console = GUIConsole(Skin(Gdx.files.internal("assets/testskin/uiskin.json")), false)
+        setScreen(ScreenImage.Splash)
+        console = GUIConsole(assetManager[Assets.Skin], false)
         commandExecutor = DwCommandExecutor(this)
         console.setCommandExecutor(commandExecutor)
         Gdx.input.addProcessor(console.inputProcessor)
         setupLogger(console)
-        setScreen(MainScreen(this))
+        setScreen(ScreenImage.MainMenu)
         console.isVisible = true
         console.isDisabled = false
     }
@@ -40,6 +54,7 @@ class Core : Game() {
     override fun dispose() {
         super.dispose()
         console.dispose()
+        assetManager.dispose()
         Gdx.input.removeProcessor(console.inputProcessor)
     }
 

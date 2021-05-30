@@ -2,6 +2,7 @@ package ru.substancial.dreamwalkers.dev
 
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Family
+import com.badlogic.gdx.assets.AssetManager
 import com.strongjoshua.console.CommandExecutor
 import com.strongjoshua.console.LogLevel
 import ru.substancial.dreamwalkers.Core
@@ -12,13 +13,16 @@ import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.maybeExtract
 import ru.substancial.dreamwalkers.ecs.system.CameraSystem
 import ru.substancial.dreamwalkers.screen.MainScreen
+import ru.substancial.dreamwalkers.screen.ScreenImage
 
-class DwCommandExecutor(private val core: Core) : CommandExecutor() {
+class DwCommandExecutor(
+    private val core: Core
+) : CommandExecutor() {
 
     var currentEngine: Engine? = null
 
     fun exitToMainScreen() {
-        core.screen = MainScreen(core)
+        core.setScreen(ScreenImage.MainMenu)
     }
 
     fun isLunaAirborne() {

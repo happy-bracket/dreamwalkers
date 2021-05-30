@@ -2,6 +2,7 @@ package ru.substancial.dreamwalkers.screen
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.ScreenAdapter
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.scenes.scene2d.InputEvent
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.Label
@@ -11,14 +12,18 @@ import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener
 import com.badlogic.gdx.utils.Align
 import com.badlogic.gdx.utils.viewport.FitViewport
+import ru.substancial.dreamwalkers.Assets
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.utilities.ClearScreen
 import ru.substancial.dreamwalkers.utilities.addProcessor
 import ru.substancial.dreamwalkers.utilities.removeProcessor
 
-class MainScreen(private val core: Core) : HasDisplayScreenAdapter() {
+class MainScreen(
+    private val assetManager: AssetManager,
+    private val core: Core
+) : HasDisplayScreenAdapter() {
 
-    private val skin = Skin(Gdx.files.internal("assets/testskin/uiskin.json"))
+    private val skin: Skin = assetManager[Assets.Skin]
     private val stage: Stage = Stage()
 
     init {
@@ -28,7 +33,8 @@ class MainScreen(private val core: Core) : HasDisplayScreenAdapter() {
 
         startButton.addListener(object : ClickListener() {
             override fun clicked(event: InputEvent?, x: Float, y: Float) {
-                core.screen = GameScreen(core, "assets/scenarios/test", "scenario.lua", null)
+//                core.screen = GameScreen(assetManager, core, "assets/scenarios/test", "scenario.lua", null)
+                core.setScreen(ScreenImage.Game)
             }
         })
 
@@ -52,7 +58,6 @@ class MainScreen(private val core: Core) : HasDisplayScreenAdapter() {
 
     override fun dispose() {
         stage.dispose()
-        skin.dispose()
         Gdx.input.removeProcessor(stage)
     }
 

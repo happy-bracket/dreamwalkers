@@ -66,6 +66,7 @@ class GameScreen(
         Controllers.addListener(controller)
         core.commandExecutor.currentEngine = engine
 
+        // region UI
         val root = Table()
         root.setFillParent(true)
         stage.addActor(root)
@@ -78,6 +79,7 @@ class GameScreen(
         dashCooldown.isVisible = false // temporal
 
         stage.isDebugAll = true
+        //endregion
 
         val interactor = GameScenarioCallbacks()
         scenarioHolder = ScenarioHolder(
@@ -86,7 +88,7 @@ class GameScreen(
             engine, registry,
             EntitySpawner(
                 world, engine,
-                NightsEdgeLoader(EarClippingTriangulator(), TmxMapLoader(), world),
+                NightsEdgeLoader(EarClippingTriangulator(), assetManager, world),
                 rayHandler
             )
         )
@@ -122,6 +124,10 @@ class GameScreen(
         }
 
         scenarioHolder.initialize(saveFile)
+    }
+
+    private fun inflateUi() {
+
     }
 
     override fun render(delta: Float) {

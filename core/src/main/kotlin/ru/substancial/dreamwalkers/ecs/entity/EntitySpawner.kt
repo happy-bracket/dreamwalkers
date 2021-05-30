@@ -13,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.*
 import ktx.box2d.body
 import ktx.box2d.filter
 import ktx.box2d.ropeJointWith
+import ru.substancial.dreamwalkers.Assets
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.has
@@ -161,7 +162,7 @@ class EntitySpawner(
         entity.add(LookComponent())
         entity.add(IdentityComponent("Luna"))
         entity.add(DashComponent(1.0f))
-        equip(entity, "armory/sword.tmx")
+        equip(entity, Assets.Armory.Sword)
 //        val lightSpellEntity = Entity()
 //        val light = PointLight(rayHandler, 60, Color.BLUE, 7.5f, 0.0f, 0.0f)
 //        lightSpellEntity.add(LightComponent(light))

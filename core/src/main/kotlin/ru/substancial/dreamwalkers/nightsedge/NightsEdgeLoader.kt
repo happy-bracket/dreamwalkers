@@ -1,8 +1,10 @@
 package ru.substancial.dreamwalkers.nightsedge
 
+import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.maps.MapProperties
 import com.badlogic.gdx.maps.objects.PolygonMapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
+import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
@@ -22,12 +24,12 @@ import kotlin.experimental.or
 
 class NightsEdgeLoader(
         private val triangulator: EarClippingTriangulator,
-        private val loader: TmxMapLoader,
+        private val assetManager: AssetManager,
         private val world: World
 ) {
 
     fun load(modelName: String): NightsEdgeModel {
-        val weaponMap = loader.load(modelName)
+        val weaponMap = assetManager.get<TiledMap>(modelName)
 
         val boundingBox = weaponMap.layers[L.BoundingBox].objects.first() as RectangleMapObject
         val sourceHeight = boundingBox.rectangle.height

@@ -40,6 +40,10 @@ class ScenarioHolder(
         globals["playerDeath"]?.invoke(invokerLua)
     }
 
+    fun levelReady() {
+        globals["on_level_ready"]?.invoke(invokerLua)
+    }
+
     fun call(functionName: String, initiator: Entity, target: Entity) {
         invoker.initiator = initiator
         invoker.target = target

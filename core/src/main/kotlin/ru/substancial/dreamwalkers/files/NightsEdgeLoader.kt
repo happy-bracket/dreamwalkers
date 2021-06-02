@@ -1,11 +1,10 @@
-package ru.substancial.dreamwalkers.nightsedge
+package ru.substancial.dreamwalkers.files
 
 import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.maps.MapProperties
 import com.badlogic.gdx.maps.objects.PolygonMapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
-import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
@@ -17,8 +16,6 @@ import ru.substancial.dreamwalkers.ecs.component.DamageType
 import ru.substancial.dreamwalkers.ecs.component.HitboxFragment
 import ru.substancial.dreamwalkers.physics.Filters
 import ru.substancial.dreamwalkers.utilities.complement
-import ru.substancial.dreamwalkers.utilities.fromPolygon
-import ru.substancial.dreamwalkers.utilities.fromRectangle
 import ru.substancial.dreamwalkers.utilities.safeCast
 import kotlin.experimental.or
 

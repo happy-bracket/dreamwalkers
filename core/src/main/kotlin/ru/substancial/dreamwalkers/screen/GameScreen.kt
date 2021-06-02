@@ -3,8 +3,8 @@ package ru.substancial.dreamwalkers.screen
 import box2dLight.RayHandler
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.assets.AssetManager
 import com.badlogic.gdx.controllers.Controllers
+import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
@@ -22,17 +22,15 @@ import ru.substancial.dreamwalkers.ecs.component.LevelComponent
 import ru.substancial.dreamwalkers.ecs.component.RayHandlerComponent
 import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
 import ru.substancial.dreamwalkers.ecs.system.*
-import ru.substancial.dreamwalkers.level.Level
-import ru.substancial.dreamwalkers.level.SaveFile
-import ru.substancial.dreamwalkers.level.ScenarioCallbacks
-import ru.substancial.dreamwalkers.level.ScenarioHolder
-import ru.substancial.dreamwalkers.nightsedge.NightsEdgeLoader
+import ru.substancial.dreamwalkers.files.DreamwalkersAssetManager
+import ru.substancial.dreamwalkers.files.NightsEdgeLoader
+import ru.substancial.dreamwalkers.level.*
 import ru.substancial.dreamwalkers.utilities.ClearScreen
 import ru.substancial.dreamwalkers.utilities.EntityOf
 import ru.substancial.dreamwalkers.utilities.IdentityRegistry
 
 class GameScreen(
-    private val assetManager: AssetManager,
+    private val assetManager: DreamwalkersAssetManager,
     private val core: Core,
     private val scenarioPath: String,
     scenarioName: String,
@@ -61,6 +59,9 @@ class GameScreen(
     private val registry: IdentityRegistry = IdentityRegistry()
 
     private val engine = Engine()
+
+    private val levelLoader = LevelLoader(scenarioPath, assetManager)
+    private var stateReady = false
 
     init {
         Controllers.addListener(controller)
@@ -126,16 +127,17 @@ class GameScreen(
         scenarioHolder.initialize(saveFile)
     }
 
-    private fun inflateUi() {
-
-    }
-
     override fun render(delta: Float) {
-        ClearScreen()
-        scenarioHolder.update(delta)
-        engine.update(delta)
-        stage.act(delta)
-        stage.draw()
+        if (stateReady) {
+            ClearScreen()
+            scenarioHolder.update(delta)
+            engine.update(delta)
+            stage.act(delta)
+            stage.draw()
+        } else {
+            ClearScreen(b = 0.3f)
+            levelLoader.update()
+        }
     }
 
     override fun dispose() {
@@ -151,15 +153,14 @@ class GameScreen(
     inner class GameScenarioCallbacks : ScenarioCallbacks {
 
         override fun loadLevel(name: String) {
-            val levelFolder = Gdx.files.internal("$scenarioPath/$name")
-            val levelFolderContents = levelFolder.list()
-
-            val levelPath = levelFolderContents.first { it.extension() == "tmx" }
-
-            val map = TmxMapLoader().load(levelPath.path(), TmxMapLoader.Parameters().apply { convertObjectToTileSpace = true })
-            val loadedLevel = Level(map)
-            engine.addEntity(EntityOf(LevelComponent(loadedLevel)))
-            loadedLevel.inflate(world, engine)
+            levelLoader.loadLevel(name) { map ->
+                val loadedLevel = Level(map)
+                engine.addEntity(EntityOf(LevelComponent(loadedLevel)))
+                loadedLevel.inflate(world, engine)
+                stateReady = true
+                scenarioHolder.levelReady()
+                assetManager["sword_small.png", Texture::class.java]
+            }
         }
 
         override fun gameOver(iconFile: String, title: String, description: String) {

@@ -7,6 +7,7 @@ import com.strongjoshua.console.Console
 import com.strongjoshua.console.GUIConsole
 import com.strongjoshua.console.LogLevel
 import ru.substancial.dreamwalkers.dev.DwCommandExecutor
+import ru.substancial.dreamwalkers.files.DreamwalkersAssetManager
 import ru.substancial.dreamwalkers.screen.*
 import ru.substancial.dreamwalkers.utilities.addProcessor
 import ru.substancial.dreamwalkers.utilities.removeProcessor
@@ -15,7 +16,7 @@ class Core : Game() {
 
     private lateinit var console: GUIConsole
     lateinit var commandExecutor: DwCommandExecutor
-    private val assetManager = AssetManager()
+    private val assetManager = DreamwalkersAssetManager()
 
     fun setScreen(image: ScreenImage) {
         setScreen(

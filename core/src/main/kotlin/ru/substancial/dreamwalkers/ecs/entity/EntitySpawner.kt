@@ -18,7 +18,7 @@ import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.has
 import ru.substancial.dreamwalkers.ecs.maybeExtract
-import ru.substancial.dreamwalkers.nightsedge.NightsEdgeLoader
+import ru.substancial.dreamwalkers.files.NightsEdgeLoader
 import ru.substancial.dreamwalkers.physics.BodyProp
 import ru.substancial.dreamwalkers.physics.Filters
 import ru.substancial.dreamwalkers.physics.entity

@@ -2,6 +2,9 @@ require "scripting_utils/components"
 
 function init(invoker)
     local level = invoker:getInteractor():loadLevel("observatory")
+end
+
+function on_level_ready(invoker)
     local spawn_point = invoker:getRegistry():get("spawn_point")
     local xy = position_mapper:get(spawn_point):getXy()
 
@@ -13,7 +16,8 @@ function init(invoker)
 end
 
 function test_spawn(invoker)
-    invoker:getInteractor():gameOver("", "Bad Dream Ending", "You know that feeling when you die in a dream? This is the one.")
+    invoker:getInteractor():unloadLevel()
+    invoker:getInteractor():loadLevel("observatory")
 end
 
 function update(delta)

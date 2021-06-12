@@ -6,10 +6,12 @@ import com.badlogic.gdx.maps.objects.PolygonMapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.EarClippingTriangulator
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Body
 import com.badlogic.gdx.physics.box2d.BodyDef
 import com.badlogic.gdx.physics.box2d.World
+import com.badlogic.gdx.utils.ShortArray
 import ktx.box2d.body
 import ktx.box2d.filter
 import ru.substancial.dreamwalkers.ecs.component.DamageType
@@ -51,7 +53,7 @@ class NightsEdgeLoader(
             relevantObjects.forEach { mo ->
                 when (mo) {
                     is RectangleMapObject -> {
-                        val rect = mo.rectangle
+                        val rect = Rectangle(mo.rectangle)
                         rect.width *= scale
                         rect.height *= scale
                         rect.x = (rect.x - offset.x) * scale
@@ -79,7 +81,7 @@ class NightsEdgeLoader(
                     }
                     is PolygonMapObject -> {
                         val polygon = mo.polygon
-                        val vertices = polygon.transformedVertices
+                        val vertices = polygon.transformedVertices.copyOf()
                         for (i in vertices.indices) {
                             if (i % 2 == 0) {
                                 vertices[i] = (vertices[i] - offset.x) * scale
@@ -88,7 +90,7 @@ class NightsEdgeLoader(
                             }
                         }
 
-                        val triangles = triangulator.computeTriangles(vertices)
+                        val triangles: ShortArray = triangulator.computeTriangles(vertices)
 
                         for (i in 0 until triangles.size / 3) {
 

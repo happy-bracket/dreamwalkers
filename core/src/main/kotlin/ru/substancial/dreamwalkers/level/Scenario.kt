@@ -68,6 +68,8 @@ interface ScenarioCallbacks {
 
     fun loadLevel(name: String)
 
+    fun unloadLevel()
+
     fun gameOver(
             iconFile: String,
             title: String,

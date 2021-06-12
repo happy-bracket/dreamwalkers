@@ -95,8 +95,7 @@ class GameScreen(
             )
         )
 
-        engine.addEntity(EntityOf(RayHandlerComponent(rayHandler)))
-        engine.addEntity(EntityOf(CameraComponent(camera)))
+        addEssentialEntities()
 
         engine.apply {
             addSystem(WeaponSystem(controller))
@@ -151,6 +150,11 @@ class GameScreen(
         rayHandler.dispose()
     }
 
+    private fun addEssentialEntities() {
+        engine.addEntity(EntityOf(RayHandlerComponent(rayHandler)))
+        engine.addEntity(EntityOf(CameraComponent(camera)))
+    }
+
     inner class GameScenarioCallbacks : ScenarioCallbacks {
 
         override fun loadLevel(name: String) {
@@ -160,8 +164,14 @@ class GameScreen(
                 loadedLevel.inflate(world, engine)
                 stateReady = true
                 scenarioHolder.levelReady()
-                assetManager["sword_small.png", Texture::class.java]
             }
+        }
+
+        override fun unloadLevel() {
+            stateReady = false
+            engine.removeAllEntities()
+            addEssentialEntities()
+            levelLoader.unloadLevel()
         }
 
         override fun gameOver(iconFile: String, title: String, description: String) {

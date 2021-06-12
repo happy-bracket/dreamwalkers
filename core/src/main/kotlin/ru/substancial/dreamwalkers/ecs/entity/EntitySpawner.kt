@@ -163,12 +163,6 @@ class EntitySpawner(
         entity.add(IdentityComponent("Luna"))
         entity.add(DashComponent(1.0f))
         equip(entity, Assets.Armory.Sword)
-//        val lightSpellEntity = Entity()
-//        val light = PointLight(rayHandler, 60, Color.BLUE, 7.5f, 0.0f, 0.0f)
-//        lightSpellEntity.add(LightComponent(light))
-//        light.attachToBody(entity.extract<BodyComponent>().pushbox)
-//        light.ignoreAttachedBody = true
-//        engine.addEntity(lightSpellEntity)
         return entity
     }
 

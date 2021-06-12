@@ -29,7 +29,7 @@ class Level(
     private val triangulator by lazy { EarClippingTriangulator() }
 
     fun inflate(world: World, engine: Engine) {
-        val objects = map.layers.flatMap { it.objects }.filterNot { it is TiledMapTileMapObject || it is TextureMapObject }
+        val objects = map.layers["ground"].objects
 
         objects.forEach { mapObject ->
             val entity = Entity()

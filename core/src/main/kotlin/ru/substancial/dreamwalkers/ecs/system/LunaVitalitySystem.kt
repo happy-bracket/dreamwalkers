@@ -11,14 +11,14 @@ import ru.substancial.dreamwalkers.utilities.justListen
 class LunaVitalitySystem(
     private val callbacks: ScenarioCallbacks
 ) : RegisteringSystem() {
-
-    private val exclusionListener by justListen(
-        Family.all(LunaComponent::class.java).get(),
-        {},
-        { e ->
-            if (e.extract<PrismaticComponent>().isBroken())
-                callbacks.gameOver("", "Pathetic Ending", "Is this how you intended it to be?")
-        }
-    )
+//
+//    private val exclusionListener by justListen(
+//        Family.all(LunaComponent::class.java).get(),
+//        {},
+//        { e ->
+//            if (e.extract<PrismaticComponent>().isBroken())
+//                callbacks.gameOver("", "Pathetic Ending", "Is this how you intended it to be?")
+//        }
+//    )
 
 }

@@ -31,9 +31,6 @@ fun BodyDefinition.fromPolygon(
     val offsetX = polygon.x
     val offsetY = polygon.y
 
-    for (i in vertices.indices) {
-        vertices[i] = vertices[i]
-    }
     val triangles = triangulator.computeTriangles(vertices)
 
     for (i in 0 until triangles.size / 3) {

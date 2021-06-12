@@ -11,10 +11,10 @@ class DisplaySystem(
     private val dashCooldown: ProgressBar
 ) : RegisteringSystem() {
 
-    private val luna by singular(Family.all(LunaComponent::class.java).get())
+    private val luna by optional(Family.all(LunaComponent::class.java).get())
 
     override fun update(deltaTime: Float) {
-        val dash = luna.extract<DashComponent>()
+        val dash = luna?.extract<DashComponent>() ?: return
         dashCooldown.value = dash.ticks / dash.cooldown
     }
 

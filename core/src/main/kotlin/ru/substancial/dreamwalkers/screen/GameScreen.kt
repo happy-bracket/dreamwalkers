@@ -3,6 +3,7 @@ package ru.substancial.dreamwalkers.screen
 import box2dLight.RayHandler
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.Gdx
+import com.badlogic.gdx.assets.loaders.AssetLoader
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.maps.tiled.TmxMapLoader
@@ -120,7 +121,7 @@ class GameScreen(
             addSystem(CameraSystem())
             addSystem(DisplaySystem(dashCooldown))
             addSystem(DebugRenderSystem(world, debugRenderer))
-            addSystem(RenderSystem())
+            addSystem(RenderSystem(assetManager))
             addSystem(DisposalSystem())
         }
 

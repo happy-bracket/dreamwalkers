@@ -1,0 +1,13 @@
+
+testatlas.png
+size: 256, 512
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+sword_small
+  rotate: false
+  xy: 2, 2
+  size: 137, 402
+  orig: 137, 402
+  offset: 0, 0
+  index: -1

@@ -1,29 +1,30 @@
 package ru.substancial.dreamwalkers.ecs.system
 
 import box2dLight.ConeLight
-import box2dLight.Light
 import box2dLight.PointLight
 import box2dLight.RayHandler
 import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
-import com.badlogic.gdx.assets.loaders.AssetLoader
 import com.badlogic.gdx.graphics.Color
+import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.MapObject
+import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
+import com.badlogic.gdx.math.Vector2
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.maybeExtract
-import ru.substancial.dreamwalkers.utilities.RegisteringSystem
-import ru.substancial.dreamwalkers.utilities.extractIdentityInto
-import ru.substancial.dreamwalkers.utilities.extractPositionInto
-import ru.substancial.dreamwalkers.utilities.justListen
+import ru.substancial.dreamwalkers.files.DreamwalkersAssetManager
+import ru.substancial.dreamwalkers.utilities.*
 import java.util.*
 import java.util.regex.Pattern
 
-class RenderSystem : RegisteringSystem() {
+class RenderSystem(private val assetManager: DreamwalkersAssetManager) : RegisteringSystem() {
 
     private val cameraEntity by singular(Family.all(CameraComponent::class.java).get())
     private val drawables by listener(
@@ -35,10 +36,10 @@ class RenderSystem : RegisteringSystem() {
     )
     private val handlerEntity by singular(Family.all(RayHandlerComponent::class.java).get())
 
-//    private val levelLoaded by justListen(
-//        Family.all(LevelComponent::class.java).get(),
-//        onAdded = ::inflateDrawingEntities
-//    )
+    private val levelLoaded by justListen(
+        Family.all(LevelComponent::class.java).get(),
+        onAdded = ::inflateDrawingEntities
+    )
 
     private val batch = SpriteBatch()
 
@@ -86,13 +87,17 @@ class RenderSystem : RegisteringSystem() {
 
         val pattern = Pattern.compile("visual([+-](?:0|[1-9]\\d*))$")
 
+        val mapAtlas = map.properties["atlas"] as String?
 
         for (layer in map.layers) {
             val matcher = pattern.matcher(layer.name)
             if (matcher.find()) {
                 val layerIx = matcher.group(1).toInt()
+                val layerAtlas = layer.properties["atlas"] as String?
                 layer.objects.forEach { obj ->
-//                    inflateObject(obj, layerIx)
+                    val objAtlas = obj.properties["atlas"] as String?
+                    val targetAtlas = assetManager[(objAtlas ?: layerAtlas) ?: mapAtlas, TextureAtlas::class.java]
+                    inflateObject(targetAtlas, obj as RectangleMapObject, layerIx)
                 }
             }
         }
@@ -100,8 +105,28 @@ class RenderSystem : RegisteringSystem() {
         inflateLights(map)
     }
 
+    private fun inflateObject(atlas: TextureAtlas, obj: RectangleMapObject, layerIx: Int) {
+        val type = (obj.properties["drawable_type"] ?: return) as Int
+        val entity = Entity()
+        obj.extractIdentityInto(entity)
+        obj.extractPositionInto(entity)
+        entity.add(DrawingLayerComponent(layerIx))
+        when (type) {
+            0 -> {
+                val drawableName = obj.properties["drawable_name"] as String? ?: return
+                val drawableComponent = SpriteComponent(
+                    atlas.findRegion(drawableName),
+                    obj.rectangle.width,
+                    obj.rectangle.height
+                )
+                entity.add(drawableComponent)
+            }
+        }
+        engine.addEntity(entity)
+    }
+
     private fun inflateLights(map: TiledMap) {
-        val lightObjectsLayer = map.layers["lights"]
+        val lightObjectsLayer = map.layers["lights"] ?: return
         // 0 - point, 1 - cone
         val handler = handlerEntity.extract<RayHandlerComponent>().handler
         lightObjectsLayer.objects.forEach {
@@ -129,21 +154,6 @@ class RenderSystem : RegisteringSystem() {
         engine.addEntity(entity)
     }
 
-    private fun inflateObject(parentAtlas: TextureAtlas, obj: MapObject, layerIx: Int) {
-        val type = (obj.properties["drawable_type"] ?: return) as Int
-        val entity = Entity()
-        obj.extractIdentityInto(entity)
-        entity.add(DrawingLayerComponent(layerIx))
-        when (type) {
-            0 -> {
-                val drawableName = (obj.properties["drawable_name"] ?: return) as String
-                val drawableComponent = SpriteComponent(parentAtlas.findRegion(drawableName).let(TextureAtlas::AtlasSprite))
-                entity.add(drawableComponent)
-            }
-        }
-        engine.addEntity(entity)
-    }
-
     private fun addEntity(cache: LinkedList<ExposedLayerDrawableEntity>, entity: Entity) {
         val entityLayer = entity.maybeExtract<DrawingLayerComponent>()?.drawingLayer ?: 0
         val represented = ExposedLayerDrawableEntity(entityLayer, entity)
@@ -158,7 +168,10 @@ class RenderSystem : RegisteringSystem() {
     }
 
     private fun draw(entity: Entity, batch: SpriteBatch) {
-        entity.maybeExtract<SpriteComponent>()?.sprite?.draw(batch)
+        entity.maybeExtract<SpriteComponent>()?.let { spriteComponent ->
+            val position = entity.maybeExtract<PositionComponent>()?.xy ?: Vector2.Zero
+            batch.draw(spriteComponent.region, position.x, position.y + spriteComponent.height, spriteComponent.width, spriteComponent.height)
+        }
     }
 
     private class ExposedLayerDrawableEntity(

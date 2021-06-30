@@ -3,10 +3,7 @@ package ru.substancial.dreamwalkers.screen
 import box2dLight.RayHandler
 import com.badlogic.ashley.core.Engine
 import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.assets.loaders.AssetLoader
 import com.badlogic.gdx.controllers.Controllers
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.math.EarClippingTriangulator
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
@@ -33,7 +30,7 @@ import ru.substancial.dreamwalkers.utilities.IdentityRegistry
 class GameScreen(
     private val assetManager: DreamwalkersAssetManager,
     private val core: Core,
-    private val scenarioPath: String,
+    scenarioPath: String,
     scenarioName: String,
     saveFile: SaveFile?
 ) : HasDisplayScreenAdapter() {
@@ -111,7 +108,7 @@ class GameScreen(
             addSystem(WorldSystem(world))
             addSystem(CollisionSystem(world))
             addSystem(DamageSystem())
-            addSystem(LunaVitalitySystem(interactor))
+            addSystem(DeathSystem(interactor))
             addSystem(ScenarioCollisionSystem(scenarioHolder))
             addSystem(PositionSystem())
             addSystem(PositionalLightsSystem())
@@ -141,6 +138,7 @@ class GameScreen(
     }
 
     override fun dispose() {
+        levelLoader.unloadLevel()
         engine.removeAllEntities()
         engine.systems.forEach(engine::removeSystem)
         world.dispose()

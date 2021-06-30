@@ -18,6 +18,7 @@ import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.has
 import ru.substancial.dreamwalkers.ecs.maybeExtract
+import ru.substancial.dreamwalkers.ecs.other.PointsPool
 import ru.substancial.dreamwalkers.files.NightsEdgeLoader
 import ru.substancial.dreamwalkers.physics.BodyProp
 import ru.substancial.dreamwalkers.physics.Filters
@@ -139,7 +140,7 @@ class EntitySpawner(
         }
         val armor = ArmorProperties.HasArmor(1f, 7.5f)
         val fragments = mapOf(hurtbox to HurtboxFragment(1f, armor))
-        entity.add(HurtboxComponent(mutableSetOf(), fragments))
+        entity.add(HurtboxComponent(fragments))
         entity.add(BodyComponent(pushbox))
         entity.add(PositionComponent())
         entity.add(TerrainMovementComponent(maxSpeed, mass, false))
@@ -162,6 +163,7 @@ class EntitySpawner(
         entity.add(LookComponent())
         entity.add(IdentityComponent("Luna"))
         entity.add(DashComponent(1.0f))
+        entity.add(PrismaticComponent(PointsPool.Full(10f), PointsPool.Full(10f), 1f))
         equip(entity, Assets.Armory.Sword)
         return entity
     }

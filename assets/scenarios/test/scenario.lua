@@ -16,8 +16,9 @@ function on_level_ready(invoker)
 end
 
 function test_spawn(invoker)
-    invoker:getInteractor():unloadLevel()
-    invoker:getInteractor():loadLevel("observatory")
+    local lunaEntity = invoker:getRegistry():get("Luna")
+    local prism = prismatic_mapper:get(lunaEntity)
+    prism:damageFor(30.0)
 end
 
 function update(delta)

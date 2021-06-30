@@ -6,10 +6,11 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.physics.box2d.Body
 import ru.substancial.dreamwalkers.physics.destroy
 
-class HurtboxComponent(
-    val hitBy: MutableSet<Entity>,
+class HurtboxComponent constructor(
     val hurtboxes: Map<Body, HurtboxFragment>
 ) : Component, DisposableComponent {
+
+    val hitBy: MutableSet<HitboxComponent> = mutableSetOf()
 
     override fun dispose() {
         hurtboxes.keys.forEach(Body::destroy)

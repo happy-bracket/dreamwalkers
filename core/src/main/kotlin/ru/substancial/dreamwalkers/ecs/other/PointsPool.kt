@@ -1,11 +1,4 @@
-package ru.substancial.dreamwalkers.ecs.component
-
-import com.badlogic.ashley.core.Component
-
-class LunaVitalityComponent(
-    val health: PointsPool,
-    val shield: PointsPool
-) : Component
+package ru.substancial.dreamwalkers.ecs.other
 
 class PointsPool(
     val capacity: Float,
@@ -30,5 +23,11 @@ class PointsPool(
     }
 
     fun isFull() = _points == capacity
+
+    companion object {
+
+        fun Full(capacity: Float): PointsPool = PointsPool(capacity, capacity)
+
+    }
 
 }

@@ -7,22 +7,22 @@ import com.badlogic.gdx.physics.box2d.Fixture
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.has
+import ru.substancial.dreamwalkers.level.ScenarioCallbacks
 import ru.substancial.dreamwalkers.physics.entity
 import ru.substancial.dreamwalkers.utilities.RegisteringSystem
+import ru.substancial.dreamwalkers.utilities.justListen
 import ru.substancial.dreamwalkers.utilities.setVelocityViaImpulse
 import java.util.*
 
 class DamageSystem : RegisteringSystem() {
 
-    private val listener by listener(
+    private val listener by justListen(
         Family.all(ContactComponent::class.java).get(),
-        LinkedList<OpeningWound>(),
-        { ws, e -> tryProcessContact(ws, e.extract(), true) },
-        { ws, e -> tryProcessContact(ws, e.extract(), false) },
-        { ws -> ws.clear() }
+        { e -> tryProcessContact(e.extract(), true) },
+        { e -> tryProcessContact(e.extract(), false) }
     )
 
-    private fun tryProcessContact(wounds: LinkedList<OpeningWound>, contact: ContactComponent, begin: Boolean) {
+    private fun tryProcessContact(contact: ContactComponent, begin: Boolean) {
         if (!contact.isTouching) return
         val fa = contact.fixtureA
         val fb = contact.fixtureB
@@ -50,9 +50,8 @@ class DamageSystem : RegisteringSystem() {
         val hitbox = hitboxEntity.extract<HitboxComponent>()
         val hurtbox = hurtboxEntity.extract<HurtboxComponent>()
         if (hitbox.owner === hurtboxEntity) return
-        if (begin) {
-            if (hurtbox.hitBy.contains(hitboxEntity)) return
-            hurtbox.hitBy.add(hitboxEntity)
+        if (begin && !hurtbox.hitBy.contains(hitbox)) {
+            hurtbox.hitBy.add(hitbox)
             val hurtboxFragment = hurtbox.hurtboxes.getValue(hurtboxBody)
             val hitboxBody = hitboxEntity.extract<BodyComponent>().pushbox
 
@@ -62,23 +61,12 @@ class DamageSystem : RegisteringSystem() {
                     val impact = getImpact(hitboxBody, hitbox.fragments.getValue(hitboxFixture))
                     if (!processArmor(impact, hurtboxFragment, hitboxBody)) return
                     processHurtbox(impact, hurtboxFragment, hurtboxEntity)
-                    if (prism.shield.points <= impact) {
-                        prism.integrity.decreaseBy(impact - prism.shield.points)
-                        prism.shield.set(0f)
-                    } else {
-                        prism.shield.decreaseBy(impact)
-                    }
-                    if (prism.isBroken()) {
-                        engine.removeEntity(hurtboxEntity)
-                    }
-                    wounds.add(OpeningWound(hitboxEntity, hurtboxEntity, impact))
+                    prism.damageFor(impact)
                 }
             }
 
         } else {
-            hurtbox.hitBy.remove(hitboxEntity)
-            val wound = wounds.firstOrNull { it.target === hurtboxEntity && it.weapon === hitboxEntity } ?: return
-            wounds.remove(wound)
+            hurtbox.hitBy.remove(hitbox)
         }
     }
 
@@ -100,11 +88,5 @@ class DamageSystem : RegisteringSystem() {
             true
         } else false
     }
-
-    class OpeningWound(
-        val weapon: Entity,
-        val target: Entity,
-        val impact: Float
-    )
 
 }

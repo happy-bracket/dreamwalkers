@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
 import com.badlogic.gdx.scenes.scene2d.ui.Skin
 import com.badlogic.gdx.scenes.scene2d.ui.Table
+import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
 import ru.substancial.dreamwalkers.Assets
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
@@ -19,6 +20,7 @@ import ru.substancial.dreamwalkers.ecs.component.CameraComponent
 import ru.substancial.dreamwalkers.ecs.component.LevelComponent
 import ru.substancial.dreamwalkers.ecs.component.RayHandlerComponent
 import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
+import ru.substancial.dreamwalkers.ecs.other.AvailableInteractions
 import ru.substancial.dreamwalkers.ecs.system.*
 import ru.substancial.dreamwalkers.files.DreamwalkersAssetManager
 import ru.substancial.dreamwalkers.files.NightsEdgeLoader
@@ -52,6 +54,8 @@ class GameScreen(
 
     private val skin: Skin = assetManager[Assets.Skin]
     private val stage = Stage()
+
+    private val interactions: AvailableInteractions
 
     private val scenarioHolder: ScenarioHolder
     private val registry: IdentityRegistry = IdentityRegistry()
@@ -92,6 +96,8 @@ class GameScreen(
             )
         )
 
+        interactions = AvailableInteractions(VerticalGroup(), scenarioHolder, skin)
+
         addEssentialEntities()
 
         engine.apply {
@@ -113,7 +119,7 @@ class GameScreen(
             addSystem(PositionSystem())
             addSystem(PositionalLightsSystem())
             addSystem(HurtboxFollowSystem())
-            addSystem(InteractionSystem())
+            addSystem(InteractionSystem(world, interactions))
             addSystem(CameraSystem())
             addSystem(DisplaySystem(dashCooldown))
             addSystem(DebugRenderSystem(world, debugRenderer))

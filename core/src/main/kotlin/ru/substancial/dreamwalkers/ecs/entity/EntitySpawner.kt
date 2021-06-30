@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.MathUtils
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.*
 import ktx.box2d.body
+import ktx.box2d.circle
 import ktx.box2d.filter
 import ktx.box2d.ropeJointWith
 import ru.substancial.dreamwalkers.Assets
@@ -35,40 +36,6 @@ class EntitySpawner(
 ) {
 
     private val triangulator by lazy { DelaunayTriangulator() }
-
-    fun addInteraction(
-        entity: Entity,
-        callbackName: String,
-        prompt: String,
-        radius: Float
-    ) {
-        val interaction = entity.maybeExtract<InteractionComponent>() ?: run {
-            Gdx.app.error("EntitySpawner", "tried to add interaction to entity that is not interactive; skip")
-            return
-        }
-        val fd = FixtureDef()
-        fd.shape = CircleShape().apply { this.radius = radius }
-        fd.isSensor = true
-        fd.filter {
-            categoryBits = Filters.Interactive
-            maskBits = Filters.Pushbox
-        }
-        val fixture = interaction.sensorBody.createFixture(fd)
-        interaction.interactions[fixture] = Interaction(callbackName, prompt)
-    }
-
-    fun makeInteractive(
-        entity: Entity,
-        interactiveName: String
-    ) {
-        if (entity.has<InteractionComponent>()) {
-            Gdx.app.debug("EntitySpawner", "tried to make an entity interactive, but it already was; skip")
-        }
-        val sensorBody = world.body {
-            this.userData = entity
-        }
-        entity.add(InteractionComponent(sensorBody, interactiveName))
-    }
 
     fun spawn(
         width: Float,

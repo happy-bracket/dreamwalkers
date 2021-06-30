@@ -14,6 +14,7 @@ class InteractionComponent(
 }
 
 class Interaction(
+    val id: String,
     val functionName: String,
     val prompt: String
 )

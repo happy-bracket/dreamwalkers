@@ -19,7 +19,7 @@ class ScenarioHolder(
 
     private val globals = JsePlatform.standardGlobals()
 
-    private val invoker = Invoker(null, null, interactor, engine, registry, spawner, null)
+    private val invoker = Invoker(null, null, interactor, engine, registry, spawner,null)
     private val invokerLua = invoker.lua
 
     init {
@@ -52,12 +52,16 @@ class ScenarioHolder(
         invoker.target = null
     }
 
+    fun call(functionName: String) {
+        globals[functionName]?.invoke(invokerLua)
+    }
+
 }
 
 class Invoker(
         var initiator: Entity?,
         var target: Entity?,
-        val interactor: ScenarioCallbacks,
+        val callbacks: ScenarioCallbacks,
         val engine: Engine,
         val registry: IdentityRegistry,
         val spawner: EntitySpawner,

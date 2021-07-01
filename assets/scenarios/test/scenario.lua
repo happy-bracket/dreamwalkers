@@ -1,7 +1,7 @@
 require "scripting_utils/components"
 
 function init(invoker)
-    local level = invoker:getInteractor():loadLevel("observatory")
+    local level = invoker:getCallbacks():loadLevel("observatory")
 end
 
 function on_level_ready(invoker)

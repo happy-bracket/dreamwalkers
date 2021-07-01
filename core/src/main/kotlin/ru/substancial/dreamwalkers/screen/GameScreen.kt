@@ -9,10 +9,8 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer
 import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
-import com.badlogic.gdx.scenes.scene2d.ui.ProgressBar
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
-import com.badlogic.gdx.scenes.scene2d.ui.Table
-import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup
+import com.badlogic.gdx.scenes.scene2d.ui.*
+import com.badlogic.gdx.utils.Align
 import ru.substancial.dreamwalkers.Assets
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
@@ -28,6 +26,7 @@ import ru.substancial.dreamwalkers.level.*
 import ru.substancial.dreamwalkers.utilities.ClearScreen
 import ru.substancial.dreamwalkers.utilities.EntityOf
 import ru.substancial.dreamwalkers.utilities.IdentityRegistry
+import ru.substancial.dreamwalkers.utilities.cast
 
 class GameScreen(
     private val assetManager: DreamwalkersAssetManager,
@@ -70,18 +69,48 @@ class GameScreen(
         core.commandExecutor.currentEngine = engine
 
         // region UI
-        val root = Table()
+        // region TopLeft
+        val dashCooldown = ProgressBar(0f, 1f, 0.01f, true, skin)
+        val dashContainer = Container(dashCooldown)
+        dashContainer.size(64f)
+
+        val healthBar = ProgressBar(0f, 1f, 0.01f, false, skin)
+        val shieldsBar = ProgressBar(0f, 1f, 0.01f, false, skin)
+        val manaBar = ProgressBar(0f, 1f, 0.01f, false, skin)
+        val barsContainer = VerticalGroup()
+        barsContainer.addActor(healthBar)
+        barsContainer.addActor(shieldsBar)
+        barsContainer.addActor(manaBar)
+        barsContainer.width = 128f
+        barsContainer.height = 64f
+
+        val topLeftContainer = HorizontalGroup()
+        topLeftContainer.addActor(dashContainer)
+        topLeftContainer.addActor(barsContainer)
+        topLeftContainer.align(Align.topLeft)
+        // endregion
+
+        // region BottomLeft
+        val interactionsHint = Label("Interactions", skin)
+        val interactionsContainer = Container(interactionsHint)
+        interactionsContainer.size(64f).align(Align.bottomLeft)
+        // endregion
+
+        // region TopRight
+        val castingBuffer = Label("CastingBuffer", skin)
+        val castingBufferContainer = Container(castingBuffer)
+        castingBufferContainer.width(128f).height(32f).align(Align.topRight)
+        // endregion
+
+        // region BottomRight
+        val weaponHint = Label("Weapon", skin)
+        val weaponHintContainer = Container(weaponHint)
+        weaponHintContainer.size(64f).align(Align.bottomRight)
+        // endregion
+
+        val root = Stack(topLeftContainer, interactionsContainer, castingBufferContainer, weaponHintContainer)
         root.setFillParent(true)
         stage.addActor(root)
-
-        root.row()
-
-        val dashCooldown = ProgressBar(0f, 1f, 0.01f, false, skin)
-        root.add(dashCooldown)
-
-        dashCooldown.isVisible = false // temporal
-
-        stage.isDebugAll = true
         //endregion
 
         val interactor = GameScenarioCallbacks()

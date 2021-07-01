@@ -41,7 +41,7 @@ class CastingSystem(
     private fun commit() {
         bindingsContainer?.extract<CastingBindingsComponent>()?.bindings?.get(buffer)?.exec?.invoke(engine)
         buffer.clear()
-        display.clear()
+        display.clearBuffer()
     }
 
 }

@@ -23,6 +23,7 @@ import ru.substancial.dreamwalkers.ecs.system.*
 import ru.substancial.dreamwalkers.files.DreamwalkersAssetManager
 import ru.substancial.dreamwalkers.files.NightsEdgeLoader
 import ru.substancial.dreamwalkers.level.*
+import ru.substancial.dreamwalkers.ui.DevCastingBufferDisplay
 import ru.substancial.dreamwalkers.utilities.ClearScreen
 import ru.substancial.dreamwalkers.utilities.EntityOf
 import ru.substancial.dreamwalkers.utilities.IdentityRegistry
@@ -97,7 +98,7 @@ class GameScreen(
         // endregion
 
         // region TopRight
-        val castingBuffer = Label("CastingBuffer", skin)
+        val castingBuffer = DevCastingBufferDisplay(skin)
         val castingBufferContainer = Container(castingBuffer)
         castingBufferContainer.width(128f).height(32f).align(Align.topRight)
         // endregion
@@ -130,6 +131,7 @@ class GameScreen(
         addEssentialEntities()
 
         engine.apply {
+            addSystem(CastingSystem(controller, castingBuffer))
             addSystem(WeaponSystem(controller))
             addSystem(LunaLookSystem(controller))
             addSystem(GroundFrictionSystem())

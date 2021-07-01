@@ -152,7 +152,7 @@ class GameScreen(
             addSystem(HurtboxFollowSystem())
             addSystem(InteractionSystem(world, interactions))
             addSystem(CameraSystem())
-            addSystem(DisplaySystem(dashCooldown))
+            addSystem(DisplaySystem(dashCooldown, healthBar, shieldsBar, manaBar))
             addSystem(DebugRenderSystem(world, debugRenderer))
             addSystem(RenderSystem(assetManager))
             addSystem(DisposalSystem())

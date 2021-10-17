@@ -201,7 +201,6 @@ class GameScreen(
         val skeleton = Skeleton(lunaSkeletonData)
         val scaleX = 3.6f / skeleton.data.width
         val scaleY = 3.4f / skeleton.data.height
-        //skeleton.setScale(scaleX, scaleY)
         val animationStateData = AnimationStateData(lunaSkeletonData)
         animationStateData.defaultMix = 0.2f
         val animationState = AnimationState(animationStateData)

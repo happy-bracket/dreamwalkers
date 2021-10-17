@@ -10,8 +10,10 @@ import ru.substancial.dreamwalkers.utilities.RegisteringSystem
 class SkeletonSystem : RegisteringSystem() {
 
     private val entities by multiple(Family.all(SkeletonComponent::class.java).get())
+    private var totalTime = 0f
 
     override fun update(deltaTime: Float) {
+        totalTime += deltaTime
         entities.forEach {
             val component = it.extract<SkeletonComponent>()
             val animationState = component.animationState
@@ -19,9 +21,8 @@ class SkeletonSystem : RegisteringSystem() {
             it.maybeExtract<PositionComponent>()?.let { (x, y) ->
                 skeleton.setPosition(x, y)
             }
-            animationState.update(deltaTime)
+            animationState.update(totalTime)
             animationState.apply(skeleton)
-            animationState.getCurrent(0)
             skeleton.updateWorldTransform()
         }
     }

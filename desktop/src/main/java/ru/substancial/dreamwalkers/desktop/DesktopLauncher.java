@@ -21,7 +21,7 @@ public class DesktopLauncher {
         configuration.width = 1280;
         configuration.height = 720;
         // TODO: remove for release
-        configuration.x = 2160 + 1920 / 2;
+        configuration.x = 500; //2160 + 1920 / 2;
         configuration.y = 320;
         for (int size : new int[] { 128, 64, 32, 16 }) {
             configuration.addIcon("libgdx" + size + ".png", FileType.Internal);

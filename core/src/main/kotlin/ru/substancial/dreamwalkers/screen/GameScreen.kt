@@ -2,6 +2,7 @@ package ru.substancial.dreamwalkers.screen
 
 import box2dLight.RayHandler
 import com.badlogic.ashley.core.Engine
+import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.controllers.Controllers
 import com.badlogic.gdx.math.EarClippingTriangulator
@@ -11,12 +12,15 @@ import com.badlogic.gdx.physics.box2d.World
 import com.badlogic.gdx.scenes.scene2d.Stage
 import com.badlogic.gdx.scenes.scene2d.ui.*
 import com.badlogic.gdx.utils.Align
+import com.esotericsoftware.spine.AnimationState
+import com.esotericsoftware.spine.AnimationStateData
+import com.esotericsoftware.spine.Skeleton
+import com.esotericsoftware.spine.SkeletonData
+import com.esotericsoftware.spine.utils.SkeletonDataLoader
 import ru.substancial.dreamwalkers.Assets
 import ru.substancial.dreamwalkers.Core
 import ru.substancial.dreamwalkers.controls.TheController
-import ru.substancial.dreamwalkers.ecs.component.CameraComponent
-import ru.substancial.dreamwalkers.ecs.component.LevelComponent
-import ru.substancial.dreamwalkers.ecs.component.RayHandlerComponent
+import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.entity.EntitySpawner
 import ru.substancial.dreamwalkers.ecs.other.AvailableInteractions
 import ru.substancial.dreamwalkers.ecs.system.*
@@ -66,6 +70,11 @@ class GameScreen(
     private var stateReady = false
 
     init {
+        assetManager.load(
+            Assets.Luna.Skeleton, SkeletonData::class.java,
+            SkeletonDataLoader.SkeletonDataParameter(Assets.Luna.Atlas)
+        )
+
         Controllers.addListener(controller)
         core.commandExecutor.currentEngine = engine
 
@@ -151,6 +160,7 @@ class GameScreen(
             addSystem(PositionalLightsSystem())
             addSystem(HurtboxFollowSystem())
             addSystem(InteractionSystem(world, interactions))
+            addSystem(SkeletonSystem())
             addSystem(CameraSystem())
             addSystem(DisplaySystem(dashCooldown, healthBar, shieldsBar, manaBar))
             addSystem(DebugRenderSystem(world, debugRenderer))
@@ -164,6 +174,7 @@ class GameScreen(
     override fun render(delta: Float) {
         if (stateReady) {
             ClearScreen()
+            finishSetup()
             scenarioHolder.update(delta)
             engine.update(delta)
             stage.act(delta)
@@ -183,6 +194,20 @@ class GameScreen(
         Controllers.clearListeners()
         core.commandExecutor.currentEngine = null
         rayHandler.dispose()
+    }
+
+    private fun finishSetup() {
+        val lunaSkeletonData = assetManager[Assets.Luna.Skeleton, SkeletonData::class.java]
+        val skeleton = Skeleton(lunaSkeletonData)
+        val scaleX = 3.6f / skeleton.data.width
+        val scaleY = 3.4f / skeleton.data.height
+        //skeleton.setScale(scaleX, scaleY)
+        val animationStateData = AnimationStateData(lunaSkeletonData)
+        animationStateData.defaultMix = 0.2f
+        val animationState = AnimationState(animationStateData)
+        engine.getEntitiesFor(Family.all(LunaComponent::class.java).get()).first()
+            .add(SkeletonComponent(skeleton, animationState, Vector2((scaleX * lunaSkeletonData.width) / 2, (scaleY * lunaSkeletonData.height) / 2)))
+        animationState.setAnimation(0, "walk", true)
     }
 
     private fun addEssentialEntities() {

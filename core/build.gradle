@@ -19,4 +19,5 @@ dependencies {
     implementation "com.badlogicgames.gdx-controllers:gdx-controllers-core:$gdxControllersVersion"
     implementation name: 'luaj-jse-3.0.1'
     implementation name: 'luaj-sources-3.0.1'
+    compile "com.esotericsoftware.spine:spine-libgdx:4.0.18.1"
 }

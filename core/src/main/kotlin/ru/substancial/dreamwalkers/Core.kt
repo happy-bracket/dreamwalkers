@@ -1,8 +1,8 @@
 package ru.substancial.dreamwalkers
 
 import com.badlogic.gdx.*
-import com.badlogic.gdx.assets.AssetManager
-import com.badlogic.gdx.scenes.scene2d.ui.Skin
+import com.esotericsoftware.spine.SkeletonData
+import com.esotericsoftware.spine.utils.SkeletonDataLoader
 import com.strongjoshua.console.Console
 import com.strongjoshua.console.GUIConsole
 import com.strongjoshua.console.LogLevel
@@ -30,6 +30,8 @@ class Core : Game() {
     }
 
     override fun create() {
+        assetManager.setLoader(SkeletonData::class.java, SkeletonDataLoader(assetManager.fileHandleResolver))
+
         Gdx.input.inputProcessor = InputMultiplexer()
         setScreen(ScreenImage.Splash)
         console = GUIConsole(assetManager[Assets.Skin], false)

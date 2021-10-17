@@ -7,20 +7,21 @@ import com.badlogic.ashley.core.Engine
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.Texture
-import com.badlogic.gdx.graphics.g2d.Sprite
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.g2d.PolygonSpriteBatch
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.MapObject
 import com.badlogic.gdx.maps.objects.RectangleMapObject
 import com.badlogic.gdx.maps.tiled.TiledMap
-import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject
 import com.badlogic.gdx.math.Vector2
+import com.esotericsoftware.spine.SkeletonRenderer
 import ru.substancial.dreamwalkers.ecs.component.*
 import ru.substancial.dreamwalkers.ecs.extract
 import ru.substancial.dreamwalkers.ecs.maybeExtract
 import ru.substancial.dreamwalkers.files.DreamwalkersAssetManager
-import ru.substancial.dreamwalkers.utilities.*
+import ru.substancial.dreamwalkers.utilities.RegisteringSystem
+import ru.substancial.dreamwalkers.utilities.extractIdentityInto
+import ru.substancial.dreamwalkers.utilities.extractPositionInto
+import ru.substancial.dreamwalkers.utilities.justListen
 import java.util.*
 import java.util.regex.Pattern
 
@@ -28,7 +29,7 @@ class RenderSystem(private val assetManager: DreamwalkersAssetManager) : Registe
 
     private val cameraEntity by singular(Family.all(CameraComponent::class.java).get())
     private val drawables by listener(
-        Family.one(SpriteComponent::class.java).get(),
+        Family.one(SpriteComponent::class.java, SkeletonComponent::class.java).get(),
         LinkedList(),
         ::addEntity,
         { m, e -> m.removeIf { drawable -> drawable.entity == e } },
@@ -41,7 +42,8 @@ class RenderSystem(private val assetManager: DreamwalkersAssetManager) : Registe
         onAdded = ::inflateDrawingEntities
     )
 
-    private val batch = SpriteBatch()
+    private val batch = PolygonSpriteBatch()
+    private val renderer = SkeletonRenderer().also { it.setPremultipliedAlpha(true) }
 
     override fun addedToEngine(engine: Engine) {
         super.addedToEngine(engine)
@@ -167,10 +169,14 @@ class RenderSystem(private val assetManager: DreamwalkersAssetManager) : Registe
         cache.addLast(represented)
     }
 
-    private fun draw(entity: Entity, batch: SpriteBatch) {
+    private fun draw(entity: Entity, batch: PolygonSpriteBatch) {
+        val position = entity.maybeExtract<PositionComponent>()?.xy ?: Vector2.Zero
         entity.maybeExtract<SpriteComponent>()?.let { spriteComponent ->
-            val position = entity.maybeExtract<PositionComponent>()?.xy ?: Vector2.Zero
             batch.draw(spriteComponent.region, position.x, position.y + spriteComponent.height, spriteComponent.width, spriteComponent.height)
+        }
+        entity.maybeExtract<SkeletonComponent>()?.let { skeletonComponent ->
+            val skeleton = skeletonComponent.skeleton
+            renderer.draw(batch, skeleton)
         }
     }
 
